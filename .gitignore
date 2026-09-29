@@ -72,3 +72,7 @@ website/package-lock.json
 
 # Python
 __pycache__/
+
+# Submission packages (zip, pdf)
+submission/
+submissions/
