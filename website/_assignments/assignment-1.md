@@ -35,7 +35,9 @@ Sergei Prokudin-Gorskii (1863-1944) was convinced early on that colour photograp
 
 The goal of this assignment is to turn a digitized plate into a single colour image automatically, with as few visual artifacts as possible. Each plate is split into three equal parts (B, G, R), and the G and R channels are aligned to B. The alignment model is a pure x, y translation: for each channel, find the shift that makes it line up with the blue channel.
 
-The data set has 12 small plates (about 400 x 1024 px, so each channel is about 400 x 341) and 6 full-size scans (about 3700 x 9700 px, channels about 3700 x 3230). Two things make the alignment harder than it sounds:
+The data set has 12 small plates (about 400 x 1024 px, so each channel is about 400 x 341) and 6 full-size scans (about 3700 x 9700 px, channels about 3700 x 3230). Every method was run on all of them. To keep the page manageable, images are shown for six plates: 00056v, 00804v, and 31421v (small) and 00458u, 01657u, and 01725u (full-size). The results tables in section 7 only include these six plates.
+
+Two things make the alignment harder than it sounds:
 
 - The channels were exposed separately, so the same object has a different brightness in each one.
 - The plate borders are damaged and uneven, and they don't line up across channels.
@@ -62,16 +64,7 @@ Stacking the channels exactly as they come off the plate shows how far apart the
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/baseline/00056v.jpg" alt="00056v"><figcaption>00056v</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/00125v.jpg" alt="00125v"><figcaption>00125v</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/00163v.jpg" alt="00163v"><figcaption>00163v</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/baseline/00804v.jpg" alt="00804v"><figcaption>00804v</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01164v.jpg" alt="01164v"><figcaption>01164v</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01269v.jpg" alt="01269v"><figcaption>01269v</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01522v.jpg" alt="01522v"><figcaption>01522v</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01597v.jpg" alt="01597v"><figcaption>01597v</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01598v.jpg" alt="01598v"><figcaption>01598v</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01728v.jpg" alt="01728v"><figcaption>01728v</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/10131v.jpg" alt="10131v"><figcaption>10131v</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/baseline/31421v.jpg" alt="31421v"><figcaption>31421v</figcaption></figure>
 </div>
 
@@ -81,11 +74,8 @@ The full-size images are scaled down for the web.
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/baseline/00458u.jpg" alt="00458u"><figcaption>00458u</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01007a.jpg" alt="01007a"><figcaption>01007a</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01047u.jpg" alt="01047u"><figcaption>01047u</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/baseline/01657u.jpg" alt="01657u"><figcaption>01657u</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/baseline/01725u.jpg" alt="01725u"><figcaption>01725u</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01861a.jpg" alt="01861a"><figcaption>01861a</figcaption></figure>
 </div>
 
 ## 3. Single-Scale L2 and NCC
@@ -116,84 +106,12 @@ Offsets below are the (x, y) shift in pixels applied to the G or R channel to li
   <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00056v_ncc.jpg" alt="NCC: G (1, 6), R (1, 13), 1.5 s"><figcaption>NCC: G (1, 6), R (1, 13), 1.5 s</figcaption></figure>
 </div>
 
-#### 00125v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/00125v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00125v_l2.jpg" alt="L2: G (2, 5), R (1, 10), 0.5 s"><figcaption>L2: G (2, 5), R (1, 10), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00125v_ncc.jpg" alt="NCC: G (2, 5), R (1, 10), 1.2 s"><figcaption>NCC: G (2, 5), R (1, 10), 1.2 s</figcaption></figure>
-</div>
-
-#### 00163v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/00163v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00163v_l2.jpg" alt="L2: G (1, -3), R (1, -4), 0.5 s"><figcaption>L2: G (1, -3), R (1, -4), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00163v_ncc.jpg" alt="NCC: G (1, -3), R (1, -4), 1.1 s"><figcaption>NCC: G (1, -3), R (1, -4), 1.1 s</figcaption></figure>
-</div>
-
 #### 00804v
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/baseline/00804v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00804v_l2.jpg" alt="L2: G (-2, 6), R (-4, 13), 0.5 s"><figcaption>L2: G (-2, 6), R (-4, 13), 0.5 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00804v_ncc.jpg" alt="NCC: G (-2, 6), R (-4, 13), 1.2 s"><figcaption>NCC: G (-2, 6), R (-4, 13), 1.2 s</figcaption></figure>
-</div>
-
-#### 01164v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01164v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01164v_l2.jpg" alt="L2: G (2, 6), R (3, 11), 0.4 s"><figcaption>L2: G (2, 6), R (3, 11), 0.4 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01164v_ncc.jpg" alt="NCC: G (2, 6), R (3, 11), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 11), 1.1 s</figcaption></figure>
-</div>
-
-#### 01269v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01269v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01269v_l2.jpg" alt="L2: G (2, 6), R (3, 14), 0.4 s"><figcaption>L2: G (2, 6), R (3, 14), 0.4 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01269v_ncc.jpg" alt="NCC: G (2, 6), R (3, 13), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 13), 1.1 s</figcaption></figure>
-</div>
-
-#### 01522v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01522v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01522v_l2.jpg" alt="L2: G (2, 6), R (1, 13), 0.5 s"><figcaption>L2: G (2, 6), R (1, 13), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01522v_ncc.jpg" alt="NCC: G (2, 6), R (2, 13), 1.1 s"><figcaption>NCC: G (2, 6), R (2, 13), 1.1 s</figcaption></figure>
-</div>
-
-#### 01597v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01597v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01597v_l2.jpg" alt="L2: G (1, 7), R (1, 16), 0.4 s"><figcaption>L2: G (1, 7), R (1, 16), 0.4 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01597v_ncc.jpg" alt="NCC: G (1, 7), R (1, 16), 1.2 s"><figcaption>NCC: G (1, 7), R (1, 16), 1.2 s</figcaption></figure>
-</div>
-
-#### 01598v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01598v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01598v_l2.jpg" alt="L2: G (0, 8), R (-1, 17), 0.5 s"><figcaption>L2: G (0, 8), R (-1, 17), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01598v_ncc.jpg" alt="NCC: G (0, 8), R (-1, 16), 1.2 s"><figcaption>NCC: G (0, 8), R (-1, 16), 1.2 s</figcaption></figure>
-</div>
-
-#### 01728v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01728v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01728v_l2.jpg" alt="L2: G (1, 8), R (1, 18), 0.4 s"><figcaption>L2: G (1, 8), R (1, 18), 0.4 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/01728v_ncc.jpg" alt="NCC: G (1, 8), R (1, 18), 1.1 s"><figcaption>NCC: G (1, 8), R (1, 18), 1.1 s</figcaption></figure>
-</div>
-
-#### 10131v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/10131v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/10131v_l2.jpg" alt="L2: G (2, 6), R (3, 12), 0.5 s"><figcaption>L2: G (2, 6), R (3, 12), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/10131v_ncc.jpg" alt="NCC: G (2, 6), R (3, 12), 1.2 s"><figcaption>NCC: G (2, 6), R (3, 12), 1.2 s</figcaption></figure>
 </div>
 
 #### 31421v
@@ -224,101 +142,7 @@ This is a recursive wrapper around the single-scale search from section 3, with 
 
 This section uses a 20% crop instead of 10%. With 10%, L2 put the red channel of 01269v at (-25, 25), a corner of the search window, while NCC found the right answer: the wider window lets L2 lock onto the plate borders. A 20% crop fixes it and changes every other offset by at most 2 px.
 
-#### 00056v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/00056v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00056v_l2.jpg" alt="L2: G (1, 6), R (1, 13), 0.5 s"><figcaption>L2: G (1, 6), R (1, 13), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00056v_ncc.jpg" alt="NCC: G (1, 6), R (1, 13), 1.1 s"><figcaption>NCC: G (1, 6), R (1, 13), 1.1 s</figcaption></figure>
-</div>
-
-#### 00125v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/00125v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00125v_l2.jpg" alt="L2: G (2, 5), R (1, 10), 0.5 s"><figcaption>L2: G (2, 5), R (1, 10), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00125v_ncc.jpg" alt="NCC: G (2, 5), R (1, 9), 1.1 s"><figcaption>NCC: G (2, 5), R (1, 9), 1.1 s</figcaption></figure>
-</div>
-
-#### 00163v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/00163v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00163v_l2.jpg" alt="L2: G (1, -3), R (1, -4), 0.5 s"><figcaption>L2: G (1, -3), R (1, -4), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00163v_ncc.jpg" alt="NCC: G (1, -3), R (1, -4), 1.1 s"><figcaption>NCC: G (1, -3), R (1, -4), 1.1 s</figcaption></figure>
-</div>
-
-#### 00804v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/00804v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00804v_l2.jpg" alt="L2: G (-2, 6), R (-4, 13), 0.5 s"><figcaption>L2: G (-2, 6), R (-4, 13), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00804v_ncc.jpg" alt="NCC: G (-2, 6), R (-4, 13), 1.1 s"><figcaption>NCC: G (-2, 6), R (-4, 13), 1.1 s</figcaption></figure>
-</div>
-
-#### 01164v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01164v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01164v_l2.jpg" alt="L2: G (2, 6), R (3, 11), 0.5 s"><figcaption>L2: G (2, 6), R (3, 11), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01164v_ncc.jpg" alt="NCC: G (2, 6), R (3, 11), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 11), 1.1 s</figcaption></figure>
-</div>
-
-#### 01269v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01269v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01269v_l2.jpg" alt="L2: G (2, 6), R (3, 14), 0.5 s"><figcaption>L2: G (2, 6), R (3, 14), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01269v_ncc.jpg" alt="NCC: G (2, 6), R (3, 14), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 14), 1.1 s</figcaption></figure>
-</div>
-
-#### 01522v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01522v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01522v_l2.jpg" alt="L2: G (2, 6), R (2, 13), 0.5 s"><figcaption>L2: G (2, 6), R (2, 13), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01522v_ncc.jpg" alt="NCC: G (2, 6), R (2, 13), 1.1 s"><figcaption>NCC: G (2, 6), R (2, 13), 1.1 s</figcaption></figure>
-</div>
-
-#### 01597v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01597v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01597v_l2.jpg" alt="L2: G (1, 7), R (1, 16), 0.5 s"><figcaption>L2: G (1, 7), R (1, 16), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01597v_ncc.jpg" alt="NCC: G (1, 7), R (1, 16), 1.1 s"><figcaption>NCC: G (1, 7), R (1, 16), 1.1 s</figcaption></figure>
-</div>
-
-#### 01598v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01598v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01598v_l2.jpg" alt="L2: G (0, 8), R (-1, 17), 0.5 s"><figcaption>L2: G (0, 8), R (-1, 17), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01598v_ncc.jpg" alt="NCC: G (0, 8), R (-1, 16), 1.1 s"><figcaption>NCC: G (0, 8), R (-1, 16), 1.1 s</figcaption></figure>
-</div>
-
-#### 01728v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01728v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01728v_l2.jpg" alt="L2: G (1, 8), R (1, 18), 0.5 s"><figcaption>L2: G (1, 8), R (1, 18), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01728v_ncc.jpg" alt="NCC: G (1, 8), R (1, 18), 1.1 s"><figcaption>NCC: G (1, 8), R (1, 18), 1.1 s</figcaption></figure>
-</div>
-
-#### 10131v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/10131v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/10131v_l2.jpg" alt="L2: G (2, 6), R (3, 12), 0.5 s"><figcaption>L2: G (2, 6), R (3, 12), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/10131v_ncc.jpg" alt="NCC: G (2, 5), R (3, 12), 1.1 s"><figcaption>NCC: G (2, 5), R (3, 12), 1.1 s</figcaption></figure>
-</div>
-
-#### 31421v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/31421v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/31421v_l2.jpg" alt="L2: G (0, 8), R (0, 13), 0.5 s"><figcaption>L2: G (0, 8), R (0, 13), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/31421v_ncc.jpg" alt="NCC: G (0, 8), R (0, 13), 1.1 s"><figcaption>NCC: G (0, 8), R (0, 13), 1.1 s</figcaption></figure>
-</div>
+Only the full-size plates are shown here. The small plates are under 500 px, so for them the pyramid is the same single-scale search as section 3.
 
 #### 00458u (full-size)
 
@@ -326,22 +150,6 @@ This section uses a 20% crop instead of 10%. With 10%, L2 put the red channel of
   <figure><img loading="lazy" src="../images/assignment-1/baseline/00458u.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00458u_l2.jpg" alt="L2: G (6, 43), R (32, 87), 2.3 s"><figcaption>L2: G (6, 43), R (32, 87), 2.3 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/00458u_ncc.jpg" alt="NCC: G (6, 42), R (32, 87), 4.4 s"><figcaption>NCC: G (6, 42), R (32, 87), 4.4 s</figcaption></figure>
-</div>
-
-#### 01007a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01007a.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01007a_l2.jpg" alt="L2: G (13, 60), R (13, 129), 2.4 s"><figcaption>L2: G (13, 60), R (13, 129), 2.4 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01007a_ncc.jpg" alt="NCC: G (13, 60), R (13, 129), 4.6 s"><figcaption>NCC: G (13, 60), R (13, 129), 4.6 s</figcaption></figure>
-</div>
-
-#### 01047u (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01047u.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01047u_l2.jpg" alt="L2: G (20, 24), R (33, 71), 2.3 s"><figcaption>L2: G (20, 24), R (33, 71), 2.3 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01047u_ncc.jpg" alt="NCC: G (20, 24), R (33, 71), 4.5 s"><figcaption>NCC: G (20, 24), R (33, 71), 4.5 s</figcaption></figure>
 </div>
 
 #### 01657u (full-size)
@@ -358,14 +166,6 @@ This section uses a 20% crop instead of 10%. With 10%, L2 put the red channel of
   <figure><img loading="lazy" src="../images/assignment-1/baseline/01725u.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01725u_l2.jpg" alt="L2: G (45, 77), R (77, 162), 2.3 s"><figcaption>L2: G (45, 77), R (77, 162), 2.3 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01725u_ncc.jpg" alt="NCC: G (45, 77), R (78, 161), 4.4 s"><figcaption>NCC: G (45, 77), R (78, 161), 4.4 s</figcaption></figure>
-</div>
-
-#### 01861a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/baseline/01861a.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01861a_l2.jpg" alt="L2: G (38, 71), R (62, 147), 2.3 s"><figcaption>L2: G (38, 71), R (62, 147), 2.3 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/img_pyramid/01861a_ncc.jpg" alt="NCC: G (38, 71), R (62, 147), 4.5 s"><figcaption>NCC: G (38, 71), R (62, 147), 4.5 s</figcaption></figure>
 </div>
 
 Observations:
@@ -397,84 +197,12 @@ The pyramid settings are the same as in section 4 (window ±25 px, refine ±2 px
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00056v_ncc.jpg" alt="NCC: G (1, 5), R (1, 13), 1.2 s"><figcaption>NCC: G (1, 5), R (1, 13), 1.2 s</figcaption></figure>
 </div>
 
-#### 00125v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00125v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00125v_l2.jpg" alt="L2: G (2, 5), R (1, 10), 0.5 s"><figcaption>L2: G (2, 5), R (1, 10), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00125v_ncc.jpg" alt="NCC: G (2, 5), R (1, 10), 1.1 s"><figcaption>NCC: G (2, 5), R (1, 10), 1.1 s</figcaption></figure>
-</div>
-
-#### 00163v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00163v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00163v_l2.jpg" alt="L2: G (1, -2), R (1, -4), 0.5 s"><figcaption>L2: G (1, -2), R (1, -4), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00163v_ncc.jpg" alt="NCC: G (1, -2), R (1, -4), 1.1 s"><figcaption>NCC: G (1, -2), R (1, -4), 1.1 s</figcaption></figure>
-</div>
-
 #### 00804v
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00804v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00804v_l2.jpg" alt="L2: G (-2, 6), R (-4, 13), 0.5 s"><figcaption>L2: G (-2, 6), R (-4, 13), 0.5 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00804v_ncc.jpg" alt="NCC: G (-2, 6), R (-4, 13), 1.2 s"><figcaption>NCC: G (-2, 6), R (-4, 13), 1.2 s</figcaption></figure>
-</div>
-
-#### 01164v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01164v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01164v_l2.jpg" alt="L2: G (1, 6), R (3, 11), 0.5 s"><figcaption>L2: G (1, 6), R (3, 11), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01164v_ncc.jpg" alt="NCC: G (1, 6), R (3, 11), 1.2 s"><figcaption>NCC: G (1, 6), R (3, 11), 1.2 s</figcaption></figure>
-</div>
-
-#### 01269v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01269v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01269v_l2.jpg" alt="L2: G (2, 6), R (3, 14), 0.5 s"><figcaption>L2: G (2, 6), R (3, 14), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01269v_ncc.jpg" alt="NCC: G (2, 6), R (3, 14), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 14), 1.1 s</figcaption></figure>
-</div>
-
-#### 01522v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01522v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01522v_l2.jpg" alt="L2: G (2, 6), R (2, 13), 0.5 s"><figcaption>L2: G (2, 6), R (2, 13), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01522v_ncc.jpg" alt="NCC: G (2, 6), R (2, 13), 1.2 s"><figcaption>NCC: G (2, 6), R (2, 13), 1.2 s</figcaption></figure>
-</div>
-
-#### 01597v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01597v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01597v_l2.jpg" alt="L2: G (1, 7), R (1, 16), 0.5 s"><figcaption>L2: G (1, 7), R (1, 16), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01597v_ncc.jpg" alt="NCC: G (1, 7), R (1, 16), 1.1 s"><figcaption>NCC: G (1, 7), R (1, 16), 1.1 s</figcaption></figure>
-</div>
-
-#### 01598v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01598v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01598v_l2.jpg" alt="L2: G (0, 8), R (-1, 17), 0.5 s"><figcaption>L2: G (0, 8), R (-1, 17), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01598v_ncc.jpg" alt="NCC: G (0, 8), R (-1, 17), 1.2 s"><figcaption>NCC: G (0, 8), R (-1, 17), 1.2 s</figcaption></figure>
-</div>
-
-#### 01728v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01728v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01728v_l2.jpg" alt="L2: G (1, 8), R (1, 18), 0.5 s"><figcaption>L2: G (1, 8), R (1, 18), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01728v_ncc.jpg" alt="NCC: G (1, 8), R (1, 18), 1.1 s"><figcaption>NCC: G (1, 8), R (1, 18), 1.1 s</figcaption></figure>
-</div>
-
-#### 10131v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/10131v_edges.jpg" alt="Sobel edges, 0.0 s"><figcaption>Sobel edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/10131v_l2.jpg" alt="L2: G (2, 6), R (3, 12), 0.5 s"><figcaption>L2: G (2, 6), R (3, 12), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/10131v_ncc.jpg" alt="NCC: G (2, 6), R (3, 12), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 12), 1.1 s</figcaption></figure>
 </div>
 
 #### 31421v
@@ -493,22 +221,6 @@ The pyramid settings are the same as in section 4 (window ±25 px, refine ±2 px
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00458u_ncc.jpg" alt="NCC: G (8, 43), R (33, 86), 6.1 s"><figcaption>NCC: G (8, 43), R (33, 86), 6.1 s</figcaption></figure>
 </div>
 
-#### 01007a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01007a_edges.jpg" alt="Sobel edges, 1.4 s"><figcaption>Sobel edges, 1.4 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01007a_l2.jpg" alt="L2: G (13, 60), R (13, 129), 3.8 s"><figcaption>L2: G (13, 60), R (13, 129), 3.8 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01007a_ncc.jpg" alt="NCC: G (13, 60), R (13, 129), 5.9 s"><figcaption>NCC: G (13, 60), R (13, 129), 5.9 s</figcaption></figure>
-</div>
-
-#### 01047u (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01047u_edges.jpg" alt="Sobel edges, 1.6 s"><figcaption>Sobel edges, 1.6 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01047u_l2.jpg" alt="L2: G (20, 25), R (33, 71), 4.0 s"><figcaption>L2: G (20, 25), R (33, 71), 4.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01047u_ncc.jpg" alt="NCC: G (20, 25), R (33, 71), 6.1 s"><figcaption>NCC: G (20, 25), R (33, 71), 6.1 s</figcaption></figure>
-</div>
-
 #### 01657u (full-size)
 
 <div class="media-grid">
@@ -523,14 +235,6 @@ The pyramid settings are the same as in section 4 (window ±25 px, refine ±2 px
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01725u_edges.jpg" alt="Sobel edges, 1.7 s"><figcaption>Sobel edges, 1.7 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01725u_l2.jpg" alt="L2: G (44, 77), R (77, 161), 4.0 s"><figcaption>L2: G (44, 77), R (77, 161), 4.0 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01725u_ncc.jpg" alt="NCC: G (44, 77), R (77, 161), 6.2 s"><figcaption>NCC: G (44, 77), R (77, 161), 6.2 s</figcaption></figure>
-</div>
-
-#### 01861a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01861a_edges.jpg" alt="Sobel edges, 1.6 s"><figcaption>Sobel edges, 1.6 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01861a_l2.jpg" alt="L2: G (38, 71), R (62, 147), 3.9 s"><figcaption>L2: G (38, 71), R (62, 147), 3.9 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01861a_ncc.jpg" alt="NCC: G (38, 71), R (62, 147), 6.0 s"><figcaption>NCC: G (38, 71), R (62, 147), 6.0 s</figcaption></figure>
 </div>
 
 Observations:
@@ -549,84 +253,12 @@ Observations:
   <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00056v_ncc.jpg" alt="NCC: G (1, 5), R (0, 13), 1.1 s"><figcaption>NCC: G (1, 5), R (0, 13), 1.1 s</figcaption></figure>
 </div>
 
-#### 00125v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00125v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00125v_l2.jpg" alt="L2: G (2, 5), R (1, 10), 0.5 s"><figcaption>L2: G (2, 5), R (1, 10), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00125v_ncc.jpg" alt="NCC: G (2, 5), R (1, 10), 1.2 s"><figcaption>NCC: G (2, 5), R (1, 10), 1.2 s</figcaption></figure>
-</div>
-
-#### 00163v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00163v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00163v_l2.jpg" alt="L2: G (1, -3), R (1, -4), 0.5 s"><figcaption>L2: G (1, -3), R (1, -4), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00163v_ncc.jpg" alt="NCC: G (1, -3), R (1, -4), 1.1 s"><figcaption>NCC: G (1, -3), R (1, -4), 1.1 s</figcaption></figure>
-</div>
-
 #### 00804v
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00804v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00804v_l2.jpg" alt="L2: G (-2, 6), R (-4, 13), 0.5 s"><figcaption>L2: G (-2, 6), R (-4, 13), 0.5 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00804v_ncc.jpg" alt="NCC: G (-2, 6), R (-4, 13), 1.2 s"><figcaption>NCC: G (-2, 6), R (-4, 13), 1.2 s</figcaption></figure>
-</div>
-
-#### 01164v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01164v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01164v_l2.jpg" alt="L2: G (2, 6), R (3, 11), 0.5 s"><figcaption>L2: G (2, 6), R (3, 11), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01164v_ncc.jpg" alt="NCC: G (2, 6), R (3, 11), 1.2 s"><figcaption>NCC: G (2, 6), R (3, 11), 1.2 s</figcaption></figure>
-</div>
-
-#### 01269v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01269v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01269v_l2.jpg" alt="L2: G (3, 6), R (24, 25), 0.5 s"><figcaption>L2: G (3, 6), R (24, 25), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01269v_ncc.jpg" alt="NCC: G (3, 6), R (18, -21), 1.2 s"><figcaption>NCC: G (3, 6), R (18, -21), 1.2 s</figcaption></figure>
-</div>
-
-#### 01522v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01522v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01522v_l2.jpg" alt="L2: G (2, 6), R (2, 13), 0.5 s"><figcaption>L2: G (2, 6), R (2, 13), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01522v_ncc.jpg" alt="NCC: G (2, 6), R (2, 13), 1.2 s"><figcaption>NCC: G (2, 6), R (2, 13), 1.2 s</figcaption></figure>
-</div>
-
-#### 01597v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01597v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01597v_l2.jpg" alt="L2: G (1, 7), R (1, 16), 0.5 s"><figcaption>L2: G (1, 7), R (1, 16), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01597v_ncc.jpg" alt="NCC: G (1, 7), R (1, 16), 1.2 s"><figcaption>NCC: G (1, 7), R (1, 16), 1.2 s</figcaption></figure>
-</div>
-
-#### 01598v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01598v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01598v_l2.jpg" alt="L2: G (0, 8), R (-1, 16), 0.5 s"><figcaption>L2: G (0, 8), R (-1, 16), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01598v_ncc.jpg" alt="NCC: G (0, 8), R (-1, 16), 1.2 s"><figcaption>NCC: G (0, 8), R (-1, 16), 1.2 s</figcaption></figure>
-</div>
-
-#### 01728v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01728v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01728v_l2.jpg" alt="L2: G (1, 8), R (1, 18), 0.5 s"><figcaption>L2: G (1, 8), R (1, 18), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01728v_ncc.jpg" alt="NCC: G (1, 8), R (1, 18), 1.2 s"><figcaption>NCC: G (1, 8), R (1, 18), 1.2 s</figcaption></figure>
-</div>
-
-#### 10131v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/10131v_edges.jpg" alt="Canny edges, 0.0 s"><figcaption>Canny edges, 0.0 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/10131v_l2.jpg" alt="L2: G (2, 5), R (3, 12), 0.5 s"><figcaption>L2: G (2, 5), R (3, 12), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/10131v_ncc.jpg" alt="NCC: G (2, 5), R (3, 12), 1.2 s"><figcaption>NCC: G (2, 5), R (3, 12), 1.2 s</figcaption></figure>
 </div>
 
 #### 31421v
@@ -645,22 +277,6 @@ Observations:
   <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00458u_ncc.jpg" alt="NCC: G (9, 41), R (34, 85), 7.8 s"><figcaption>NCC: G (9, 41), R (34, 85), 7.8 s</figcaption></figure>
 </div>
 
-#### 01007a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01007a_edges.jpg" alt="Canny edges, 3.1 s"><figcaption>Canny edges, 3.1 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01007a_l2.jpg" alt="L2: G (14, 60), R (13, 128), 5.5 s"><figcaption>L2: G (14, 60), R (13, 128), 5.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01007a_ncc.jpg" alt="NCC: G (14, 60), R (13, 128), 7.8 s"><figcaption>NCC: G (14, 60), R (13, 128), 7.8 s</figcaption></figure>
-</div>
-
-#### 01047u (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01047u_edges.jpg" alt="Canny edges, 3.3 s"><figcaption>Canny edges, 3.3 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01047u_l2.jpg" alt="L2: G (23, 26), R (33, 71), 5.7 s"><figcaption>L2: G (23, 26), R (33, 71), 5.7 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01047u_ncc.jpg" alt="NCC: G (23, 26), R (33, 71), 7.8 s"><figcaption>NCC: G (23, 26), R (33, 71), 7.8 s</figcaption></figure>
-</div>
-
 #### 01657u (full-size)
 
 <div class="media-grid">
@@ -675,14 +291,6 @@ Observations:
   <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01725u_edges.jpg" alt="Canny edges, 3.4 s"><figcaption>Canny edges, 3.4 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01725u_l2.jpg" alt="L2: G (44, 75), R (76, 160), 5.7 s"><figcaption>L2: G (44, 75), R (76, 160), 5.7 s</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01725u_ncc.jpg" alt="NCC: G (44, 75), R (76, 160), 7.8 s"><figcaption>NCC: G (44, 75), R (76, 160), 7.8 s</figcaption></figure>
-</div>
-
-#### 01861a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01861a_edges.jpg" alt="Canny edges, 3.3 s"><figcaption>Canny edges, 3.3 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01861a_l2.jpg" alt="L2: G (36, 69), R (62, 146), 5.7 s"><figcaption>L2: G (36, 69), R (62, 146), 5.7 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01861a_ncc.jpg" alt="NCC: G (36, 69), R (62, 146), 7.9 s"><figcaption>NCC: G (36, 69), R (62, 146), 7.9 s</figcaption></figure>
 </div>
 
 Observations:
@@ -715,74 +323,11 @@ There is no search window, so large offsets cost nothing extra. The height of th
   <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/00056v.jpg" alt="Phase: G (1, 5), R (1, 13), 0.1 s, peaks 0.237 / 0.224"><figcaption>Phase: G (1, 5), R (1, 13), 0.1 s, peaks 0.237 / 0.224</figcaption></figure>
 </div>
 
-#### 00125v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00125v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/00125v.jpg" alt="Phase: G (2, 5), R (1, 10), 0.0 s, peaks 0.427 / 0.366"><figcaption>Phase: G (2, 5), R (1, 10), 0.0 s, peaks 0.427 / 0.366</figcaption></figure>
-</div>
-
-#### 00163v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00163v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/00163v.jpg" alt="Phase: G (1, -3), R (1, -4), 0.0 s, peaks 0.284 / 0.280"><figcaption>Phase: G (1, -3), R (1, -4), 0.0 s, peaks 0.284 / 0.280</figcaption></figure>
-</div>
-
 #### 00804v
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/00804v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/00804v.jpg" alt="Phase: G (-2, 5), R (-4, 13), 0.0 s, peaks 0.346 / 0.327"><figcaption>Phase: G (-2, 5), R (-4, 13), 0.0 s, peaks 0.346 / 0.327</figcaption></figure>
-</div>
-
-#### 01164v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01164v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01164v.jpg" alt="Phase: G (2, 5), R (3, 11), 0.0 s, peaks 0.271 / 0.434"><figcaption>Phase: G (2, 5), R (3, 11), 0.0 s, peaks 0.271 / 0.434</figcaption></figure>
-</div>
-
-#### 01269v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01269v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01269v.jpg" alt="Phase: G (2, 6), R (2, 14), 0.0 s, peaks 0.316 / 0.095"><figcaption>Phase: G (2, 6), R (2, 14), 0.0 s, peaks 0.316 / 0.095</figcaption></figure>
-</div>
-
-#### 01522v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01522v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01522v.jpg" alt="Phase: G (2, 6), R (2, 14), 0.0 s, peaks 0.184 / 0.110"><figcaption>Phase: G (2, 6), R (2, 14), 0.0 s, peaks 0.184 / 0.110</figcaption></figure>
-</div>
-
-#### 01597v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01597v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01597v.jpg" alt="Phase: G (1, 7), R (1, 16), 0.0 s, peaks 0.439 / 0.242"><figcaption>Phase: G (1, 7), R (1, 16), 0.0 s, peaks 0.439 / 0.242</figcaption></figure>
-</div>
-
-#### 01598v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01598v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01598v.jpg" alt="Phase: G (0, 8), R (-1, 17), 0.0 s, peaks 0.572 / 0.115"><figcaption>Phase: G (0, 8), R (-1, 17), 0.0 s, peaks 0.572 / 0.115</figcaption></figure>
-</div>
-
-#### 01728v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01728v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01728v.jpg" alt="Phase: G (1, 9), R (1, 18), 0.0 s, peaks 0.202 / 0.130"><figcaption>Phase: G (1, 9), R (1, 18), 0.0 s, peaks 0.202 / 0.130</figcaption></figure>
-</div>
-
-#### 10131v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/10131v_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/10131v.jpg" alt="Phase: G (2, 6), R (3, 12), 0.0 s, peaks 0.338 / 0.435"><figcaption>Phase: G (2, 6), R (3, 12), 0.0 s, peaks 0.338 / 0.435</figcaption></figure>
 </div>
 
 #### 31421v
@@ -799,20 +344,6 @@ There is no search window, so large offsets cost nothing extra. The height of th
   <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/00458u.jpg" alt="Phase: G (7, 40), R (33, 84), 3.1 s, peaks 0.065 / 0.070"><figcaption>Phase: G (7, 40), R (33, 84), 3.1 s, peaks 0.065 / 0.070</figcaption></figure>
 </div>
 
-#### 01007a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01007a_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01007a.jpg" alt="Phase: G (13, 59), R (13, 128), 2.5 s, peaks 0.169 / 0.180"><figcaption>Phase: G (13, 59), R (13, 128), 2.5 s, peaks 0.169 / 0.180</figcaption></figure>
-</div>
-
-#### 01047u (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01047u_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01047u.jpg" alt="Phase: G (19, 23), R (34, 71), 3.2 s, peaks 0.075 / 0.113"><figcaption>Phase: G (19, 23), R (34, 71), 3.2 s, peaks 0.075 / 0.113</figcaption></figure>
-</div>
-
 #### 01657u (full-size)
 
 <div class="media-grid">
@@ -825,13 +356,6 @@ There is no search window, so large offsets cost nothing extra. The height of th
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01725u_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01725u.jpg" alt="Phase: G (46, 76), R (79, 162), 3.7 s, peaks 0.049 / 0.047"><figcaption>Phase: G (46, 76), R (79, 162), 3.7 s, peaks 0.049 / 0.047</figcaption></figure>
-</div>
-
-#### 01861a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_sobel/01861a_edges.jpg" alt="Sobel edges"><figcaption>Sobel edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_sobel/01861a.jpg" alt="Phase: G (39, 70), R (63, 146), 3.2 s, peaks 0.167 / 0.105"><figcaption>Phase: G (39, 70), R (63, 146), 3.2 s, peaks 0.167 / 0.105</figcaption></figure>
 </div>
 
 Observations:
@@ -848,74 +372,11 @@ Observations:
   <figure><img loading="lazy" src="../images/assignment-1/phase_canny/00056v.jpg" alt="Phase: G (1, 5), R (1, 12), 0.1 s, peaks 0.177 / 0.167"><figcaption>Phase: G (1, 5), R (1, 12), 0.1 s, peaks 0.177 / 0.167</figcaption></figure>
 </div>
 
-#### 00125v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00125v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/00125v.jpg" alt="Phase: G (2, 5), R (1, 10), 0.0 s, peaks 0.239 / 0.302"><figcaption>Phase: G (2, 5), R (1, 10), 0.0 s, peaks 0.239 / 0.302</figcaption></figure>
-</div>
-
-#### 00163v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00163v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/00163v.jpg" alt="Phase: G (1, -3), R (1, -4), 0.0 s, peaks 0.229 / 0.304"><figcaption>Phase: G (1, -3), R (1, -4), 0.0 s, peaks 0.229 / 0.304</figcaption></figure>
-</div>
-
 #### 00804v
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/edges_canny/00804v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-1/phase_canny/00804v.jpg" alt="Phase: G (-3, 6), R (52, 41), 0.0 s, peaks 0.147 / 0.079"><figcaption>Phase: G (-3, 6), R (52, 41), 0.0 s, peaks 0.147 / 0.079</figcaption></figure>
-</div>
-
-#### 01164v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01164v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01164v.jpg" alt="Phase: G (1, 6), R (3, 11), 0.0 s, peaks 0.168 / 0.286"><figcaption>Phase: G (1, 6), R (3, 11), 0.0 s, peaks 0.168 / 0.286</figcaption></figure>
-</div>
-
-#### 01269v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01269v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01269v.jpg" alt="Phase: G (2, 7), R (7, 23), 0.0 s, peaks 0.085 / 0.064"><figcaption>Phase: G (2, 7), R (7, 23), 0.0 s, peaks 0.085 / 0.064</figcaption></figure>
-</div>
-
-#### 01522v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01522v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01522v.jpg" alt="Phase: G (2, 6), R (2, 13), 0.0 s, peaks 0.215 / 0.095"><figcaption>Phase: G (2, 6), R (2, 13), 0.0 s, peaks 0.215 / 0.095</figcaption></figure>
-</div>
-
-#### 01597v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01597v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01597v.jpg" alt="Phase: G (1, 7), R (1, 16), 0.0 s, peaks 0.427 / 0.272"><figcaption>Phase: G (1, 7), R (1, 16), 0.0 s, peaks 0.427 / 0.272</figcaption></figure>
-</div>
-
-#### 01598v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01598v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01598v.jpg" alt="Phase: G (0, 8), R (-1, 16), 0.0 s, peaks 0.487 / 0.111"><figcaption>Phase: G (0, 8), R (-1, 16), 0.0 s, peaks 0.487 / 0.111</figcaption></figure>
-</div>
-
-#### 01728v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01728v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01728v.jpg" alt="Phase: G (0, 8), R (1, 18), 0.0 s, peaks 0.190 / 0.098"><figcaption>Phase: G (0, 8), R (1, 18), 0.0 s, peaks 0.190 / 0.098</figcaption></figure>
-</div>
-
-#### 10131v
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/10131v_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/10131v.jpg" alt="Phase: G (2, 5), R (3, 12), 0.0 s, peaks 0.260 / 0.264"><figcaption>Phase: G (2, 5), R (3, 12), 0.0 s, peaks 0.260 / 0.264</figcaption></figure>
 </div>
 
 #### 31421v
@@ -932,20 +393,6 @@ Observations:
   <figure><img loading="lazy" src="../images/assignment-1/phase_canny/00458u.jpg" alt="Phase: G (7, 40), R (32, 86), 4.7 s, peaks 0.029 / 0.032"><figcaption>Phase: G (7, 40), R (32, 86), 4.7 s, peaks 0.029 / 0.032</figcaption></figure>
 </div>
 
-#### 01007a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01007a_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01007a.jpg" alt="Phase: G (13, 59), R (13, 128), 4.2 s, peaks 0.101 / 0.106"><figcaption>Phase: G (13, 59), R (13, 128), 4.2 s, peaks 0.101 / 0.106</figcaption></figure>
-</div>
-
-#### 01047u (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01047u_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01047u.jpg" alt="Phase: G (19, 24), R (34, 71), 4.8 s, peaks 0.040 / 0.064"><figcaption>Phase: G (19, 24), R (34, 71), 4.8 s, peaks 0.040 / 0.064</figcaption></figure>
-</div>
-
 #### 01657u (full-size)
 
 <div class="media-grid">
@@ -960,13 +407,6 @@ Observations:
   <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01725u.jpg" alt="Phase: G (47, 77), R (79, 162), 5.4 s, peaks 0.040 / 0.031"><figcaption>Phase: G (47, 77), R (79, 162), 5.4 s, peaks 0.040 / 0.031</figcaption></figure>
 </div>
 
-#### 01861a (full-size)
-
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-1/edges_canny/01861a_edges.jpg" alt="Canny edges"><figcaption>Canny edges</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/phase_canny/01861a.jpg" alt="Phase: G (39, 70), R (63, 146), 4.9 s, peaks 0.090 / 0.060"><figcaption>Phase: G (39, 70), R (63, 146), 4.9 s, peaks 0.090 / 0.060</figcaption></figure>
-</div>
-
 Observations:
 
 - Three plates fail: 00804v (red at (52, 41)), 01269v (red at (7, 23)), and 01657u (red 9 px off). Phase correlation depends on a single global peak, so Canny's sparse edges that don't overlap between channels hurt it even more than they hurt the pyramid.
@@ -974,47 +414,45 @@ Observations:
 
 ## 7. Results
 
-Mean and median offsets and time for each alignment method. The small and full-size plates are summarized separately, because their offsets and run times differ by an order of magnitude and pooling them would hide both. Offsets are (x, y) in pixels. Times are per plate for aligning both channels, including edge detection. Single-scale search was only run on the small plates.
+Mean and median offsets and time for each alignment method, over the six plates shown on this page, in two tables. Each table only includes the methods whose images are shown for those plates. The small and full-size plates are summarized separately, because their offsets and run times differ by an order of magnitude. Offsets are (x, y) in pixels. Times are per plate for aligning both channels, including edge detection.
 
-### Small plates (12)
-
-| Method | G mean | G median | R mean | R median | Time mean | Time median |
-|--------|--------|----------|--------|----------|-----------|-------------|
-| Single-scale L2 | (1.0, 5.8) | (1, 6) | (0.8, 12.2) | (1, 13) | 0.46 s | 0.45 s |
-| Single-scale NCC | (1.0, 5.8) | (1, 6) | (0.9, 12.0) | (1, 13) | 1.18 s | 1.17 s |
-| Pyramid L2 | (1.0, 5.8) | (1, 6) | (0.9, 12.2) | (1, 13) | 0.49 s | 0.48 s |
-| Pyramid NCC | (1.0, 5.7) | (1, 6) | (0.9, 12.0) | (1, 13) | 1.13 s | 1.12 s |
-| Sobel edges, pyramid L2 | (0.9, 5.8) | (1, 6) | (0.9, 12.2) | (1, 13) | 0.50 s | 0.49 s |
-| Sobel edges, pyramid NCC | (0.9, 5.8) | (1, 6) | (0.9, 12.2) | (1, 13) | 1.15 s | 1.15 s |
-| Canny edges, pyramid L2 | (1.1, 5.6) | (1, 6) | (2.6, 13.0) | (1, 13) | 0.52 s | 0.53 s |
-| Canny edges, pyramid NCC | (1.1, 5.6) | (1, 6) | (2.1, 9.2) | (1, 13) | 1.18 s | 1.19 s |
-| Phase correlation, Sobel | (1.0, 5.7) | (1, 6) | (0.8, 12.3) | (1, 13.5) | 0.03 s | 0.03 s |
-| Phase correlation, Canny | (0.8, 5.7) | (1, 6) | (5.9, 15.1) | (1, 13) | 0.04 s | 0.04 s |
-
-### Full-size plates (6)
+### Small plates (00056v, 00804v, 31421v)
 
 | Method | G mean | G median | R mean | R median | Time mean | Time median |
 |--------|--------|----------|--------|----------|-----------|-------------|
-| Pyramid L2 | (21.7, 55.0) | (16.5, 57.5) | (38.2, 118.3) | (32.5, 121.5) | 2.33 s | 2.33 s |
-| Pyramid NCC | (21.8, 54.7) | (16.5, 57) | (38.3, 118.5) | (32.5, 122.5) | 4.48 s | 4.49 s |
-| Sobel edges, pyramid L2 | (22.0, 55.2) | (16.5, 57.5) | (38.5, 118.5) | (33, 123) | 3.96 s | 3.96 s |
-| Sobel edges, pyramid NCC | (22.0, 55.2) | (16.5, 57.5) | (38.5, 118.5) | (33, 123) | 6.06 s | 6.07 s |
-| Canny edges, pyramid L2 | (22.5, 54.5) | (18.5, 58) | (38.5, 118.3) | (33.5, 124) | 5.67 s | 5.68 s |
-| Canny edges, pyramid NCC | (22.5, 54.5) | (18.5, 58) | (38.5, 118.3) | (33.5, 124) | 7.85 s | 7.84 s |
-| Phase correlation, Sobel | (22.0, 53.8) | (16, 57) | (38.8, 118.0) | (33.5, 122.5) | 3.19 s | 3.19 s |
-| Phase correlation, Canny | (22.2, 54.2) | (16, 57) | (38.7, 116.8) | (33, 118) | 4.85 s | 4.85 s |
+| Single-scale L2 | (-0.3, 6.7) | (0, 6) | (-1.0, 13.0) | (0, 13) | 0.49 s | 0.45 s |
+| Single-scale NCC | (-0.3, 6.7) | (0, 6) | (-1.0, 13.0) | (0, 13) | 1.29 s | 1.21 s |
+| Sobel edges, pyramid L2 | (-0.3, 6.3) | (0, 6) | (-1.0, 13.3) | (0, 13) | 0.50 s | 0.51 s |
+| Sobel edges, pyramid NCC | (-0.3, 6.3) | (0, 6) | (-1.0, 13.3) | (0, 13) | 1.16 s | 1.16 s |
+| Canny edges, pyramid L2 | (-0.3, 6.3) | (0, 6) | (-1.3, 13.0) | (0, 13) | 0.52 s | 0.53 s |
+| Canny edges, pyramid NCC | (-0.3, 6.3) | (0, 6) | (-1.3, 13.0) | (0, 13) | 1.17 s | 1.16 s |
+| Phase correlation, Sobel | (-0.3, 6.3) | (0, 5) | (-1.0, 13.3) | (0, 13) | 0.05 s | 0.03 s |
+| Phase correlation, Canny | (-0.7, 6.3) | (0, 6) | (17.7, 22.0) | (1, 13) | 0.04 s | 0.04 s |
 
-A large gap between the mean and the median points to outliers, which here are misalignments:
+### Full-size plates (00458u, 01657u, 01725u)
 
-- Canny edges with the pyramid (L2 and NCC): 01269v.
-- Canny edges with phase correlation: 00804v, 01269v, and 01657u.
-- Every other method aligned every plate it was run on.
+| Method | G mean | G median | R mean | R median | Time mean | Time median |
+|--------|--------|----------|--------|----------|-----------|-------------|
+| Pyramid L2 | (19.7, 58.3) | (8, 55) | (40.3, 121.0) | (32, 114) | 2.34 s | 2.34 s |
+| Pyramid NCC | (20.0, 57.7) | (9, 54) | (40.7, 121.3) | (32, 116) | 4.44 s | 4.44 s |
+| Sobel edges, pyramid L2 | (20.3, 58.3) | (9, 55) | (41.0, 121.3) | (33, 117) | 3.99 s | 3.98 s |
+| Sobel edges, pyramid NCC | (20.3, 58.3) | (9, 55) | (41.0, 121.3) | (33, 117) | 6.11 s | 6.08 s |
+| Canny edges, pyramid L2 | (20.7, 57.3) | (9, 56) | (41.0, 121.7) | (34, 120) | 5.71 s | 5.74 s |
+| Canny edges, pyramid NCC | (20.7, 57.3) | (9, 56) | (41.0, 121.7) | (34, 120) | 7.86 s | 7.84 s |
+| Phase correlation, Sobel | (20.3, 57.0) | (8, 55) | (41.0, 121.0) | (33, 117) | 3.44 s | 3.53 s |
+| Phase correlation, Canny | (20.7, 57.3) | (8, 55) | (40.7, 118.7) | (32, 108) | 5.07 s | 5.15 s |
+
+With only three plates per table, the gap between the mean and the median mostly reflects how different the plates are, so compare methods row against row rather than mean against median. The misalignments still stand out:
+
+- Canny edges with phase correlation misaligns 00804v (red at (52, 41)). That pulls the small-plate red mean to (17.7, 22.0), while every other method gives about (-1, 13).
+- It also puts the red channel of 01657u 9 px off. That plate is the median of the full-size table, so the red median drops to 108, against 114 to 120 for the other methods.
+- Every other method aligned all of the plates shown.
 
 Summary:
 
-- On the full-size plates the brightness-based pyramid with L2 is the fastest method overall (2.3 s per plate), and it aligned every plate. Phase correlation has the fastest alignment step (about 1.6 s), but computing Sobel edges first brings it to 3.2 s.
-- The L2 alignment step is about twice as fast as NCC in every method, and once the crop is large enough its offsets are within 2 px of NCC's on these plates.
-- Sobel is the more reliable edge detector here, and it is faster than Canny.
+- On the full-size plates the brightness-based pyramid with L2 is the fastest method overall (2.3 s per plate), and it aligned all three. Phase correlation has the fastest alignment step (about 1.8 s), but computing Sobel edges first brings it to 3.4 s.
+- The L2 alignment step is about twice as fast as NCC, and on these plates its offsets are within 2 px of NCC's.
+- Sobel is the more reliable edge detector. With phase correlation Canny misaligns 00804v and 01657u, and with the pyramid it lands 1 to 3 px off Sobel on the full-size plates. It is also slower.
 
 <!--
 Still to write:
