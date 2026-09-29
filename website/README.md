@@ -58,7 +58,7 @@ ffmpeg -i in.mov -vcodec libx264 -crf 28 -pix_fmt yuv420p -an out.mp4
 
 ## Hand-in
 
-- PDF: use the "Save as PDF" button on an assignment page, or Ctrl+P. Print uses the light palette and hides the navigation and sidebar. Videos print as their poster frame and GIFs as a single frame.
+- PDF: use the "Save as PDF" button on an assignment page, or Ctrl+P. Print uses the light palette and hides the navigation and sidebar. Videos print as their poster frame and GIFs as a single frame, each with a "Play online" link to the live page. Print from the live site so those links point there.
 - Markdown: hand in `_assignments/assignment-N.md` together with `images/assignment-N/`.
 
 ## Where things are

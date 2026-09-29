@@ -133,8 +133,19 @@ figcaption a:hover {
   }
 }
 
+.print-only {
+  display: none;
+}
+
 /* Print: light palette (dark vars are screen only), content only */
 @media print {
+  .print-only {
+    display: block;
+    margin: 0.25em 0 0;
+    font-size: $type-size-6;
+    text-align: center;
+  }
+
   .masthead,
   .sidebar,
   .sidebar__right,

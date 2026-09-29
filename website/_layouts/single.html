@@ -47,6 +47,19 @@ layout: default
       <section class="page__content" itemprop="text">
         {% if page.collection == 'assignments' %}<button class="print-btn" onclick="window.print()"><i class="fas fa-file-pdf" aria-hidden="true"></i> Save as PDF</button>{% endif %}
         {{ content }}
+        {% if page.collection == 'assignments' %}
+        <script>
+          /* PDFs can't play video or GIFs, so add a print-only link to the live page under each one */
+          document.querySelectorAll(".page__content video, .page__content img[src$='.gif']").forEach(function (el) {
+            var fig = el.closest("figure");
+            var url = location.origin + location.pathname;
+            var p = document.createElement("p");
+            p.className = "print-only";
+            p.innerHTML = 'Play online: <a href="' + url + '">' + url + "</a>";
+            fig ? fig.appendChild(p) : el.after(p);
+          });
+        </script>
+        {% endif %}
 
         {% if page.citation and page.paperurl and page.slidesurl and page.bibtexurl %}
           <p style="font-size: smaller">Recommended citation: {{ page.citation }}<br /><a href="{{ page.paperurl }}">Download Paper</a> | <a href="{{ page.slidesurl }}">Download Slides</a> | <a href="{{ page.bibtexurl }}">Download Bibtex</a></p>
