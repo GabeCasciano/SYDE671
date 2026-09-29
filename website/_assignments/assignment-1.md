@@ -47,7 +47,7 @@ The approaches, from simplest to most involved:
 | Approach | Idea | Script |
 |----------|------|--------|
 | Baseline | Stack the three channels without any alignment | `baseline.py` |
-| Single-scale SSD / NCC | Try every shift in a window and keep the one with the best SSD or NCC score | `ssd_ncc.py` |
+| Single-scale L2 / NCC | Try every shift in a window and keep the one with the best L2 (Euclidean distance) or NCC score | `l2_ncc.py` |
 | Image pyramid | Search at low resolution first, then refine the estimate at each finer scale | `img_pyramid.py` |
 | Edge-based alignment | Align Sobel or Canny edge maps instead of raw brightness | `edges.py` |
 | Phase correlation | Estimate the shift in one step from the phase of the Fourier transform of the edge maps | `phase_cor.py` |
@@ -88,13 +88,13 @@ The full-size images are scaled down for the web.
   <figure><img src="../images/assignment-1/baseline/01861a.jpg" alt="01861a"><figcaption>01861a</figcaption></figure>
 </div>
 
-## 3. Single-Scale SSD and NCC
+## 3. Single-Scale L2 and NCC
 
 The simplest alignment is an exhaustive search: shift the G (or R) channel by every (dx, dy) in a window, score how well it matches B, and keep the best shift. Two scores are used.
 
-**Sum of squared differences (SSD)**, lower is better:
+**L2 norm (Euclidean distance)**, lower is better:
 
-$$ \text{SSD}(a, b) = \sum_{x, y} \big(a(x, y) - b(x, y)\big)^2 $$
+$$ L_2(a, b) = \lVert a - b \rVert_2 = \sqrt{\sum_{x, y} \big(a(x, y) - b(x, y)\big)^2} $$
 
 **Normalized cross-correlation (NCC)**, higher is better. The mean of each channel is subtracted first, which makes it insensitive to brightness and contrast differences between the channels:
 
@@ -112,102 +112,102 @@ Offsets below are the (x, y) shift in pixels applied to the G or R channel to li
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/00056v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/00056v_ssd.jpg" alt="SSD: G (1, 6), R (1, 13), 0.4 s"><figcaption>SSD: G (1, 6), R (1, 13), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/00056v_ncc.jpg" alt="NCC: G (1, 6), R (1, 13), 1.1 s"><figcaption>NCC: G (1, 6), R (1, 13), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/00056v_l2.jpg" alt="L2: G (1, 6), R (1, 13), 0.6 s"><figcaption>L2: G (1, 6), R (1, 13), 0.6 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/00056v_ncc.jpg" alt="NCC: G (1, 6), R (1, 13), 1.5 s"><figcaption>NCC: G (1, 6), R (1, 13), 1.5 s</figcaption></figure>
 </div>
 
 #### 00125v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/00125v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/00125v_ssd.jpg" alt="SSD: G (2, 5), R (1, 10), 0.4 s"><figcaption>SSD: G (2, 5), R (1, 10), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/00125v_ncc.jpg" alt="NCC: G (2, 5), R (1, 10), 1.1 s"><figcaption>NCC: G (2, 5), R (1, 10), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/00125v_l2.jpg" alt="L2: G (2, 5), R (1, 10), 0.5 s"><figcaption>L2: G (2, 5), R (1, 10), 0.5 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/00125v_ncc.jpg" alt="NCC: G (2, 5), R (1, 10), 1.2 s"><figcaption>NCC: G (2, 5), R (1, 10), 1.2 s</figcaption></figure>
 </div>
 
 #### 00163v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/00163v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/00163v_ssd.jpg" alt="SSD: G (1, -3), R (1, -4), 0.4 s"><figcaption>SSD: G (1, -3), R (1, -4), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/00163v_ncc.jpg" alt="NCC: G (1, -3), R (1, -4), 1.1 s"><figcaption>NCC: G (1, -3), R (1, -4), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/00163v_l2.jpg" alt="L2: G (1, -3), R (1, -4), 0.5 s"><figcaption>L2: G (1, -3), R (1, -4), 0.5 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/00163v_ncc.jpg" alt="NCC: G (1, -3), R (1, -4), 1.1 s"><figcaption>NCC: G (1, -3), R (1, -4), 1.1 s</figcaption></figure>
 </div>
 
 #### 00804v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/00804v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/00804v_ssd.jpg" alt="SSD: G (-2, 6), R (-4, 13), 0.4 s"><figcaption>SSD: G (-2, 6), R (-4, 13), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/00804v_ncc.jpg" alt="NCC: G (-2, 6), R (-4, 13), 1.1 s"><figcaption>NCC: G (-2, 6), R (-4, 13), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/00804v_l2.jpg" alt="L2: G (-2, 6), R (-4, 13), 0.5 s"><figcaption>L2: G (-2, 6), R (-4, 13), 0.5 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/00804v_ncc.jpg" alt="NCC: G (-2, 6), R (-4, 13), 1.2 s"><figcaption>NCC: G (-2, 6), R (-4, 13), 1.2 s</figcaption></figure>
 </div>
 
 #### 01164v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/01164v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01164v_ssd.jpg" alt="SSD: G (2, 6), R (3, 11), 0.4 s"><figcaption>SSD: G (2, 6), R (3, 11), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01164v_ncc.jpg" alt="NCC: G (2, 6), R (3, 11), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 11), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01164v_l2.jpg" alt="L2: G (2, 6), R (3, 11), 0.4 s"><figcaption>L2: G (2, 6), R (3, 11), 0.4 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01164v_ncc.jpg" alt="NCC: G (2, 6), R (3, 11), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 11), 1.1 s</figcaption></figure>
 </div>
 
 #### 01269v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/01269v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01269v_ssd.jpg" alt="SSD: G (2, 6), R (3, 14), 0.4 s"><figcaption>SSD: G (2, 6), R (3, 14), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01269v_ncc.jpg" alt="NCC: G (2, 6), R (3, 13), 1.0 s"><figcaption>NCC: G (2, 6), R (3, 13), 1.0 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01269v_l2.jpg" alt="L2: G (2, 6), R (3, 14), 0.4 s"><figcaption>L2: G (2, 6), R (3, 14), 0.4 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01269v_ncc.jpg" alt="NCC: G (2, 6), R (3, 13), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 13), 1.1 s</figcaption></figure>
 </div>
 
 #### 01522v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/01522v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01522v_ssd.jpg" alt="SSD: G (2, 6), R (1, 13), 0.4 s"><figcaption>SSD: G (2, 6), R (1, 13), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01522v_ncc.jpg" alt="NCC: G (2, 6), R (2, 13), 1.1 s"><figcaption>NCC: G (2, 6), R (2, 13), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01522v_l2.jpg" alt="L2: G (2, 6), R (1, 13), 0.5 s"><figcaption>L2: G (2, 6), R (1, 13), 0.5 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01522v_ncc.jpg" alt="NCC: G (2, 6), R (2, 13), 1.1 s"><figcaption>NCC: G (2, 6), R (2, 13), 1.1 s</figcaption></figure>
 </div>
 
 #### 01597v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/01597v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01597v_ssd.jpg" alt="SSD: G (1, 7), R (1, 16), 0.4 s"><figcaption>SSD: G (1, 7), R (1, 16), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01597v_ncc.jpg" alt="NCC: G (1, 7), R (1, 16), 1.1 s"><figcaption>NCC: G (1, 7), R (1, 16), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01597v_l2.jpg" alt="L2: G (1, 7), R (1, 16), 0.4 s"><figcaption>L2: G (1, 7), R (1, 16), 0.4 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01597v_ncc.jpg" alt="NCC: G (1, 7), R (1, 16), 1.2 s"><figcaption>NCC: G (1, 7), R (1, 16), 1.2 s</figcaption></figure>
 </div>
 
 #### 01598v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/01598v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01598v_ssd.jpg" alt="SSD: G (0, 8), R (-1, 17), 0.4 s"><figcaption>SSD: G (0, 8), R (-1, 17), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01598v_ncc.jpg" alt="NCC: G (0, 8), R (-1, 16), 1.1 s"><figcaption>NCC: G (0, 8), R (-1, 16), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01598v_l2.jpg" alt="L2: G (0, 8), R (-1, 17), 0.5 s"><figcaption>L2: G (0, 8), R (-1, 17), 0.5 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01598v_ncc.jpg" alt="NCC: G (0, 8), R (-1, 16), 1.2 s"><figcaption>NCC: G (0, 8), R (-1, 16), 1.2 s</figcaption></figure>
 </div>
 
 #### 01728v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/01728v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01728v_ssd.jpg" alt="SSD: G (1, 8), R (1, 18), 0.4 s"><figcaption>SSD: G (1, 8), R (1, 18), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/01728v_ncc.jpg" alt="NCC: G (1, 8), R (1, 18), 1.1 s"><figcaption>NCC: G (1, 8), R (1, 18), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01728v_l2.jpg" alt="L2: G (1, 8), R (1, 18), 0.4 s"><figcaption>L2: G (1, 8), R (1, 18), 0.4 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/01728v_ncc.jpg" alt="NCC: G (1, 8), R (1, 18), 1.1 s"><figcaption>NCC: G (1, 8), R (1, 18), 1.1 s</figcaption></figure>
 </div>
 
 #### 10131v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/10131v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/10131v_ssd.jpg" alt="SSD: G (2, 6), R (3, 12), 0.4 s"><figcaption>SSD: G (2, 6), R (3, 12), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/10131v_ncc.jpg" alt="NCC: G (2, 6), R (3, 12), 1.1 s"><figcaption>NCC: G (2, 6), R (3, 12), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/10131v_l2.jpg" alt="L2: G (2, 6), R (3, 12), 0.5 s"><figcaption>L2: G (2, 6), R (3, 12), 0.5 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/10131v_ncc.jpg" alt="NCC: G (2, 6), R (3, 12), 1.2 s"><figcaption>NCC: G (2, 6), R (3, 12), 1.2 s</figcaption></figure>
 </div>
 
 #### 31421v
 
 <div class="media-grid">
   <figure><img src="../images/assignment-1/baseline/31421v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/31421v_ssd.jpg" alt="SSD: G (0, 8), R (0, 13), 0.4 s"><figcaption>SSD: G (0, 8), R (0, 13), 0.4 s</figcaption></figure>
-  <figure><img src="../images/assignment-1/ssd_ncc/31421v_ncc.jpg" alt="NCC: G (0, 8), R (0, 13), 1.1 s"><figcaption>NCC: G (0, 8), R (0, 13), 1.1 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/31421v_l2.jpg" alt="L2: G (0, 8), R (0, 13), 0.4 s"><figcaption>L2: G (0, 8), R (0, 13), 0.4 s</figcaption></figure>
+  <figure><img src="../images/assignment-1/l2_ncc/31421v_ncc.jpg" alt="NCC: G (0, 8), R (0, 13), 1.2 s"><figcaption>NCC: G (0, 8), R (0, 13), 1.2 s</figcaption></figure>
 </div>
 
 Observations:
 
 - Both metrics align all 12 small plates. They agree exactly on 9 of them and differ by 1 px in the red channel on 01269v, 01522v, and 01598v, which is not visible at this size.
-- SSD is about 2.5 times faster than NCC here (about 0.4 s versus 1.1 s per plate), because NCC also subtracts the means and normalizes at every shift.
+- L2 is about 2.6 times faster than NCC here (about 0.5 s versus 1.2 s per plate), because NCC also subtracts the means and normalizes at every shift.
 - The coloured strips along the edges are the plate borders, which don't line up across channels, plus a few rows that wrap around when a channel is shifted. Removing them automatically is one of the bells & whistles.
 
 <!--

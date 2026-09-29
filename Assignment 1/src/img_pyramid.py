@@ -6,7 +6,7 @@ import time
 import numpy as np
 
 from common import find_images, load_plate, parse_args, run_dir, save_image, shift, split_plate
-from ssd_ncc import align
+from l2_ncc import align
 
 DEFAULTS = {
     "images": "*.jpg",     # comma-separated globs or names in data/
@@ -14,7 +14,7 @@ DEFAULTS = {
     "refine": 2,           # search radius at each finer level
     "coarse_size": 500,    # halve until the smaller channel side is at most this (px)
     "crop": 0.2,           # fraction trimmed from each side before scoring
-    "metrics": "ssd,ncc",  # comma-separated: ssd, ncc
+    "metrics": "l2,ncc",   # comma-separated: l2, ncc
 }
 
 

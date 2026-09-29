@@ -1,4 +1,4 @@
-"""Single-scale exhaustive alignment of Prokudin-Gorskii plates using SSD or NCC."""
+"""Single-scale exhaustive alignment of Prokudin-Gorskii plates using L2 or NCC."""
 
 import csv
 import time
@@ -11,13 +11,13 @@ DEFAULTS = {
     "images": "*v.jpg",    # comma-separated globs or names in data/
     "window": 20,          # search displacements in [-window, window]
     "crop": 0.1,           # fraction trimmed from each side before scoring
-    "metrics": "ssd,ncc",  # comma-separated: ssd, ncc
+    "metrics": "l2,ncc",   # comma-separated: l2, ncc
 }
 
 
-def ssd(a, b):
-    """Sum of squared differences, lower is better."""
-    return np.sum((a - b) ** 2)
+def l2(a, b):
+    """Euclidean distance (L2 norm of the difference), lower is better."""
+    return np.sqrt(np.sum((a - b) ** 2))
 
 
 def ncc(a, b):
@@ -34,7 +34,7 @@ def align(moving, ref, window, crop_frac, metric):
     for dy in range(-window, window + 1):
         for dx in range(-window, window + 1):
             cand = crop(shift(moving, (dx, dy)), crop_frac)
-            score = ssd(cand, ref_c) if metric == "ssd" else -ncc(cand, ref_c)
+            score = l2(cand, ref_c) if metric == "l2" else -ncc(cand, ref_c)
             if best_score is None or score < best_score:
                 best_d, best_score = (dx, dy), score
     return best_d
