@@ -3,4 +3,40 @@
 <!-- Support for MathJax -->
 <script id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-mml-chtml.js"></script>
 
+<!-- Click any content image to enlarge it; click, the close button, or Escape exits -->
+<div class="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged image">
+  <button class="lightbox__close" aria-label="Close">&times;</button>
+  <img class="lightbox__img" alt="">
+  <p class="lightbox__caption"></p>
+</div>
+<script>
+  (function () {
+    var box = document.querySelector(".lightbox");
+    var big = box.querySelector(".lightbox__img");
+    var cap = box.querySelector(".lightbox__caption");
+    /* Move out of the fixed, animated footer so the overlay covers the viewport */
+    document.body.appendChild(box);
+    function close() {
+      box.classList.remove("is-open");
+      document.body.style.overflow = "";
+    }
+    document.querySelectorAll(".page__content img").forEach(function (img) {
+      if (img.closest("a")) return;
+      img.classList.add("zoomable");
+      img.addEventListener("click", function () {
+        var fc = img.closest("figure") && img.closest("figure").querySelector("figcaption");
+        big.src = img.currentSrc || img.src;
+        big.alt = img.alt;
+        cap.textContent = fc ? fc.textContent : img.alt;
+        box.classList.add("is-open");
+        document.body.style.overflow = "hidden";
+        box.querySelector(".lightbox__close").focus();
+      });
+    });
+    box.addEventListener("click", close);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") close();
+    });
+  })();
+</script>
 <!-- end custom footer snippets -->

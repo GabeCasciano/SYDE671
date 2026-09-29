@@ -115,6 +115,59 @@ figcaption a:hover {
   }
 }
 
+/* Lightbox for content images */
+.zoomable {
+  cursor: zoom-in;
+}
+
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3em 1em 1em;
+  background: rgba(22, 22, 30, 0.94);
+  cursor: zoom-out;
+
+  &.is-open {
+    display: flex;
+  }
+}
+
+.lightbox__img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
+
+.lightbox__caption {
+  margin: 0.75em 0 0;
+  color: #c8d3f5;
+  font-size: $type-size-6;
+  text-align: center;
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 0.5em;
+  right: 0.75em;
+  padding: 0 0.3em;
+  color: #c8d3f5;
+  font-size: 2.5em;
+  line-height: 1;
+  background: none;
+  border: 0;
+  cursor: pointer;
+
+  &:hover {
+    color: #82aaff;
+  }
+}
+
 /* Save as PDF button on assignment pages */
 .print-btn {
   float: right;
@@ -146,6 +199,7 @@ figcaption a:hover {
     text-align: center;
   }
 
+  .lightbox,
   .masthead,
   .sidebar,
   .sidebar__right,
