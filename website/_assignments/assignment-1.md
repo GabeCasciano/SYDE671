@@ -54,7 +54,7 @@ The approaches, from simplest to most involved:
 | Edge-based alignment | Align Sobel or Canny edge maps instead of raw brightness | `edges.py` |
 | Phase correlation | Estimate the shift in one step from the phase of the Fourier transform of the edge maps | `phase_cor.py` |
 
-All of the code is in `Assignment 1/src/`.
+Sections 8 to 11 add four automatic enhancements (cropping, contrast, white balance, and colour mapping), each applied to the best alignment. All of the code is in `Assignment 1/src/`.
 
 ## 2. Baseline: No Alignment
 
@@ -448,16 +448,241 @@ With only three plates per table, the gap between the mean and the median mostly
 - It also puts the red channel of 01657u 9 px off. That plate is the median of the full-size table, so the red median drops to 108, against 114 to 120 for the other methods.
 - Every other method aligned all of the plates shown.
 
-Summary:
+### Best method
 
-- On the full-size plates the brightness-based pyramid with L2 is the fastest method overall (2.3 s per plate), and it aligned all three. Phase correlation has the fastest alignment step (about 1.8 s), but computing Sobel edges first brings it to 3.4 s.
-- The L2 alignment step is about twice as fast as NCC, and on these plates its offsets are within 2 px of NCC's.
-- Sobel is the more reliable edge detector. With phase correlation Canny misaligns 00804v and 01657u, and with the pyramid it lands 1 to 3 px off Sobel on the full-size plates. It is also slower.
+**Alignment.** Sobel edges with the pyramid gives the best alignment.
+
+- It aligned every plate shown.
+- Its L2 and NCC offsets are identical on all of them.
+- In full-resolution crops of 01657u it is visibly cleaner than the brightness-based pyramid. The brightness-based pyramid leaves a cyan fringe along the dress and fingers and a magenta halo around dust specks, from a red channel about 3 px off. On 00458u the two are indistinguishable.
+- Phase correlation on Sobel edges lands within 1 to 3 px of it, but shows slightly more fringing on 00458u.
+- Canny with phase correlation misaligns 00804v and 01657u outright, and Canny with the pyramid lands 1 to 3 px off Sobel on the full-size plates.
+
+**Speed.** On the full-size plates:
+
+- The brightness-based pyramid with L2 is the fastest method overall at 2.3 s per plate, because it needs no edge detection.
+- Phase correlation has the fastest alignment step (about 1.8 s), but Sobel edge detection brings it to 3.4 s.
+- The Sobel pyramid with L2 takes 4.0 s.
+- NCC roughly doubles the alignment time in every method.
+
+On the small plates every method takes about a second or less, and phase correlation is about ten times faster than the rest (0.03 to 0.05 s, against 0.5 s or more).
+
+**Overall.** Sobel edges with the pyramid and L2 is the best choice: the most accurate alignment, for 1.7 s more per full-size plate than the fastest method. It is the input for the bells & whistles in sections 8 to 11. If speed matters more than the last few pixels, the brightness-based pyramid with L2 is the fastest method that still aligned every plate.
+
+## 8. Auto-Cropping
+
+Sections 8 to 11 are the bells & whistles. Each has its own script, and all four start from the best alignment found above: Sobel edges with the pyramid and L2 (see section 7). Contrast, white balance, and colour mapping all run on the auto-cropped image, so the borders don't skew their statistics.
+
+After alignment, each channel's plate border (a black frame, with the white scanner margin outside it) sits in a different place, which leaves coloured strips around the image. `auto_crop.py` scans inward from each side, looking at most 12% of the way in, and marks a row or column as border when either of these holds:
+
+- **The channels disagree:** the mean of max minus min across R, G, and B is above 0.5. Inside the photo it is typically 0.15 to 0.27.
+- **One channel is its black frame:** more than 80% of the row is dark (below 0.2) in any one channel.
+
+It cuts through the last border row, stops once 2% of the side in a row is clean, and adds a 1% margin. It also always removes the rows and columns that wrapped around when the channels were shifted.
+
+This follows the hint in the assignment: inside the photo the three channels agree, while at the borders they don't. Detecting that difference adapts to each plate, instead of cutting a fixed margin. The 80% dark requirement is what separates a frame from dark picture content: a dark dress or a wooden wall covers at most about 70% of a row, while a frame covers 80 to 100%. Cut sizes are in full-resolution pixels.
+
+#### 00056v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00056v_aligned.jpg" alt="Aligned"><figcaption>Aligned</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00056v_cropped.jpg" alt="Auto-cropped: cut top 15, bottom 8, left 26, right 18 px"><figcaption>Auto-cropped: cut top 15, bottom 8, left 26, right 18 px</figcaption></figure>
+</div>
+
+#### 00804v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00804v_aligned.jpg" alt="Aligned"><figcaption>Aligned</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00804v_cropped.jpg" alt="Auto-cropped: cut top 23, bottom 6, left 22, right 22 px"><figcaption>Auto-cropped: cut top 23, bottom 6, left 22, right 22 px</figcaption></figure>
+</div>
+
+#### 31421v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/31421v_aligned.jpg" alt="Aligned"><figcaption>Aligned</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/31421v_cropped.jpg" alt="Auto-cropped: cut top 17, bottom 13, left 22, right 23 px"><figcaption>Auto-cropped: cut top 17, bottom 13, left 22, right 23 px</figcaption></figure>
+</div>
+
+#### 00458u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00458u_aligned.jpg" alt="Aligned"><figcaption>Aligned</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00458u_cropped.jpg" alt="Auto-cropped: cut top 228, bottom 87, left 214, right 171 px"><figcaption>Auto-cropped: cut top 228, bottom 87, left 214, right 171 px</figcaption></figure>
+</div>
+
+#### 01657u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01657u_aligned.jpg" alt="Aligned"><figcaption>Aligned</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01657u_cropped.jpg" alt="Auto-cropped: cut top 233, bottom 42, left 215, right 164 px"><figcaption>Auto-cropped: cut top 233, bottom 42, left 215, right 164 px</figcaption></figure>
+</div>
+
+#### 01725u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01725u_aligned.jpg" alt="Aligned"><figcaption>Aligned</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01725u_cropped.jpg" alt="Auto-cropped: cut top 246, bottom 33, left 255, right 195 px"><figcaption>Auto-cropped: cut top 246, bottom 33, left 255, right 195 px</figcaption></figure>
+</div>
+
+## 9. Auto-Contrast
+
+`auto_contrast.py` works in two steps:
+
+1. **Linear stretch.** Map the 0.5th percentile of all pixel values to black and the 99.5th percentile to white, using one range for all three channels. Percentiles, rather than the minimum and maximum, keep a few specks of dust or scratches from setting the range. A shared range keeps the colour balance unchanged.
+2. **CLAHE** (contrast-limited adaptive histogram equalization, `skimage.exposure.equalize_adapthist`) on the lightness channel of CIELAB. It equalizes the histogram in small tiles, so each region uses the full tonal range. The clip limit (0.01) caps how much any tone can be stretched, which keeps noise and halos down. Working on lightness only leaves the colours alone.
+
+The scans are flat: after cropping, the values span only about 0.06 to 0.96, and most of the image sits in the middle tones. The stretch fixes the range, and CLAHE brings out local detail (clouds, foliage, the track ballast) that a single global curve can't.
+
+#### 00056v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00056v_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00056v_contrast.jpg" alt="Auto-contrast: range [0.10, 0.98] stretched"><figcaption>Auto-contrast: range [0.10, 0.98] stretched</figcaption></figure>
+</div>
+
+#### 00804v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00804v_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00804v_contrast.jpg" alt="Auto-contrast: range [0.10, 0.95] stretched"><figcaption>Auto-contrast: range [0.10, 0.95] stretched</figcaption></figure>
+</div>
+
+#### 31421v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/31421v_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/31421v_contrast.jpg" alt="Auto-contrast: range [0.02, 0.85] stretched"><figcaption>Auto-contrast: range [0.02, 0.85] stretched</figcaption></figure>
+</div>
+
+#### 00458u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00458u_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00458u_contrast.jpg" alt="Auto-contrast: range [0.07, 0.96] stretched"><figcaption>Auto-contrast: range [0.07, 0.96] stretched</figcaption></figure>
+</div>
+
+#### 01657u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01657u_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01657u_contrast.jpg" alt="Auto-contrast: range [0.06, 0.95] stretched"><figcaption>Auto-contrast: range [0.06, 0.95] stretched</figcaption></figure>
+</div>
+
+#### 01725u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01725u_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01725u_contrast.jpg" alt="Auto-contrast: range [0.06, 0.96] stretched"><figcaption>Auto-contrast: range [0.06, 0.96] stretched</figcaption></figure>
+</div>
+
+## 10. Auto White Balance
+
+`auto_white_balance.py` estimates the colour of the light (the illuminant) and divides it out. The illuminant is estimated with shades of gray (Finlayson and Trezzi, 2004), as a power mean of each channel over all N pixels:
+
+$$ e_c = \Big( \frac{1}{N} \sum_{x} I_c(x)^p \Big)^{1/p} $$
+
+Each channel is then multiplied by $$ \bar{e} / e_c $$, which makes the estimate neutral gray (a von Kries diagonal correction). With p = 1 this is the gray world assumption (the average colour of a scene is gray). As p grows it approaches white patch (the brightest colour is white). The script uses p = 6, in between, which copes better with both large single-coloured areas and a few bright highlights.
+
+Each exposure was made through a different filter onto a plate with a different sensitivity, so the channels come out unbalanced. 01725u, for example, comes out strongly red. Scaling each channel is the simplest correction; the hard part is estimating the illuminant, and shades of gray is a simple estimator that works well in practice.
+
+#### 00056v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00056v_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00056v_wb.jpg" alt="White balance: gains R 1.08, G 1.02, B 0.91"><figcaption>White balance: gains R 1.08, G 1.02, B 0.91</figcaption></figure>
+</div>
+
+#### 00804v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00804v_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00804v_wb.jpg" alt="White balance: gains R 1.08, G 0.98, B 0.95"><figcaption>White balance: gains R 1.08, G 0.98, B 0.95</figcaption></figure>
+</div>
+
+#### 31421v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/31421v_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/31421v_wb.jpg" alt="White balance: gains R 1.10, G 1.07, B 0.87"><figcaption>White balance: gains R 1.10, G 1.07, B 0.87</figcaption></figure>
+</div>
+
+#### 00458u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00458u_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00458u_wb.jpg" alt="White balance: gains R 0.99, G 1.00, B 1.01"><figcaption>White balance: gains R 0.99, G 1.00, B 1.01</figcaption></figure>
+</div>
+
+#### 01657u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01657u_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01657u_wb.jpg" alt="White balance: gains R 0.94, G 1.08, B 0.99"><figcaption>White balance: gains R 0.94, G 1.08, B 0.99</figcaption></figure>
+</div>
+
+#### 01725u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01725u_cropped.jpg" alt="Auto-cropped"><figcaption>Auto-cropped</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01725u_wb.jpg" alt="White balance: gains R 0.82, G 1.04, B 1.21"><figcaption>White balance: gains R 0.82, G 1.04, B 1.21</figcaption></figure>
+</div>
+
+## 11. Auto Colour Mapping
+
+Prokudin-Gorskii's filters were not the sRGB primaries, and neighbouring filters overlap in the spectrum: the green exposure also records some blue and red light, and so on. Each recorded channel is therefore a mix of the true ones, which washes the colours out. `auto_colour_map.py` models this with a mixing matrix in which red and green, and green and blue, share a fraction e of their light (red and blue don't overlap):
+
+$$ \begin{bmatrix} R' \\ G' \\ B' \end{bmatrix} = \begin{bmatrix} 1-e & e & 0 \\ e & 1-2e & e \\ 0 & e & 1-e \end{bmatrix} \begin{bmatrix} R \\ G \\ B \end{bmatrix} $$
+
+It then applies the inverse matrix. Each row sums to 1, so grays stay gray, and the inverse has negative off-diagonal terms that subtract the leaked light, which is what a camera's colour correction matrix does. The leakage is chosen per image: the script tries e from 0 to 0.3 and keeps the largest value that pushes at most 0.5% of pixels outside the displayable range.
+
+It runs after white balance, as in a camera pipeline, because the correction exaggerates colour differences from gray and would also exaggerate an uncorrected colour cast.
+
+This recovers colour separation that the overlapping filters lost (greener fields and a bluer river on 00804v) without needing a reference image. On 00056v the chosen leakage is 0: the plate's damage already contains strongly saturated blotches, so any correction would clip too many pixels. The true filter curves are unknown, so the symmetric leakage model is an approximation.
+
+#### 00056v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00056v_wb.jpg" alt="White balanced"><figcaption>White balanced</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00056v_colour.jpg" alt="Colour mapped: leak 0.00"><figcaption>Colour mapped: leak 0.00</figcaption></figure>
+</div>
+
+#### 00804v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00804v_wb.jpg" alt="White balanced"><figcaption>White balanced</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00804v_colour.jpg" alt="Colour mapped: leak 0.18"><figcaption>Colour mapped: leak 0.18</figcaption></figure>
+</div>
+
+#### 31421v
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/31421v_wb.jpg" alt="White balanced"><figcaption>White balanced</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/31421v_colour.jpg" alt="Colour mapped: leak 0.12"><figcaption>Colour mapped: leak 0.12</figcaption></figure>
+</div>
+
+#### 00458u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00458u_wb.jpg" alt="White balanced"><figcaption>White balanced</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/00458u_colour.jpg" alt="Colour mapped: leak 0.11"><figcaption>Colour mapped: leak 0.11</figcaption></figure>
+</div>
+
+#### 01657u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01657u_wb.jpg" alt="White balanced"><figcaption>White balanced</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01657u_colour.jpg" alt="Colour mapped: leak 0.05"><figcaption>Colour mapped: leak 0.05</figcaption></figure>
+</div>
+
+#### 01725u (full-size)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01725u_wb.jpg" alt="White balanced"><figcaption>White balanced</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/bells/01725u_colour.jpg" alt="Colour mapped: leak 0.08"><figcaption>Colour mapped: leak 0.08</figcaption></figure>
+</div>
 
 <!--
 Still to write:
-
-## Bells & Whistles
 
 ## Part 1: Becoming Friends with Your Camera
 ### Selfie: The Wrong Way vs. The Right Way
