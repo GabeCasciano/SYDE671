@@ -1,0 +1,76 @@
+/* ==========================================================================
+   Syntax highlighting
+   ========================================================================== */
+
+div.highlighter-rouge, figure.highlight {
+  position: relative;
+  margin-bottom: 1em;
+  padding: 1em;
+  border: 1px solid var(--global-border-color);
+  border-radius: $border-radius;
+  background-color: var(--global-code-background-color);
+  box-shadow: $box-shadow;
+  font-size: $type-size-4;
+
+  &:before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5em;
+    background-color: var(--global-border-color);
+    color: var(--global-text-color-light);
+    border-bottom-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
+    content: "\f121";
+    font-family: "Font Awesome 6 Free" !important;
+    font-size: $type-size-6;
+    line-height: 1;
+    text-transform: none;
+    speak: none;
+  }
+
+  .highlight {
+    margin: 0;
+    font-family: $monospace;
+    font-size: $type-size-6;
+    line-height: 1.8;
+  }
+}
+
+.highlight table td { padding: 5px; }
+.highlight table pre { margin: 0; }
+
+
+/*
+   Tokyo Night, colours set per mode in _sass/theme/_tokyonight_*.scss
+   ========================================================================== */
+
+.highlight, .highlight .n, .highlight .p, .highlight .w, .highlight .nl, .highlight .nn,
+.highlight .nx, .highlight .py, .highlight .na, .highlight .ld, .highlight .l, .highlight .g,
+.highlight .go, .highlight .gp, .highlight .gt { color: var(--global-code-text-color) }
+
+.highlight .c, .highlight .cm, .highlight .c1, .highlight .ch, .highlight .cpf,
+.highlight .sd, .highlight .sb { color: var(--syn-comment); font-style: italic }
+
+.highlight .k, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr,
+.highlight .ow, .highlight .cp, .highlight .cs { color: var(--syn-keyword) }
+
+.highlight .s, .highlight .s1, .highlight .s2, .highlight .sa, .highlight .sc, .highlight .sh,
+.highlight .si, .highlight .sx, .highlight .ss, .highlight .dl { color: var(--syn-string) }
+
+.highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo,
+.highlight .il, .highlight .kc, .highlight .no, .highlight .se, .highlight .sr,
+.highlight .x { color: var(--syn-number) }
+
+.highlight .nf, .highlight .fm, .highlight .nd { color: var(--syn-function) }
+.highlight .nc, .highlight .kt, .highlight .nt, .highlight .ne { color: var(--syn-type) }
+.highlight .o { color: var(--syn-operator) }
+.highlight .nb, .highlight .bp { color: var(--syn-builtin) }
+.highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .ni { color: var(--syn-variable) }
+.highlight .err, .highlight .gr { color: var(--syn-error) }
+
+.highlight .gh, .highlight .gu { color: var(--tn-h1); font-weight: bold }
+.highlight .gi { color: var(--tn-success) }
+.highlight .gd { color: var(--tn-danger) }
+.highlight .ge { font-style: italic }
+.highlight .gs { font-weight: bold }

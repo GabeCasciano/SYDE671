@@ -1,0 +1,8 @@
+# Header links, in order.
+
+main:
+  - title: "Assignments"
+    url: /assignments/
+
+  - title: "CV"
+    url: /cv/

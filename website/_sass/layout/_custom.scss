@@ -1,0 +1,186 @@
+/* ==========================================================================
+   SITE CUSTOMIZATIONS: Tokyo Night polish, media, print
+   ========================================================================== */
+
+::selection {
+  background: var(--tn-selection);
+}
+
+/* Headings use the tokyonight.nvim markdown heading colours */
+.page__title,
+.page__content h1 { color: var(--tn-h1); }
+.page__content h2 { color: var(--tn-h2); }
+.page__content h3 { color: var(--tn-h3); }
+.page__content h4 { color: var(--tn-h4); }
+.page__content h5 { color: var(--tn-h5); }
+.page__content h6 { color: var(--tn-h6); }
+
+/* Masthead styled like a statusline */
+.masthead,
+.masthead__menu-item,
+.greedy-nav,
+.greedy-nav button {
+  background-color: var(--tn-bg-dark);
+}
+
+.greedy-nav .visible-links a:before {
+  background: var(--global-base-color);
+}
+
+.masthead__menu-item.selected a,
+.masthead__menu-item.selected a:hover {
+  color: var(--global-base-color);
+  border-bottom-color: var(--global-base-color);
+}
+
+/* Upstream hardcodes light colours here */
+.toc {
+  background-color: var(--global-bg-color);
+
+  .nav__title {
+    color: var(--global-bg-color);
+  }
+}
+
+.toc__menu a:hover {
+  color: var(--global-bg-color);
+  background: var(--global-base-color);
+}
+
+figcaption a:hover {
+  color: var(--global-link-color-hover);
+  border-bottom-color: currentColor;
+}
+
+.notice,
+.notice--primary,
+.notice--info,
+.notice--warning,
+.notice--success,
+.notice--danger {
+  color: var(--global-text-color);
+  background-color: var(--global-code-background-color);
+  border-left: 4px solid var(--global-text-color-light);
+  box-shadow: none;
+
+  code {
+    background-color: var(--global-bg-color);
+  }
+}
+
+.notice--primary { border-left-color: var(--global-base-color); }
+.notice--info    { border-left-color: var(--tn-info); }
+.notice--warning { border-left-color: var(--tn-warning); }
+.notice--success { border-left-color: var(--tn-success); }
+.notice--danger  { border-left-color: var(--tn-danger); }
+
+/* Media */
+.page__content {
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+    border-radius: $border-radius;
+  }
+
+  video {
+    width: 100%;
+  }
+
+  figure {
+    flex-direction: column;
+    align-items: center;
+
+    img,
+    video {
+      margin-bottom: 0.5em;
+    }
+  }
+
+  figcaption {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1em;
+  align-items: start;
+  margin: 2em 0;
+
+  figure {
+    margin: 0;
+  }
+}
+
+/* Save as PDF button on assignment pages */
+.print-btn {
+  float: right;
+  margin: 0 0 1em 1em;
+  padding: 0.3em 0.8em;
+  font-size: $type-size-6;
+  color: var(--global-base-color);
+  background: transparent;
+  border: 1px solid var(--global-base-color);
+  border-radius: $border-radius;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--global-bg-color);
+    background: var(--global-base-color);
+  }
+}
+
+/* Print: light palette (dark vars are screen only), content only */
+@media print {
+  .masthead,
+  .sidebar,
+  .sidebar__right,
+  .page__footer,
+  .page__meta,
+  .page__share,
+  .page__related,
+  .pagination,
+  .print-btn {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #main {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .page {
+    float: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  figure,
+  img,
+  video,
+  table,
+  pre,
+  .highlight,
+  .media-grid figure {
+    break-inside: avoid;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    break-after: avoid;
+  }
+}

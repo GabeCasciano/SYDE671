@@ -1,0 +1,58 @@
+/* ==========================================================================
+    TOKYO NIGHT THEME - DARK VERSION (Moon, the default)
+    Palette: folke/tokyonight.nvim extras/lua/tokyonight_moon.lua
+    ========================================================================== */
+
+/* Compile-time colours used by buttons and forms */
+$primary-color              : #82aaff;
+$danger-color               : #c53b53;
+$info-color                 : #3e68d7;
+$notice-color               : #737aa2;
+$success-color              : #41a6b5;
+$warning-color              : #ff966c;
+
+/* Screen only, so printing always uses the light palette */
+@media screen {
+    html[data-theme="dark"] {
+        --global-base-color                 : #82aaff;
+        --global-bg-color                   : #222436;
+        --global-footer-bg-color            : #1e2030;
+        --global-border-color               : #2f334d;
+        --global-dark-border-color          : #3b4261;
+        --global-code-background-color      : #1e2030;
+        --global-code-text-color            : #c8d3f5;
+        --global-fig-caption-color          : #828bb8;
+        --global-link-color                 : #82aaff;
+        --global-link-color-hover           : #86e1fc;
+        --global-link-color-visited         : #c099ff;
+        --global-masthead-link-color        : #828bb8;
+        --global-masthead-link-color-hover  : #82aaff;
+        --global-text-color                 : #c8d3f5;
+        --global-text-color-light           : #828bb8;
+        --global-thead-color                : #2f334d;
+
+        --tn-bg-dark                        : #1e2030;
+        --tn-selection                      : #2d3f76;
+        --tn-h1                             : #82aaff;
+        --tn-h2                             : #ffc777;
+        --tn-h3                             : #c3e88d;
+        --tn-h4                             : #4fd6be;
+        --tn-h5                             : #c099ff;
+        --tn-h6                             : #fca7ea;
+        --tn-info                           : #0db9d7;
+        --tn-warning                        : #ffc777;
+        --tn-danger                         : #c53b53;
+        --tn-success                        : #c3e88d;
+
+        --syn-comment                       : #636da6;
+        --syn-keyword                       : #c099ff;
+        --syn-string                        : #c3e88d;
+        --syn-number                        : #ff966c;
+        --syn-function                      : #82aaff;
+        --syn-type                          : #65bcff;
+        --syn-operator                      : #89ddff;
+        --syn-builtin                       : #ffc777;
+        --syn-variable                      : #ff757f;
+        --syn-error                         : #c53b53;
+    }
+}

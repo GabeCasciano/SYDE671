@@ -1,0 +1,58 @@
+/* ==========================================================================
+    TOKYO NIGHT THEME - LIGHT VERSION (Day)
+    Palette: folke/tokyonight.nvim extras/lua/tokyonight_day.lua
+    ========================================================================== */
+
+/* Shared settings (the dark file sets the compile-time colours) */
+$monospace                  : "JetBrains Mono", Monaco, Consolas, "Lucida Console", monospace;
+$border-radius              : 6px;
+$box-shadow                 : 0 1px 1px rgba(0, 0, 0, 0.125);
+$global-transition          : all 0.2s ease-in-out;
+$masthead-height            : 70px;
+$navicon-width              : 28px;
+$navicon-height             : 4px;
+$sidebar-link-max-width     : 250px;
+$sidebar-screen-min-width   : 1024px;
+
+:root {
+    --global-base-color                 : #2e7de9;
+    --global-bg-color                   : #e1e2e7;
+    --global-footer-bg-color            : #d0d5e3;
+    --global-border-color               : #c4c8da;
+    --global-dark-border-color          : #a8aecb;
+    --global-code-background-color      : #d0d5e3;
+    --global-code-text-color            : #3760bf;
+    --global-fig-caption-color          : #6172b0;
+    --global-link-color                 : #2e7de9;
+    --global-link-color-hover           : #007197;
+    --global-link-color-visited         : #9854f1;
+    --global-masthead-link-color        : #6172b0;
+    --global-masthead-link-color-hover  : #2e7de9;
+    --global-text-color                 : #3760bf;
+    --global-text-color-light           : #6172b0;
+    --global-thead-color                : #c4c8da;
+
+    --tn-bg-dark                        : #d0d5e3;
+    --tn-selection                      : #b7c1e3;
+    --tn-h1                             : #2e7de9;
+    --tn-h2                             : #8c6c3e;
+    --tn-h3                             : #587539;
+    --tn-h4                             : #118c74;
+    --tn-h5                             : #9854f1;
+    --tn-h6                             : #7847bd;
+    --tn-info                           : #07879d;
+    --tn-warning                        : #8c6c3e;
+    --tn-danger                         : #c64343;
+    --tn-success                        : #587539;
+
+    --syn-comment                       : #848cb5;
+    --syn-keyword                       : #9854f1;
+    --syn-string                        : #587539;
+    --syn-number                        : #b15c00;
+    --syn-function                      : #2e7de9;
+    --syn-type                          : #188092;
+    --syn-operator                      : #006a83;
+    --syn-builtin                       : #8c6c3e;
+    --syn-variable                      : #f52a65;
+    --syn-error                         : #c64343;
+}

@@ -1,0 +1,16 @@
+# Local preview: `docker compose up`, then open http://localhost:4000/SYDE671/
+services:
+  jekyll:
+    image: ruby:3.3
+    working_dir: /srv
+    user: "1000:1000"
+    environment: [HOME=/tmp, JEKYLL_ENV=docker]
+    volumes:
+      - .:/srv:z
+      - gems:/usr/local/bundle
+    ports: ["4000:4000"]
+    command: bash -c "bundle install && bundle exec jekyll serve -H 0.0.0.0 --config _config.yml,_config_docker.yml"
+
+volumes:
+  gems:
+    name: syde671-gems

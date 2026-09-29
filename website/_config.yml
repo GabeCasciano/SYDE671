@@ -1,0 +1,153 @@
+# Site settings. Restart `jekyll serve` after editing this file.
+
+# Basic Site Settings
+locale                   : "en-US"
+site_theme               : "tokyonight"
+title                    : "SYDE 671"
+title_separator          : "-"
+name                     : &name "Gabe Casciano"
+description              : &description "SYDE 671 project pages"
+url                      : https://gabecasciano.github.io
+baseurl                  : "/SYDE671"
+repository               : "GabeCasciano/SYDE671"
+
+# Site Author - blank fields are hidden in the sidebar.
+author:
+  avatar           : "profile.png"
+  name             : *name
+  pronouns         :
+  bio              : "SYDE 671"
+  location         :
+  employer         : "University of Waterloo"
+  uri              : # URL
+  email            : # address
+  github           : "GabeCasciano"
+  linkedin         : # Username, the part after linkedin.com/in/
+  googlescholar    : # URL
+  orcid            : # URL
+  twitter          : # Username
+  instagram        : # Username
+  youtube          : # Username
+
+# Site Settings
+teaser                   :
+breadcrumbs              : false
+words_per_minute         : 160
+future                   : true
+read_more                : "disabled"
+comments:
+  provider               : false
+atom_feed:
+  hide                   : true
+
+# SEO / Social Sharing
+twitter:
+  username               :
+og_image                 :
+og_description           :
+social:
+  type                   :
+  name                   :
+  links:
+
+# Analytics
+analytics:
+  provider               : false
+
+# Reading Files
+include:
+  - .htaccess
+  - _pages
+exclude:
+  - .asset-cache
+  - .bundle
+  - .jekyll-assets-cache
+  - .sass-cache
+  - assets/js/_main.js
+  - assets/js/plugins
+  - assets/js/vendor
+  - docker-compose.yaml
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE
+  - node_modules
+  - package.json*
+  - package-lock.json
+  - README.md
+  - vendor
+  - _config_docker.yml
+keep_files:
+  - .git
+encoding: "utf-8"
+markdown_ext: "markdown,mkdown,mkdn,mkd,md"
+
+# Conversion
+markdown: kramdown
+highlighter: rouge
+lsi: false
+excerpt_separator: "\n\n"
+incremental: false
+
+# Markdown Processing
+kramdown:
+  input: GFM
+  hard_wrap: false
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  enable_coderay: false
+
+# Assignments are served at /<name>/ so relative media paths like
+# ../images/assignment-1/x.jpg work both on the site and in the raw .md file.
+collections:
+  assignments:
+    output: true
+    permalink: /:name/
+
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: true
+  - scope:
+      path: ""
+      type: assignments
+    values:
+      layout: single
+      author_profile: true
+
+# Sass/SCSS
+sass:
+  sass_dir: _sass
+  style: compressed
+
+# Outputting
+permalink: /:categories/:title/
+timezone: America/Toronto
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-gist
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-redirect-from
+  - jemoji
+
+whitelist:
+  - jekyll-feed
+  - jekyll-gist
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-redirect-from
+  - jemoji
+
+# HTML Compression
+compress_html:
+  clippings: all
+  ignore:
+    envs: development
