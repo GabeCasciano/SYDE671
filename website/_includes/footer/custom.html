@@ -3,10 +3,12 @@
 <!-- Support for MathJax -->
 <script id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-mml-chtml.js"></script>
 
-<!-- Click any content image to enlarge it; click, the close button, or Escape exits -->
+<!-- Click any content image to enlarge it; arrows step through its set; click, the close button, or Escape exits -->
 <div class="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged image">
   <button class="lightbox__close" aria-label="Close">&times;</button>
+  <button class="lightbox__prev" aria-label="Previous image">&lsaquo;</button>
   <img class="lightbox__img" alt="">
+  <button class="lightbox__next" aria-label="Next image">&rsaquo;</button>
   <p class="lightbox__caption"></p>
 </div>
 <script>
@@ -14,8 +16,19 @@
     var box = document.querySelector(".lightbox");
     var big = box.querySelector(".lightbox__img");
     var cap = box.querySelector(".lightbox__caption");
+    var group = [];
+    var index = 0;
     /* Move out of the fixed, animated footer so the overlay covers the viewport */
     document.body.appendChild(box);
+    function show(i) {
+      index = (i + group.length) % group.length;
+      var img = group[index];
+      var fc = img.closest("figure") && img.closest("figure").querySelector("figcaption");
+      big.src = img.currentSrc || img.src;
+      big.alt = img.alt;
+      cap.textContent = (fc ? fc.textContent : img.alt) +
+        (group.length > 1 ? "  (" + (index + 1) + " / " + group.length + ")" : "");
+    }
     function close() {
       box.classList.remove("is-open");
       document.body.style.overflow = "";
@@ -24,18 +37,29 @@
       if (img.closest("a")) return;
       img.classList.add("zoomable");
       img.addEventListener("click", function () {
-        var fc = img.closest("figure") && img.closest("figure").querySelector("figcaption");
-        big.src = img.currentSrc || img.src;
-        big.alt = img.alt;
-        cap.textContent = fc ? fc.textContent : img.alt;
+        var grid = img.closest(".media-grid");
+        group = grid ? Array.from(grid.querySelectorAll("img.zoomable")) : [img];
+        box.classList.toggle("has-group", group.length > 1);
+        show(group.indexOf(img));
         box.classList.add("is-open");
         document.body.style.overflow = "hidden";
         box.querySelector(".lightbox__close").focus();
       });
     });
+    box.querySelector(".lightbox__prev").addEventListener("click", function (e) {
+      e.stopPropagation();
+      show(index - 1);
+    });
+    box.querySelector(".lightbox__next").addEventListener("click", function (e) {
+      e.stopPropagation();
+      show(index + 1);
+    });
     box.addEventListener("click", close);
     document.addEventListener("keydown", function (e) {
+      if (!box.classList.contains("is-open")) return;
       if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") show(index - 1);
+      if (e.key === "ArrowRight") show(index + 1);
     });
   })();
 </script>

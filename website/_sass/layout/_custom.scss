@@ -128,7 +128,7 @@ figcaption a:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3em 1em 1em;
+  padding: 3em 3.5em 1em;
   background: rgba(22, 22, 30, 0.94);
   cursor: zoom-out;
 
@@ -167,6 +167,34 @@ figcaption a:hover {
     color: #82aaff;
   }
 }
+
+.lightbox__prev,
+.lightbox__next {
+  display: none;
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  padding: 0.1em 0.35em 0.2em;
+  color: #c8d3f5;
+  font-size: 3em;
+  line-height: 1;
+  background: rgba(30, 32, 48, 0.7);
+  border: 0;
+  border-radius: $border-radius;
+  transform: translateY(-50%);
+  cursor: pointer;
+
+  &:hover {
+    color: #82aaff;
+  }
+
+  .lightbox.has-group & {
+    display: block;
+  }
+}
+
+.lightbox__prev { left: 0.25em; }
+.lightbox__next { right: 0.25em; }
 
 /* Save as PDF button on assignment pages */
 .print-btn {
