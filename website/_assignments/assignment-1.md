@@ -29,6 +29,29 @@ GIF: same as an image. Video (the poster frame is what prints to PDF):
 Math: $$ \text{NCC} = \frac{a}{\|a\|} \cdot \frac{b}{\|b\|} $$
 -->
 
+## 0. Fun Stuff
+
+### Dolly Zoom
+
+A dolly zoom (the "Vertigo shot") moves the camera toward or away from the subject while zooming, so the subject stays the same size in the frame and the background seems to stretch or compress around it.
+
+It works because zooming and moving do different things. An object's size in the image is proportional to $$ f / d $$, its focal length over its distance from the camera. Zooming changes $$ f $$ for everything equally, so it only scales the whole picture. Moving changes $$ d $$, and changes it by a larger fraction for near objects than for far ones. Keeping $$ f / d $$ fixed for the subject holds it steady, but the background, which is much farther away, changes size as the camera moves.
+
+In this clip the camera moves in and zooms out over the first 6 seconds, so the van behind the subject shrinks. Over the last 6 seconds it backs away and zooms in, and the van grows back, while the subject stays about the same size throughout.
+
+<figure>
+  <video src="../images/assignment-1/dolly_zoom/dolly_zoom.mp4" poster="../images/assignment-1/dolly_zoom/dolly_zoom_poster.jpg" controls loop muted playsinline></video>
+  <figcaption>Dolly zoom, 12 s</figcaption>
+</figure>
+
+Stills from the first half of the clip:
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-1/dolly_zoom/frame_0s.jpg" alt="Dolly zoom at 0 s"><figcaption>0 s: camera far, zoomed in</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/dolly_zoom/frame_3s.jpg" alt="Dolly zoom at 3 s"><figcaption>3 s</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/dolly_zoom/frame_6s.jpg" alt="Dolly zoom at 6 s"><figcaption>6 s: camera close, zoomed out</figcaption></figure>
+</div>
+
 ## 1. Overview
 
 Sergei Prokudin-Gorskii (1863-1944) was convinced early on that colour photography was the future. He travelled across the Russian Empire photographing people, buildings, landscapes, and railways. He recorded every scene as three black-and-white exposures on a single glass plate, taken through blue, green, and red filters and stacked top to bottom. There was no way to print colour photographs at the time. The Library of Congress bought the plates in 1948 and has since digitized them.
@@ -102,24 +125,24 @@ Offsets below are the (x, y) shift in pixels applied to the G or R channel to li
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/baseline/00056v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00056v_l2.jpg" alt="L2: G (1, 6), R (1, 13), 0.6 s"><figcaption>L2: G (1, 6), R (1, 13), 0.6 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00056v_ncc.jpg" alt="NCC: G (1, 6), R (1, 13), 1.5 s"><figcaption>NCC: G (1, 6), R (1, 13), 1.5 s</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/l2/00056v_l2.jpg" alt="L2: G (1, 6), R (1, 13), 0.6 s"><figcaption>L2: G (1, 6), R (1, 13), 0.6 s</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/ncc/00056v_ncc.jpg" alt="NCC: G (1, 6), R (1, 13), 1.5 s"><figcaption>NCC: G (1, 6), R (1, 13), 1.5 s</figcaption></figure>
 </div>
 
 #### 00804v
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/baseline/00804v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00804v_l2.jpg" alt="L2: G (-2, 6), R (-4, 13), 0.5 s"><figcaption>L2: G (-2, 6), R (-4, 13), 0.5 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/00804v_ncc.jpg" alt="NCC: G (-2, 6), R (-4, 13), 1.2 s"><figcaption>NCC: G (-2, 6), R (-4, 13), 1.2 s</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/l2/00804v_l2.jpg" alt="L2: G (-2, 6), R (-4, 13), 0.5 s"><figcaption>L2: G (-2, 6), R (-4, 13), 0.5 s</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/ncc/00804v_ncc.jpg" alt="NCC: G (-2, 6), R (-4, 13), 1.2 s"><figcaption>NCC: G (-2, 6), R (-4, 13), 1.2 s</figcaption></figure>
 </div>
 
 #### 31421v
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-1/baseline/31421v.jpg" alt="Baseline"><figcaption>Baseline</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/31421v_l2.jpg" alt="L2: G (0, 8), R (0, 13), 0.4 s"><figcaption>L2: G (0, 8), R (0, 13), 0.4 s</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-1/l2_ncc/31421v_ncc.jpg" alt="NCC: G (0, 8), R (0, 13), 1.2 s"><figcaption>NCC: G (0, 8), R (0, 13), 1.2 s</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/l2/31421v_l2.jpg" alt="L2: G (0, 8), R (0, 13), 0.4 s"><figcaption>L2: G (0, 8), R (0, 13), 0.4 s</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-1/ncc/31421v_ncc.jpg" alt="NCC: G (0, 8), R (0, 13), 1.2 s"><figcaption>NCC: G (0, 8), R (0, 13), 1.2 s</figcaption></figure>
 </div>
 
 Observations:
@@ -687,5 +710,4 @@ Still to write:
 ## Part 1: Becoming Friends with Your Camera
 ### Selfie: The Wrong Way vs. The Right Way
 ### Architectural Perspective Compression
-### The Dolly Zoom
 -->
