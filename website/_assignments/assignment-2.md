@@ -50,7 +50,20 @@ def conv2(img, kernel):
 
 #### 9x9 box filter
 
-The box filter is `np.ones((9, 9)) / 81`, applied to a 635 x 900 grayscale image with each method.
+Every entry of the 9x9 box filter is 1/81, so each output pixel is the mean of the 9x9 neighbourhood around it:
+
+$$ B = \frac{1}{81} \begin{bmatrix} 1 & 1 & \cdots & 1 \\ 1 & 1 & \cdots & 1 \\ \vdots & \vdots & \ddots & \vdots \\ 1 & 1 & \cdots & 1 \end{bmatrix}_{9 \times 9} $$
+
+The filter is applied to a 635 x 900 grayscale picture of me with each of the three methods:
+
+```python
+img = load_image(DATA_DIR / "pasta-boy.jpg", gray=True)
+box = np.ones((9, 9)) / 81
+
+out_four = conv4(img, box)
+out_two = conv2(img, box)
+out_scipy = convolve2d(img, box, mode="same", boundary="fill")
+```
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/1.1/gray.jpg" alt="Grayscale input"><figcaption>Input (grayscale)</figcaption></figure>
