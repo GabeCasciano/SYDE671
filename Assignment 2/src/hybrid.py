@@ -18,6 +18,7 @@ DEFAULTS = {
     "sigma_high": 4.0,
     "sigma_mid": "3,10",         # band-pass G(small) - G(large) for the middle image
     "max_size": 1500,            # downscale inputs so the longest side is at most this
+    "face_crop": 0.0,            # crop each input to this many eye distances around the eyes (0 = off)
     "sweep_low": "4,8,16",       # empty to skip the cutoff sweep
     "sweep_high": "2,4,8",
     "process": 1,                # 1 saves the aligned images and FFTs
@@ -149,6 +150,15 @@ def load(name, max_size):
     return img, np.array(points[name]) * scale
 
 
+def face_crop(img, pts, k):
+    """Crop to a box k eye distances wide (and 1.2k tall) centred on the eyes."""
+    d = np.hypot(*(pts[1] - pts[0]))
+    cx, cy = pts.mean(0)
+    x0, y0 = int(max(cx - k * d / 2, 0)), int(max(cy - 0.5 * k * d, 0))
+    x1, y1 = int(min(cx + k * d / 2, img.shape[1])), int(min(cy + 0.7 * k * d, img.shape[0]))
+    return img[y0:y1, x0:x1], pts - [x0, y0]
+
+
 def with_mask(img):
     return np.dstack([img, np.ones(img.shape[:2], img.dtype)])
 
@@ -157,6 +167,9 @@ def load_aligned(p):
     """Two images aligned with the starter's align_images."""
     im1, pts1 = load(p["im1"], p["max_size"])
     im2, pts2 = load(p["im2"], p["max_size"])
+    if p["face_crop"]:
+        im1, pts1 = face_crop(im1, pts1, p["face_crop"])
+        im2, pts2 = face_crop(im2, pts2, p["face_crop"])
     # Same call order as the starter: [im2, im1] = align_images(im2, im1)
     im2a, im1a = align_images(with_mask(im2), with_mask(im1), pts2, pts1)
     im1a, im2a = crop_valid(im1a, im2a)

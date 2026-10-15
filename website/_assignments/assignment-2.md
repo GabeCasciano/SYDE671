@@ -463,17 +463,17 @@ Log magnitude of the 2D Fourier transform, computed as `np.log(np.abs(np.fft.fft
 
 #### Cats
 
-Two photos of the same cat, aligned on the eyes. Both arrangements are shown: each photo is used once as the low-frequency image and once as the high-frequency image. Both use $$ \sigma_{low} = 8 $$ and $$ \sigma_{high} = 4 $$.
+Two different cats, aligned on the eyes. Each photo was cropped around the cat's face before alignment, to a box 3.5 eye distances wide centred on the eyes, so the faces fill the frame and the two backgrounds take up less of it. Both arrangements are shown: each cat is used once as the low-frequency image and once as the high-frequency image. Both use $$ \sigma_{low} = 8 $$ and $$ \sigma_{high} = 4 $$.
 
 <div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_im1.jpg" alt="Cat photo 1"><figcaption>Photo 1 (low frequencies)</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_im2.jpg" alt="Cat photo 2"><figcaption>Photo 2 (high frequencies)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_im1.jpg" alt="Big cat"><figcaption>Big cat (low frequencies)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_im2.jpg" alt="Little cat"><figcaption>Little cat (high frequencies)</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_hybrid.jpg" alt="Hybrid"><figcaption>Hybrid</figcaption></figure>
 </div>
 
 <div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_im1.jpg" alt="Cat photo 2"><figcaption>Photo 2 (low frequencies)</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_im2.jpg" alt="Cat photo 1"><figcaption>Photo 1 (high frequencies)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_im1.jpg" alt="Little cat"><figcaption>Little cat (low frequencies)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_im2.jpg" alt="Big cat"><figcaption>Big cat (high frequencies)</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_hybrid.jpg" alt="Hybrid"><figcaption>Hybrid</figcaption></figure>
 </div>
 
