@@ -4,12 +4,6 @@ date: 2026-10-14
 excerpt: "Convolution, edge detection, unsharp masking, hybrid images, and multiresolution blending."
 ---
 
-<!--
-Plain Markdown only (no Liquid), so this file also renders outside the site.
-Media goes in website/images/assignment-2/ and is referenced as ../images/assignment-2/<file>.
-See assignment-1.md for figure, grid, video, and math snippets.
--->
-
 ## Part 1: Fun with Filters
 
 ### 1.1 Convolutions from Scratch
@@ -78,8 +72,6 @@ out_scipy = convolve2d(img, box, mode="same", boundary="fill")
 | Two loops | 2.98 | 2.98e-08 |
 | `scipy.signal.convolve2d` | 0.10 | - |
 
-<!-- Analysis (yours): Why is each method faster than the last (Python loop overhead vs vectorized numpy vs compiled C)? How do they handle boundaries: what does zero padding do to the edges of the box-filtered image, and what other boundary options does scipy offer? Why does the difference come out around 3e-8 rather than exactly 0? -->
-
 #### Finite difference operators
 
 $$ D_x = \begin{bmatrix} 1 & 0 & -1 \end{bmatrix}, \quad D_y = \begin{bmatrix} 1 \\ 0 \\ -1 \end{bmatrix} $$
@@ -96,8 +88,6 @@ Computed with the two-loop convolution. Mid grey is zero.
   <figure><img loading="lazy" src="../images/assignment-2/1.1/d45.jpg" alt="D45"><figcaption>Image * D45</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/1.1/d135.jpg" alt="D135"><figcaption>Image * D135</figcaption></figure>
 </div>
-
-<!-- Analysis (yours): Which edges show up in Dx and which in Dy, and why? Which edges do the diagonal operators pick up that Dx and Dy miss or weaken? What does the sign (light vs dark side) tell you about the edge? -->
 
 ### 1.2 Finite Difference Operator
 
@@ -140,8 +130,6 @@ The gradient magnitude ranges from 0 to 0.86. The median is 0.012 and the 99th p
   <img loading="lazy" src="../images/assignment-2/1.2/edges_0.2.png" alt="Edges at t = 0.20">
   <figcaption>Binarized gradient magnitude, t = 0.20</figcaption>
 </figure>
-
-<!-- Analysis (yours): Where does the noise come from at low thresholds (grass, sky)? Which real edges disappear first as the threshold rises (buildings in the background, tripod legs)? Which threshold is the best tradeoff, and why? -->
 
 ### 1.3 Derivative of Gaussian (DoG) Filter
 
@@ -191,8 +179,6 @@ The gradient magnitude of the blurred image goes up to 0.32 (it was 0.86 without
   <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.06.png" alt="Gaussian then finite difference, t = 0.06"><figcaption>Gaussian, then finite difference, t = 0.06</figcaption></figure>
 </div>
 
-<!-- Analysis (yours): What differences do you see? Look at the grass, edge thickness, and how continuous the tripod legs and skyline are. Why does blurring first suppress the noise, and what does it cost (localization, fine detail)? Why does the magnitude range shrink? -->
-
 #### DoG filters
 
 Convolving the Gaussian with $$ D_x $$ and $$ D_y $$ gives the derivative of Gaussian filters, so the blur and the derivative become one convolution:
@@ -222,8 +208,6 @@ Applying the DoG filters directly to the image:
 </div>
 
 The difference image is shown on the same scale as the gradient magnitude images and comes out completely black. The largest difference between the two-step and DoG magnitudes is 1.65e-15, about 5e-15 of the brightest magnitude. That is far below one grey level (1/255), so every pixel rounds to 0.
-
-<!-- Analysis (yours): Do you get the same result as before? Why is the difference ~1e-15 and not exactly 0? Why is one DoG convolution preferable to two convolutions? -->
 
 ### Bells & Whistles: Gradient Orientation
 
@@ -265,8 +249,6 @@ Each wheel is the legend: angle is the gradient direction, and the distance from
   <figure><img loading="lazy" src="../images/assignment-2/bw1/twilight_edges.png" alt="Twilight orientation, edges"><figcaption>Edges only</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/bw1/wheel_twilight.png" alt="Twilight wheel"><figcaption>Legend</figcaption></figure>
 </div>
-
-<!-- Analysis (yours): Explain the process in your own words. Pick an edge, e.g. the left side of the coat or a tripod leg: does its colour match the direction from dark to bright on the wheel? Why do the two sides of a thin line (tripod leg) get opposite colours? Why does the colormap need to be cyclic? Which visualization reads better, HSV or twilight, and why? -->
 
 ## Part 2: Fun with Frequencies
 
@@ -319,8 +301,6 @@ sharpened = conv(img, unsharp_kernel(sigma, a))
   <figure><img loading="lazy" src="../images/assignment-2/2.1/crazy-cat_sharp_4.jpg" alt="alpha 4"><figcaption>Sharpened, alpha = 4</figcaption></figure>
 </div>
 
-<!-- Analysis (yours): How does the unsharp mask relate to the blur filter and to high frequencies? What changes as alpha increases: which details get crisper, and where do artifacts appear (halos around the dome and trees, amplified noise or JPEG blocks)? Which alpha looks best for each image? -->
-
 #### Blur, then re-sharpen
 
 A sharp image is blurred with the same Gaussian and then sharpened again with the unsharp mask filter.
@@ -346,8 +326,6 @@ The table gives the root mean square error between each image and the original (
 | Re-sharpened, alpha = 1 | 0.0260 |
 | Re-sharpened, alpha = 2 | 0.0235 |
 | Re-sharpened, alpha = 4 | 0.0336 |
-
-<!-- Analysis (yours): Does re-sharpening recover the original? Compare fine detail (hair, beard, fork tines, plate pattern) between the original and the re-sharpened versions. Why can't the unsharp mask bring back detail the blur removed (what does it amplify instead)? Why does the error go down and then back up as alpha grows? -->
 
 ### 2.2 Hybrid Images
 
