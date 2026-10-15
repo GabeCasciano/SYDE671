@@ -8,6 +8,11 @@ import numpy as np
 from PIL import Image
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+WEB_DIR = Path(__file__).resolve().parents[2] / "website" / "images" / "assignment-2"
+
+# Finite difference operators
+DX = np.array([[1.0, -1.0]])
+DY = np.array([[1.0], [-1.0]])
 
 
 def load_image(path, gray=False):
@@ -17,6 +22,18 @@ def load_image(path, gray=False):
 
 def save_image(path, img):
     Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8)).save(path, quality=95)
+
+
+def signed(img):
+    """Map a signed image to [0, 1] with zero at mid grey."""
+    return 0.5 + img / (2 * np.abs(img).max())
+
+
+def web_dir(part):
+    """Create and return WEB_DIR/<part>/."""
+    path = WEB_DIR / part
+    path.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 def find_images(pattern):
