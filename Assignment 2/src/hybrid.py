@@ -12,9 +12,12 @@ from common import DATA_DIR, gaussian_blur, load_image, parse_args, save_image, 
 DEFAULTS = {
     "im1": "DerekPicture.jpg",   # low frequencies (seen from far)
     "im2": "nutmeg.jpg",         # high frequencies (seen up close)
+    "im_mid": "",                # optional middle band for a three-band hybrid
     "name": "derek_nutmeg",
     "sigma_low": 8.0,
     "sigma_high": 4.0,
+    "sigma_mid": "3,10",         # band-pass G(small) - G(large) for the middle image
+    "max_size": 1500,            # downscale inputs so the longest side is at most this
     "sweep_low": "4,8,16",       # empty to skip the cutoff sweep
     "sweep_high": "2,4,8",
     "process": 1,                # 1 saves the aligned images and FFTs
@@ -80,18 +83,28 @@ def align_images(im1, im2, pts1, pts2):
     return im1, im2
 
 
-def crop_valid(im1, im2):
-    """Replaces the starter's manual crop: trim borders until both images have real pixels everywhere.
+def crop_valid(*imgs):
+    """Replaces the starter's manual crop: trim borders until every image has real pixels everywhere.
 
     The last channel of each image is a validity mask that the padding and rotation zero out.
     """
-    valid = (im1[..., -1] > 0.99) & (im2[..., -1] > 0.99)
+    valid = np.all([im[..., -1] > 0.99 for im in imgs], axis=0)
     t, b, l, r = 0, valid.shape[0], 0, valid.shape[1]
     while not valid[t:b, l:r].all():
         bad = [(~valid[t, l:r]).sum(), (~valid[b - 1, l:r]).sum(), (~valid[t:b, l]).sum(), (~valid[t:b, r - 1]).sum()]
         side = int(np.argmax(bad))
         t, b, l, r = t + (side == 0), b - (side == 1), l + (side == 2), r - (side == 3)
-    return im1[t:b, l:r, :-1], im2[t:b, l:r, :-1]
+    return [im[t:b, l:r, :-1] for im in imgs]
+
+
+def warp_to(img, pts, ref_pts, shape):
+    """Same two-point translate, scale, and rotate as align_images, as one warp into a reference frame."""
+    angle = lambda q: np.arctan2(-(q[1, 1] - q[0, 1]), q[1, 0] - q[0, 0])
+    length = lambda q: np.hypot(*(q[1] - q[0]))
+    c, c_ref = pts.mean(0), ref_pts.mean(0)
+    m = cv2.getRotationMatrix2D(tuple(c), np.degrees(angle(ref_pts) - angle(pts)), length(ref_pts) / length(pts))
+    m[:, 2] += c_ref - c
+    return cv2.warpAffine(img, m, (shape[1], shape[0]), flags=cv2.INTER_LINEAR)
 
 
 def hybrid_image(im1, im2, sigma_low, sigma_high):
@@ -99,6 +112,14 @@ def hybrid_image(im1, im2, sigma_low, sigma_high):
     low = gaussian_blur(im1, sigma_low)
     high = im2 - gaussian_blur(im2, sigma_high)
     return low, high, low + high
+
+
+def three_band(im1, im_mid, im2, sigma_low, sigma_mid, sigma_high):
+    """Low-pass im1, band-pass im_mid (difference of two Gaussians), high-pass im2."""
+    low = gaussian_blur(im1, sigma_low)
+    mid = gaussian_blur(im_mid, sigma_mid[0]) - gaussian_blur(im_mid, sigma_mid[1])
+    high = im2 - gaussian_blur(im2, sigma_high)
+    return low, mid, high, low + mid + high
 
 
 def cutoff(sigma, n):
@@ -114,28 +135,62 @@ def gray(img):
     return img @ np.array([0.299, 0.587, 0.114])
 
 
+def load(name, max_size):
+    """Load an image downscaled to max_size, with its two reference points (clicked once per image)."""
+    img = load_image(DATA_DIR / name)
+    scale = min(1.0, max_size / max(img.shape[:2]))
+    img = resize(img, scale) if scale < 1 else img
+    store = DATA_DIR / "points.json"
+    points = json.loads(store.read_text()) if store.exists() else {}
+    if name not in points:
+        print(f"Click the left eye, then the right eye, on {name}")
+        points[name] = (get_points(img) / scale).tolist()
+        store.write_text(json.dumps(points, indent=1))
+    return img, np.array(points[name]) * scale
+
+
+def with_mask(img):
+    return np.dstack([img, np.ones(img.shape[:2], img.dtype)])
+
+
 def load_aligned(p):
-    """Load both images and align them, clicking the points once and caching them."""
-    im1 = load_image(DATA_DIR / p["im1"])
-    im2 = load_image(DATA_DIR / p["im2"])
-    ones = lambda im: np.ones(im.shape[:2] + (1,), im.dtype)
-    cache = DATA_DIR / f"align_{p['name']}.json"
-    if cache.exists():
-        pts = json.loads(cache.read_text())
-    else:
-        print(f"Click two points on {p['im2']} (e.g. the eyes), then the same two on {p['im1']}")
-        pts = {"im2": get_points(im2).tolist(), "im1": get_points(im1).tolist()}
-        cache.write_text(json.dumps(pts))
+    """Two images aligned with the starter's align_images."""
+    im1, pts1 = load(p["im1"], p["max_size"])
+    im2, pts2 = load(p["im2"], p["max_size"])
     # Same call order as the starter: [im2, im1] = align_images(im2, im1)
-    im2a, im1a = align_images(np.dstack([im2, ones(im2)]), np.dstack([im1, ones(im1)]),
-                              np.array(pts["im2"]), np.array(pts["im1"]))
+    im2a, im1a = align_images(with_mask(im2), with_mask(im1), pts2, pts1)
     im1a, im2a = crop_valid(im1a, im2a)
     return im1, im2, np.clip(im1a, 0, 1), np.clip(im2a, 0, 1)
+
+
+def main_three(p, out):
+    """Three-band hybrid: each image is warped onto the low-frequency image using its two points."""
+    name = p["name"]
+    imgs, pts = zip(*[load(p[k], p["max_size"]) for k in ("im1", "im_mid", "im2")])
+    shape = imgs[0].shape[:2]
+    warped = [with_mask(imgs[0])] + [warp_to(with_mask(im), q, pts[0], shape) for im, q in zip(imgs[1:], pts[1:])]
+    g1, gm, g2 = [gray(np.clip(im, 0, 1)) for im in crop_valid(*warped)]
+    sm = [float(v) for v in p["sigma_mid"].split(",")]
+    low, mid, high, hyb = three_band(g1, gm, g2, p["sigma_low"], sm, p["sigma_high"])
+    for k, im in zip(("im1", "im_mid", "im2"), imgs):
+        save_image(out / f"{name}_{k}.jpg", im)
+    if p["process"]:
+        save_image(out / f"{name}_low.jpg", low)
+        save_image(out / f"{name}_mid.jpg", signed(mid))
+        save_image(out / f"{name}_high.jpg", signed(high))
+    save_image(out / f"{name}_hybrid.jpg", hyb)
+    for s in [0.5, 0.25, 0.125]:
+        save_image(out / f"{name}_hybrid_{s:g}.jpg", resize(hyb, s))
+    n = max(g1.shape)
+    print(f"{name}: size {g1.shape}, low < {cutoff(p['sigma_low'], n):.1f}, "
+          f"mid {cutoff(sm[1], n):.1f}-{cutoff(sm[0], n):.1f}, high > {cutoff(p['sigma_high'], n):.1f} cycles/image")
 
 
 def main():
     p = parse_args(DEFAULTS)
     out = web_dir("2.2")
+    if p["im_mid"]:
+        return main_three(p, out)
     name = p["name"]
     im1, im2, im1a, im2a = load_aligned(p)
     g1, g2 = gray(im1a), gray(im2a)

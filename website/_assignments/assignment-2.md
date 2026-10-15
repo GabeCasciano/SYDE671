@@ -461,6 +461,82 @@ Log magnitude of the 2D Fourier transform, computed as `np.log(np.abs(np.fft.fft
   <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_fft_hybrid.png" alt="FFT hybrid"><figcaption>Hybrid</figcaption></figure>
 </div>
 
+#### Cats
+
+Two photos of the same cat, aligned on the eyes. Both arrangements are shown: each photo is used once as the low-frequency image and once as the high-frequency image. Both use $$ \sigma_{low} = 8 $$ and $$ \sigma_{high} = 4 $$.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_im1.jpg" alt="Cat photo 1"><figcaption>Photo 1 (low frequencies)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_im2.jpg" alt="Cat photo 2"><figcaption>Photo 2 (high frequencies)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_hybrid.jpg" alt="Hybrid"><figcaption>Hybrid</figcaption></figure>
+</div>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_im1.jpg" alt="Cat photo 2"><figcaption>Photo 2 (low frequencies)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_im2.jpg" alt="Cat photo 1"><figcaption>Photo 1 (high frequencies)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_hybrid.jpg" alt="Hybrid"><figcaption>Hybrid</figcaption></figure>
+</div>
+
+#### Three-band hybrid: father and sisters
+
+This extends the hybrid to three images. A third image adds a middle band of frequencies, taken with a band-pass filter: the difference of two Gaussians. Up close the high-pass image dominates, at a middle distance the band-pass image does, and from far away the low-pass image does.
+
+$$ H = I_1 * G_{\sigma_{low}} + \left( I_2 * G_{\sigma_a} - I_2 * G_{\sigma_b} \right) + \left( I_3 - I_3 * G_{\sigma_{high}} \right) $$
+
+```python
+def three_band(im1, im_mid, im2, sigma_low, sigma_mid, sigma_high):
+    low = gaussian_blur(im1, sigma_low)
+    mid = gaussian_blur(im_mid, sigma_mid[0]) - gaussian_blur(im_mid, sigma_mid[1])
+    high = im2 - gaussian_blur(im2, sigma_high)
+    return low, mid, high, low + mid + high
+```
+
+The middle and high images are aligned to the low-frequency image using the same two-point translation, scale, and rotation as `align_images`, applied as a single warp. Both results use $$ \sigma_{low} = 14 $$, $$ \sigma_a = 4 $$, $$ \sigma_b = 10 $$, and $$ \sigma_{high} = 2 $$. For a 1350 px tall image this keeps the three bands apart:
+
+| Band | Cycles per image |
+|------|------------------|
+| Low | below 18 |
+| Middle | 25 to 63 |
+| High | above 126 |
+
+##### Father (low), sister 1 (middle), sister 2 (high)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_im1.jpg" alt="Father"><figcaption>Father (low)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_im_mid.jpg" alt="Sister 1"><figcaption>Sister 1 (middle)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_im2.jpg" alt="Sister 2"><figcaption>Sister 2 (high)</figcaption></figure>
+</div>
+
+<figure>
+  <img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_hybrid.jpg" alt="Three-band hybrid">
+  <figcaption>Three-band hybrid</figcaption>
+</figure>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_hybrid_0.5.jpg" alt="1/2"><figcaption>1/2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_hybrid_0.25.jpg" alt="1/4"><figcaption>1/4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_hybrid_0.125.jpg" alt="1/8"><figcaption>1/8</figcaption></figure>
+</div>
+
+##### Sister 1 (low), father (middle), sister 2 (high)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_im1.jpg" alt="Sister 1"><figcaption>Sister 1 (low)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_im_mid.jpg" alt="Father"><figcaption>Father (middle)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_im2.jpg" alt="Sister 2"><figcaption>Sister 2 (high)</figcaption></figure>
+</div>
+
+<figure>
+  <img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid.jpg" alt="Three-band hybrid">
+  <figcaption>Three-band hybrid</figcaption>
+</figure>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid_0.5.jpg" alt="1/2"><figcaption>1/2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid_0.25.jpg" alt="1/4"><figcaption>1/4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid_0.125.jpg" alt="1/8"><figcaption>1/8</figcaption></figure>
+</div>
+
 ### Bells & Whistles: Hybrid Images
 
 The same hybrid ($$ \sigma_{low} = 8 $$, $$ \sigma_{high} = 4 $$), with colour kept in the low-frequency image, the high-frequency image, both, or neither. Colour images are filtered one channel at a time.

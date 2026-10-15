@@ -6,7 +6,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 from scipy.signal import convolve2d
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -21,7 +21,8 @@ D135 = np.fliplr(D45)
 
 def load_image(path, gray=False):
     """Load an image as float32 in [0, 1], grayscale or RGB."""
-    return np.asarray(Image.open(path).convert("L" if gray else "RGB"), dtype=np.float32) / 255.0
+    img = ImageOps.exif_transpose(Image.open(path))
+    return np.asarray(img.convert("L" if gray else "RGB"), dtype=np.float32) / 255.0
 
 
 def save_image(path, img):
