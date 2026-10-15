@@ -548,6 +548,56 @@ The same hybrid ($$ \sigma_{low} = 8 $$, $$ \sigma_{high} = 4 $$), with colour k
   <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_colour_both.jpg" alt="Colour both"><figcaption>Colour both</figcaption></figure>
 </div>
 
+#### Cats
+
+Same settings as above ($$ \sigma_{low} = 8 $$, $$ \sigma_{high} = 4 $$, cropped to the faces).
+
+##### Big cat (low), little cat (high)
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_colour_none.jpg" alt="Grayscale"><figcaption>Grayscale</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_colour_low.jpg" alt="Colour low"><figcaption>Colour low frequencies (big cat)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_colour_high.jpg" alt="Colour high"><figcaption>Colour high frequencies (little cat)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/bigcat_littlecat_colour_both.jpg" alt="Colour both"><figcaption>Colour both</figcaption></figure>
+</div>
+
+##### Little cat (low), big cat (high)
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_colour_none.jpg" alt="Grayscale"><figcaption>Grayscale</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_colour_low.jpg" alt="Colour low"><figcaption>Colour low frequencies (little cat)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_colour_high.jpg" alt="Colour high"><figcaption>Colour high frequencies (big cat)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_colour_both.jpg" alt="Colour both"><figcaption>Colour both</figcaption></figure>
+</div>
+
+#### Three-band hybrids
+
+With three bands, colour can be kept in the low, middle, or high band, or in all three. Same settings as above.
+
+##### Father (low), sister 1 (middle), sister 2 (high)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_colour_none.jpg" alt="Grayscale"><figcaption>Grayscale</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_colour_low.jpg" alt="Colour low"><figcaption>Colour low (father)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_colour_mid.jpg" alt="Colour middle"><figcaption>Colour middle (sister 1)</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_colour_high.jpg" alt="Colour high"><figcaption>Colour high (sister 2)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_colour_all.jpg" alt="Colour all"><figcaption>Colour all three</figcaption></figure>
+</div>
+
+##### Sister 1 (low), father (middle), sister 2 (high)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_colour_none.jpg" alt="Grayscale"><figcaption>Grayscale</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_colour_low.jpg" alt="Colour low"><figcaption>Colour low (sister 1)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_colour_mid.jpg" alt="Colour middle"><figcaption>Colour middle (father)</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_colour_high.jpg" alt="Colour high"><figcaption>Colour high (sister 2)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_colour_all.jpg" alt="Colour all"><figcaption>Colour all three</figcaption></figure>
+</div>
+
 ### 2.3 Gaussian and Laplacian Stacks
 
 ### 2.4 Multiresolution Blending

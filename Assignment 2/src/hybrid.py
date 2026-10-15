@@ -182,7 +182,8 @@ def main_three(p, out):
     imgs, pts = zip(*[load(p[k], p["max_size"]) for k in ("im1", "im_mid", "im2")])
     shape = imgs[0].shape[:2]
     warped = [with_mask(imgs[0])] + [warp_to(with_mask(im), q, pts[0], shape) for im, q in zip(imgs[1:], pts[1:])]
-    g1, gm, g2 = [gray(np.clip(im, 0, 1)) for im in crop_valid(*warped)]
+    colour = [np.clip(im, 0, 1) for im in crop_valid(*warped)]
+    g1, gm, g2 = [gray(im) for im in colour]
     sm = [float(v) for v in p["sigma_mid"].split(",")]
     low, mid, high, hyb = three_band(g1, gm, g2, p["sigma_low"], sm, p["sigma_high"])
     for k, im in zip(("im1", "im_mid", "im2"), imgs):
@@ -194,6 +195,11 @@ def main_three(p, out):
     save_image(out / f"{name}_hybrid.jpg", hyb)
     for s in [0.5, 0.25, 0.125]:
         save_image(out / f"{name}_hybrid_{s:g}.jpg", resize(hyb, s))
+    if p["colour"]:
+        greys = [np.dstack([g] * 3) for g in (g1, gm, g2)]
+        for mode in ["none", "low", "mid", "high", "all"]:
+            bands = [c if mode in (k, "all") else g for k, c, g in zip(("low", "mid", "high"), colour, greys)]
+            save_image(out / f"{name}_colour_{mode}.jpg", three_band(*bands, p["sigma_low"], sm, p["sigma_high"])[3])
     n = max(g1.shape)
     print(f"{name}: size {g1.shape}, low < {cutoff(p['sigma_low'], n):.1f}, "
           f"mid {cutoff(sm[1], n):.1f}-{cutoff(sm[0], n):.1f}, high > {cutoff(p['sigma_high'], n):.1f} cycles/image")
