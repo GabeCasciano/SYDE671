@@ -227,6 +227,47 @@ The largest difference between the two-step and DoG gradient magnitudes is 1.65e
 
 ### Bells & Whistles: Gradient Orientation
 
+The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. No built-in angle function (`np.arctan2`, `np.angle`) is used. The angle is the arctangent of the slope $$ g_y / g_x $$, which only covers $$ (-\pi/2, \pi/2) $$, so $$ \pi $$ is added wherever $$ g_x < 0 $$ to recover the full circle. Code: `Assignment 2/src/orientation.py`.
+
+$$ \theta = \begin{cases} \arctan(g_y / g_x) & g_x > 0 \\ \arctan(g_y / g_x) + \pi & g_x < 0 \\ \pm \pi / 2 & g_x = 0 \end{cases} \pmod{2\pi} $$
+
+```python
+def orientation(gx, gy):
+    with np.errstate(divide="ignore", invalid="ignore"):
+        theta = np.arctan(gy / gx)
+    theta = np.where(gx < 0, theta + np.pi, theta)
+    theta = np.nan_to_num(theta)
+    return np.mod(theta, 2 * np.pi)
+```
+
+The orientation sets the hue and the gradient magnitude sets the brightness, so flat regions go dark. Hue is periodic, which means 0 and $$ 2\pi $$ get the same colour. The magnitude is scaled by its 99th percentile and clipped to 1. In the "edges only" images, the brightness is the binary edge map from 1.3 (t = 0.06), so every edge pixel is shown at full brightness.
+
+```python
+hsv = np.dstack([theta / (2 * np.pi), np.ones_like(theta), value])
+rgb = hsv_to_rgb(hsv)                                        # HSV colour space
+rgb = colormaps["twilight"](theta / (2 * np.pi))[..., :3] * value[..., None]  # cyclic colormap
+```
+
+Each wheel is the legend: angle is the gradient direction, and the distance from the centre is the magnitude.
+
+#### HSV
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/bw1/hsv.png" alt="HSV orientation"><figcaption>Brightness = magnitude</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/bw1/hsv_edges.png" alt="HSV orientation, edges"><figcaption>Edges only</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/bw1/wheel_hsv.png" alt="HSV wheel"><figcaption>Legend</figcaption></figure>
+</div>
+
+#### Matplotlib `twilight` (cyclic)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/bw1/twilight.png" alt="Twilight orientation"><figcaption>Brightness = magnitude</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/bw1/twilight_edges.png" alt="Twilight orientation, edges"><figcaption>Edges only</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/bw1/wheel_twilight.png" alt="Twilight wheel"><figcaption>Legend</figcaption></figure>
+</div>
+
+<!-- Analysis (yours): Explain the process in your own words. Pick an edge, e.g. the left side of the coat or a tripod leg: does its colour match the direction from dark to bright on the wheel? Why do the two sides of a thin line (tripod leg) get opposite colours? Why does the colormap need to be cyclic? Which visualization reads better, HSV or twilight, and why? -->
+
 ## Part 2: Fun with Frequencies
 
 ### 2.1 Image Sharpening
