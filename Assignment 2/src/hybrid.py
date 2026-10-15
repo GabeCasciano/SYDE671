@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.ndimage import rotate
 
-from common import DATA_DIR, gaussian_blur, load_image, parse_args, save_image, signed, web_dir
+from common import DATA_DIR, gaussian_blur, load_image, parse_args, resize, save_image, signed, web_dir
 
 DEFAULTS = {
     "im1": "DerekPicture.jpg",   # low frequencies (seen from far)
@@ -44,11 +44,6 @@ def pad_x(img, t):
 def pad_y(img, t):
     w = [(t, 0) if t > 0 else (0, -t), (0, 0)] + [(0, 0)] * (img.ndim - 2)
     return np.pad(img, w)
-
-
-def resize(img, scale):
-    h, w = img.shape[:2]
-    return cv2.resize(img, (round(w * scale), round(h * scale)), interpolation=cv2.INTER_LINEAR)
 
 
 def align_images(im1, im2, pts1, pts2):

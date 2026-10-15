@@ -44,6 +44,12 @@ def gaussian_blur(img, sigma):
     return convolve2d(img, g.T, mode="same", boundary="symm")
 
 
+def resize(img, scale):
+    """Bilinear resize by a scale factor."""
+    h, w = img.shape[:2]
+    return cv2.resize(img, (round(w * scale), round(h * scale)), interpolation=cv2.INTER_LINEAR)
+
+
 def signed(img):
     """Map a signed image to [0, 1] with zero at mid grey."""
     return 0.5 + img / (2 * np.abs(img).max())

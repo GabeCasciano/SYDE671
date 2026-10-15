@@ -602,7 +602,7 @@ With three bands, colour can be kept in the low, middle, or high band, or in all
 
 ### 2.3 Gaussian and Laplacian Stacks
 
-A stack is like a pyramid without downsampling: every level stays the same size as the original image. Each level of the Gaussian stack is the previous level blurred with the 5-tap binomial filter from the lecture, $$ \tfrac{1}{16}[1\ 4\ 6\ 4\ 1] $$, applied separably in x and y. A pyramid halves the image at each level, so a fixed-size filter covers twice as much of the scene each time. Without downsampling, the same effect comes from spreading the filter taps out instead: at level $$ i $$ there are $$ 2^i - 1 $$ zeros between taps. Each Laplacian level is the difference between neighbouring Gaussian levels. The last level is the Gaussian residual, so adding up the Laplacian stack gives back the original image. Both images use 8 levels, and colour images are filtered one channel at a time. Code: `Assignment 2/src/stacks.py`.
+A stack is like a pyramid without downsampling: every level stays the same size as the original image. Each level of the Gaussian stack is the previous level blurred with the 5-tap binomial filter from the lecture, $$ \tfrac{1}{16}[1\ 4\ 6\ 4\ 1] $$, applied separably in x and y. A pyramid halves the image at each level, so a fixed-size filter covers twice as much of the scene each time. Without downsampling, the same effect comes from spreading the filter taps out instead: at level $$ i $$ there are $$ 2^i - 1 $$ zeros between taps. Only the 5 non-zero taps are computed, by adding shifted copies of the image. Each Laplacian level is the difference between neighbouring Gaussian levels. The last level is the Gaussian residual, so adding up the Laplacian stack gives back the original image. All images use 8 levels, and colour images are filtered one channel at a time. Code: `Assignment 2/src/stacks.py`.
 
 $$ G_0 = I, \quad G_{i+1} = G_i * b_i, \quad L_i = G_i - G_{i+1}, \quad L_{N-1} = G_{N-1}, \quad \sum_i L_i = I $$
 
@@ -611,11 +611,14 @@ BINOMIAL = np.array([1, 4, 6, 4, 1]) / 16
 
 
 def blur(img, level):
-    k = np.zeros(4 * 2 ** level + 1)
-    k[::2 ** level] = BINOMIAL
-    k = k[None, :]
-    img = convolve2d(img, k, mode="same", boundary="symm")
-    return convolve2d(img, k.T, mode="same", boundary="symm")
+    step = 2 ** level
+    for axis in (0, 1):
+        pad = [(0, 0)] * img.ndim
+        pad[axis] = (2 * step, 2 * step)
+        p = np.pad(img, pad, mode="symmetric")
+        n = img.shape[axis]
+        img = sum(w * np.take(p, np.arange(j * step, j * step + n), axis=axis) for j, w in enumerate(BINOMIAL))
+    return img
 
 
 def gaussian_stack(img, levels):
@@ -630,7 +633,7 @@ def laplacian_stack(img, levels):
     return [g[i] - g[i + 1] for i in range(levels - 1)] + [g[-1]]
 ```
 
-Adding up the Laplacian stack reproduces each input to within 2.2e-16.
+Adding up the Laplacian stack reproduces each input to within 2.2e-16. The family photos are downscaled so their longest side is 1000 px.
 
 The Laplacian levels are band-pass images with positive and negative values. They are shown around mid grey (zero), each scaled by its own 99th percentile of absolute value so that the weaker fine levels are still visible. The residual is shown as is.
 
@@ -690,31 +693,287 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
 </div>
 
+#### Father
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g2.jpg" alt="G2"><figcaption>G2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g3.jpg" alt="G3"><figcaption>G3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g4.jpg" alt="G4"><figcaption>G4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g5.jpg" alt="G5"><figcaption>G5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
+</div>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l2.jpg" alt="L2"><figcaption>L2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l3.jpg" alt="L3"><figcaption>L3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l4.jpg" alt="L4"><figcaption>L4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l5.jpg" alt="L5"><figcaption>L5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
+</div>
+
+#### Sister 1
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g2.jpg" alt="G2"><figcaption>G2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g3.jpg" alt="G3"><figcaption>G3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g4.jpg" alt="G4"><figcaption>G4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g5.jpg" alt="G5"><figcaption>G5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
+</div>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l2.jpg" alt="L2"><figcaption>L2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l3.jpg" alt="L3"><figcaption>L3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l4.jpg" alt="L4"><figcaption>L4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l5.jpg" alt="L5"><figcaption>L5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
+</div>
+
+#### Sister 2
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g2.jpg" alt="G2"><figcaption>G2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g3.jpg" alt="G3"><figcaption>G3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g4.jpg" alt="G4"><figcaption>G4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g5.jpg" alt="G5"><figcaption>G5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
+</div>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l2.jpg" alt="L2"><figcaption>L2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l3.jpg" alt="L3"><figcaption>L3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l4.jpg" alt="L4"><figcaption>L4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l5.jpg" alt="L5"><figcaption>L5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
+</div>
+
 #### Recreating Szeliski figure 3.42
 
 The figure uses the mask blending described in 2.4, with a vertical step mask. The masked apple is $$ G^M_i L^A_i $$, the masked orange is $$ (1 - G^M_i) L^B_i $$, and the blended level is their sum. Within each of the first three rows, all three images share the same display scale. The bottom row adds up all 8 levels of each stack.
 
 <div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_apple_l0.jpg" alt="(a) Masked apple, level 0"><figcaption>(a) Masked apple, level 0</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_orange_l0.jpg" alt="(b) Masked orange, level 0"><figcaption>(b) Masked orange, level 0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_a_l0.jpg" alt="(a) Masked apple, level 0"><figcaption>(a) Masked apple, level 0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_b_l0.jpg" alt="(b) Masked orange, level 0"><figcaption>(b) Masked orange, level 0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_blend_l0.jpg" alt="(c) Blended, level 0"><figcaption>(c) Blended, level 0</figcaption></figure>
 </div>
 <div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_apple_l2.jpg" alt="(d) Masked apple, level 2"><figcaption>(d) Masked apple, level 2</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_orange_l2.jpg" alt="(e) Masked orange, level 2"><figcaption>(e) Masked orange, level 2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_a_l2.jpg" alt="(d) Masked apple, level 2"><figcaption>(d) Masked apple, level 2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_b_l2.jpg" alt="(e) Masked orange, level 2"><figcaption>(e) Masked orange, level 2</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_blend_l2.jpg" alt="(f) Blended, level 2"><figcaption>(f) Blended, level 2</figcaption></figure>
 </div>
 <div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_apple_l4.jpg" alt="(g) Masked apple, level 4"><figcaption>(g) Masked apple, level 4</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_orange_l4.jpg" alt="(h) Masked orange, level 4"><figcaption>(h) Masked orange, level 4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_a_l4.jpg" alt="(g) Masked apple, level 4"><figcaption>(g) Masked apple, level 4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_b_l4.jpg" alt="(h) Masked orange, level 4"><figcaption>(h) Masked orange, level 4</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_blend_l4.jpg" alt="(i) Blended, level 4"><figcaption>(i) Blended, level 4</figcaption></figure>
 </div>
 <div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_apple_sum.jpg" alt="(j) Masked apple, collapsed"><figcaption>(j) Masked apple, collapsed</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_orange_sum.jpg" alt="(k) Masked orange, collapsed"><figcaption>(k) Masked orange, collapsed</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_a_sum.jpg" alt="(j) Masked apple, collapsed"><figcaption>(j) Masked apple, collapsed</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_b_sum.jpg" alt="(k) Masked orange, collapsed"><figcaption>(k) Masked orange, collapsed</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_blend_sum.jpg" alt="(l) Blended, collapsed"><figcaption>(l) Blended, collapsed</figcaption></figure>
 </div>
 
 ### 2.4 Multiresolution Blending
 
+Blending follows the mask algorithm on page 230 of Burt and Adelson. A Laplacian stack is built for each image, and a Gaussian stack for the mask. Each level is blended using the mask blurred to the same level, and the blended levels are added up. Because the mask gets wider at coarser levels, low frequencies mix over a wide band while fine detail switches over sharply, so no single seam is visible. The stacks are the ones from 2.3 (8 levels). Code: `Assignment 2/src/blend.py`.
+
+$$ L^{blend}_i = G^M_i \, L^A_i + \left(1 - G^M_i\right) L^B_i, \qquad I^{blend} = \sum_i L^{blend}_i $$
+
+```python
+def blend_stacks(im1, im2, mask, levels):
+    gm = gaussian_stack(mask, levels)
+    l1, l2 = laplacian_stack(im1, levels), laplacian_stack(im2, levels)
+    a = [m * x for m, x in zip(gm, l1)]
+    b = [(1 - m) * x for m, x in zip(gm, l2)]
+    return a, b, [x + y for x, y in zip(a, b)]
+
+
+result = sum(blend_stacks(im1, im2, mask, 8)[2])
+```
+
+#### The oraple
+
+The mask is a vertical step: 1 on the left half (apple), 0 on the right (orange).
+
+<figure>
+  <img loading="lazy" src="../images/assignment-2/2.4/oraple.jpg" alt="Oraple">
+  <figcaption>Oraple</figcaption>
+</figure>
+
+#### Vertical seams: father and sisters
+
+Each pair is aligned on the eyes: the second photo is warped onto the first with the same two-point transform used in 2.2. The seam runs vertically through the midpoint between the eyes, with the first person on the left. If the warped photo doesn't cover part of the frame, the first photo is used there.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_sister1_seam_a.jpg" alt="Father"><figcaption>Father</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_sister1_seam_b.jpg" alt="Sister 1 (aligned)"><figcaption>Sister 1 (aligned)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_sister1_seam.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
+</div>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_sister2_seam_a.jpg" alt="Father"><figcaption>Father</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_sister2_seam_b.jpg" alt="Sister 2 (aligned)"><figcaption>Sister 2 (aligned)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_sister2_seam.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
+</div>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_sister2_seam_a.jpg" alt="Sister 1"><figcaption>Sister 1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_sister2_seam_b.jpg" alt="Sister 2 (aligned)"><figcaption>Sister 2 (aligned)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_sister2_seam.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
+</div>
+
+#### Irregular masks
+
+The masks are generated shapes placed relative to the eyes of the base image. They are positioned from the midpoint between the eyes and sized by the distance between them. Ellipses are filled with the ellipse equation, and polygons are filled with matplotlib's `Path.contains_points`. In each mask, white keeps the base image and black brings in the second image.
+
+```python
+def make_mask(kind, shape, pts):
+    c, d = pts.mean(0), np.hypot(*(pts[1] - pts[0]))
+    if kind == "eyes":
+        return ellipse(shape, c, (0.95 * d, 0.4 * d))
+    if kind == "face":
+        return ellipse(shape, (c[0], c[1] + 0.45 * d), (1.1 * d, 1.6 * d))
+    if kind == "nose":
+        return polygon(shape, (c[0], c[1] + 0.95 * d), 0.7 * d, 6, np.pi / 6)
+```
+
+##### Eye swap (ellipse): sister 2's eyes on father
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_a.jpg" alt="Father (base)"><figcaption>Father (base)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_b.jpg" alt="Sister 2 (aligned)"><figcaption>Sister 2 (aligned)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_mask.png" alt="Mask"><figcaption>Mask</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
+</div>
+
+##### Face swap (ellipse): father's face on sister 1
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_face_father_a.jpg" alt="Sister 1 (base)"><figcaption>Sister 1 (base)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_face_father_b.jpg" alt="Father (aligned)"><figcaption>Father (aligned)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_face_father_mask.png" alt="Mask"><figcaption>Mask</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_face_father.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
+</div>
+
+##### Nose and mouth swap (hexagon): father's nose and mouth on sister 2
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister2_nose_father_a.jpg" alt="Sister 2 (base)"><figcaption>Sister 2 (base)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister2_nose_father_b.jpg" alt="Father (aligned)"><figcaption>Father (aligned)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister2_nose_father_mask.png" alt="Mask"><figcaption>Mask</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister2_nose_father.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
+</div>
+
+#### Something different: cats and pasta
+
+##### Little cat's face on pasta boy
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/pastaboy_face_littlecat_a.jpg" alt="Pasta boy (base)"><figcaption>Pasta boy (base)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/pastaboy_face_littlecat_b.jpg" alt="Little cat (aligned)"><figcaption>Little cat (aligned)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/pastaboy_face_littlecat_mask.png" alt="Mask"><figcaption>Mask</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/pastaboy_face_littlecat.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
+</div>
+
+##### Pasta boy's face on big cat
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/bigcat_face_pastaboy_a.jpg" alt="Big cat (base)"><figcaption>Big cat (base)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/bigcat_face_pastaboy_b.jpg" alt="Pasta boy (aligned)"><figcaption>Pasta boy (aligned)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/bigcat_face_pastaboy_mask.png" alt="Mask"><figcaption>Mask</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/bigcat_face_pastaboy.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
+</div>
+
+#### The process: eye swap
+
+This follows Burt and Adelson figure 10 for the eye swap. The rows are Laplacian levels 0, 2, and 4, and the bottom row adds up all 8 levels. The columns are the masked father, $$ G^M_i L^A_i $$, the masked sister, $$ (1 - G^M_i) L^B_i $$, and their sum. Within each row, all three images share the same display scale, around mid grey.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_a_l0.jpg" alt="(a) Masked father, level 0"><figcaption>(a) Masked father, level 0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_b_l0.jpg" alt="(b) Masked sister 2, level 0"><figcaption>(b) Masked sister 2, level 0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_blend_l0.jpg" alt="(c) Blended, level 0"><figcaption>(c) Blended, level 0</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_a_l2.jpg" alt="(d) Masked father, level 2"><figcaption>(d) Masked father, level 2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_b_l2.jpg" alt="(e) Masked sister 2, level 2"><figcaption>(e) Masked sister 2, level 2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_blend_l2.jpg" alt="(f) Blended, level 2"><figcaption>(f) Blended, level 2</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_a_l4.jpg" alt="(g) Masked father, level 4"><figcaption>(g) Masked father, level 4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_b_l4.jpg" alt="(h) Masked sister 2, level 4"><figcaption>(h) Masked sister 2, level 4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_blend_l4.jpg" alt="(i) Blended, level 4"><figcaption>(i) Blended, level 4</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_a_sum.jpg" alt="(j) Masked father, collapsed"><figcaption>(j) Masked father, collapsed</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_b_sum.jpg" alt="(k) Masked sister 2, collapsed"><figcaption>(k) Masked sister 2, collapsed</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_blend_sum.jpg" alt="(l) Blended, collapsed"><figcaption>(l) Blended, collapsed</figcaption></figure>
+</div>
+
 ### Bells & Whistles: Blending
+
+The oraple and the eye swap blended in grayscale and in colour. For colour, every channel is blended separately with the same mask stack.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/oraple_gray.jpg" alt="Oraple, grayscale"><figcaption>Oraple, grayscale</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/oraple.jpg" alt="Oraple, colour"><figcaption>Oraple, colour</figcaption></figure>
+</div>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_gray.jpg" alt="Eye swap, grayscale"><figcaption>Eye swap, grayscale</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2.jpg" alt="Eye swap, colour"><figcaption>Eye swap, colour</figcaption></figure>
+</div>
+
+## Tooling: Selecting Alignment Points
+
+The hybrid images (2.2) and the blends (2.4) need two matching points on each photo, usually the centres of the eyes. They are picked with a small click tool modelled on `ginput` in the MATLAB starter. The image opens in a matplotlib window, and `plt.ginput(2)` waits for two clicks: first the left eye, then the right eye, as they appear on screen. The window closes after the second click.
+
+```python
+def get_points(img, n=2):
+    plt.imshow(img, cmap="gray")
+    plt.title(f"Click {n} points")
+    pts = plt.ginput(n, timeout=0)
+    plt.close()
+    return np.array(pts)
+```
+
+The points are saved per image in `Assignment 2/data/points.json`, in the coordinates of the full-resolution original, so each photo only has to be clicked once. When an image is loaded at a smaller size, its points are scaled to match. Those two points then define everything else:
+
+- **Alignment:** the translation, scale, and rotation that map one pair of points onto the other (the midpoint, the distance between the points, and the angle of the line between them).
+- **Face crop:** the cat hybrids are cropped to a box sized in eye distances around the midpoint.
+- **Masks:** the eye, face, and nose shapes in 2.4 are positioned from the midpoint and sized by the eye distance.
+
+The images below show the stored points. The red circles are the two clicks, in order. The dashed line sets the scale and rotation, and the yellow cross marks the midpoint that the images are aligned on.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/points/father.jpg" alt="Father with alignment points"><figcaption>Father</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/points/sister-2.jpg" alt="Sister 2 with alignment points"><figcaption>Sister 2</figcaption></figure>
+</div>
