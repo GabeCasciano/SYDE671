@@ -115,6 +115,11 @@ figcaption a:hover {
   }
 }
 
+/* Fixed two columns, for sets of four */
+.media-grid--2x2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 /* Lightbox for content images */
 .zoomable {
   cursor: zoom-in;
