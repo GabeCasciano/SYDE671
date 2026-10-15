@@ -329,7 +329,148 @@ The table gives the root mean square error between each image and the original (
 
 ### 2.2 Hybrid Images
 
+A hybrid image adds the low frequencies of one image to the high frequencies of another (Oliva, Torralba, and Schyns, 2006). Up close the high frequencies dominate, and from far away only the low frequencies are visible. The code is a Python port of the MATLAB starter (`hybrid_image_starter.m` and `align_images.m`). Code: `Assignment 2/src/hybrid.py`.
+
+```mermaid
+flowchart LR
+  A[Image 1<br/>Derek] --> C[Align<br/>2 points per image:<br/>translate, scale, rotate, crop]
+  B[Image 2<br/>Nutmeg] --> C
+  C --> D[Grayscale]
+  D --> E[Low-pass image 1<br/>Gaussian, sigma_low]
+  D --> F[High-pass image 2<br/>image - Gaussian, sigma_high]
+  E --> G[Add]
+  F --> G
+  G --> H[Hybrid image]
+  E --> I[Log magnitude FFT<br/>of inputs, filtered images, hybrid]
+  F --> I
+  H --> I
+```
+
+#### Alignment
+
+Two points are clicked on each image (the eyes). `align_images` follows the MATLAB version step by step:
+
+1. Pad each image so the midpoint of its two points is at the image centre.
+2. Downscale the larger image so the distance between the points matches.
+3. Rotate one image so the angle of the line between the points matches.
+4. Crop both images to the same size.
+
+The starter also has an optional manual crop at the end. Here it is done automatically instead: the borders are trimmed until neither image has any of the black fill left by the padding and rotation. The clicked points are saved, so the alignment is repeatable.
+
+```python
+def align_images(im1, im2, pts1, pts2):
+    (x1, y1), (x2, y2) = pts1.T, pts2.T
+    h1, w1 = im1.shape[:2]
+    h2, w2 = im2.shape[:2]
+    im1 = pad_y(pad_x(im1, round((w1 / 2 - x1.mean()) * 2)), round((h1 / 2 - y1.mean()) * 2))
+    im2 = pad_y(pad_x(im2, round((w2 / 2 - x2.mean()) * 2)), round((h2 / 2 - y2.mean()) * 2))
+
+    len1 = np.hypot(x1[1] - x1[0], y1[1] - y1[0])
+    len2 = np.hypot(x2[1] - x2[0], y2[1] - y2[0])
+    dscale = len2 / len1
+    if dscale < 1:
+        im1 = resize(im1, dscale)
+    else:
+        im2 = resize(im2, 1 / dscale)
+
+    theta1 = np.arctan2(-(y1[1] - y1[0]), x1[1] - x1[0])
+    theta2 = np.arctan2(-(y2[1] - y2[0]), x2[1] - x2[0])
+    im1 = rotate(im1, np.degrees(theta2 - theta1), reshape=True, order=1)
+    ...  # crop both to the same height and width
+```
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_im1.jpg" alt="Derek original"><figcaption>Derek (original)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_im2.jpg" alt="Nutmeg original"><figcaption>Nutmeg (original)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_im1_aligned.jpg" alt="Derek aligned"><figcaption>Derek (aligned, grayscale)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_im2_aligned.jpg" alt="Nutmeg aligned"><figcaption>Nutmeg (aligned, grayscale)</figcaption></figure>
+</div>
+
+#### Filtering
+
+The low-pass filter is a Gaussian, and the high-pass filter is the impulse minus a Gaussian, computed by subtracting the blurred image from the original:
+
+$$ H = I_1 * G_{\sigma_{low}} + \left( I_2 - I_2 * G_{\sigma_{high}} \right) $$
+
+```python
+def hybrid_image(im1, im2, sigma_low, sigma_high):
+    low = gaussian_blur(im1, sigma_low)
+    high = im2 - gaussian_blur(im2, sigma_high)
+    return low, high, low + high
+```
+
+The cutoff of each filter is set by its $$ \sigma $$. The Fourier transform of a Gaussian is also a Gaussian, with a standard deviation of $$ 1 / (2\pi\sigma) $$ cycles per pixel. Its response falls to one half at
+
+$$ f_c = \frac{\sqrt{2 \ln 2}}{2 \pi \sigma} \approx \frac{0.187}{\sigma} \text{ cycles per pixel} $$
+
+The aligned images are 659 x 701, so the frequencies below are given in cycles per image (multiplied by 701).
+
+#### Cutoff frequency
+
+Rows change $$ \sigma_{low} $$ (Derek) and columns change $$ \sigma_{high} $$ (Nutmeg).
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_sweep_low4_high2.jpg" alt=""><figcaption>sigma_low 4 (33), sigma_high 2 (66)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_sweep_low4_high4.jpg" alt=""><figcaption>sigma_low 4 (33), sigma_high 4 (33)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_sweep_low4_high8.jpg" alt=""><figcaption>sigma_low 4 (33), sigma_high 8 (16)</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_sweep_low8_high2.jpg" alt=""><figcaption>sigma_low 8 (16), sigma_high 2 (66)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_sweep_low8_high4.jpg" alt=""><figcaption>sigma_low 8 (16), sigma_high 4 (33)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_sweep_low8_high8.jpg" alt=""><figcaption>sigma_low 8 (16), sigma_high 8 (16)</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_sweep_low16_high2.jpg" alt=""><figcaption>sigma_low 16 (8), sigma_high 2 (66)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_sweep_low16_high4.jpg" alt=""><figcaption>sigma_low 16 (8), sigma_high 4 (33)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_sweep_low16_high8.jpg" alt=""><figcaption>sigma_low 16 (8), sigma_high 8 (16)</figcaption></figure>
+</div>
+
+Cutoffs in brackets are in cycles per image.
+
+#### Chosen result: sigma_low = 8, sigma_high = 4
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_low.jpg" alt="Low-pass Derek"><figcaption>Low-pass Derek</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_high.jpg" alt="High-pass Nutmeg"><figcaption>High-pass Nutmeg (mid grey is zero)</figcaption></figure>
+</div>
+
+<figure>
+  <img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_hybrid.jpg" alt="Hybrid">
+  <figcaption>Hybrid</figcaption>
+</figure>
+
+The same hybrid at 1/2, 1/4, and 1/8 size, which is like viewing it from further away:
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_hybrid_0.5.jpg" alt="1/2"><figcaption>1/2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_hybrid_0.25.jpg" alt="1/4"><figcaption>1/4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_hybrid_0.125.jpg" alt="1/8"><figcaption>1/8</figcaption></figure>
+</div>
+
+#### Frequency analysis
+
+Log magnitude of the 2D Fourier transform, computed as `np.log(np.abs(np.fft.fftshift(np.fft.fft2(gray_image))))`. All five spectra use the same grey scale (set from the two inputs), so brightness can be compared between them.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_fft_im1.png" alt="FFT Derek"><figcaption>Derek</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_fft_im2.png" alt="FFT Nutmeg"><figcaption>Nutmeg</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_fft_low.png" alt="FFT low-pass"><figcaption>Low-pass Derek</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_fft_high.png" alt="FFT high-pass"><figcaption>High-pass Nutmeg</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_fft_hybrid.png" alt="FFT hybrid"><figcaption>Hybrid</figcaption></figure>
+</div>
+
 ### Bells & Whistles: Hybrid Images
+
+The same hybrid ($$ \sigma_{low} = 8 $$, $$ \sigma_{high} = 4 $$), with colour kept in the low-frequency image, the high-frequency image, both, or neither. Colour images are filtered one channel at a time.
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_colour_none.jpg" alt="Grayscale"><figcaption>Grayscale</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_colour_low.jpg" alt="Colour low"><figcaption>Colour low frequencies (Derek)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_colour_high.jpg" alt="Colour high"><figcaption>Colour high frequencies (Nutmeg)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_colour_both.jpg" alt="Colour both"><figcaption>Colour both</figcaption></figure>
+</div>
 
 ### 2.3 Gaussian and Laplacian Stacks
 

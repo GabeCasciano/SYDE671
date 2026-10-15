@@ -7,6 +7,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image
+from scipy.signal import convolve2d
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 WEB_DIR = Path(__file__).resolve().parents[2] / "website" / "images" / "assignment-2"
@@ -31,6 +32,15 @@ def gaussian_2d(sigma):
     """2D Gaussian from the outer product of cv2.getGaussianKernel, size 6*sigma + 1."""
     g = cv2.getGaussianKernel(int(6 * sigma) | 1, sigma)
     return g @ g.T
+
+
+def gaussian_blur(img, sigma):
+    """Separable Gaussian blur (same kernel as gaussian_2d), per channel for colour."""
+    g = cv2.getGaussianKernel(int(6 * sigma) | 1, sigma)
+    if img.ndim == 3:
+        return np.dstack([gaussian_blur(img[..., c], sigma) for c in range(img.shape[2])])
+    img = convolve2d(img, g, mode="same", boundary="symm")
+    return convolve2d(img, g.T, mode="same", boundary="symm")
 
 
 def signed(img):
