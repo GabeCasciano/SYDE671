@@ -4,6 +4,7 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 
+import cv2
 import numpy as np
 from PIL import Image
 
@@ -24,6 +25,12 @@ def load_image(path, gray=False):
 
 def save_image(path, img):
     Image.fromarray((np.clip(img, 0, 1) * 255).astype(np.uint8)).save(path, quality=95)
+
+
+def gaussian_2d(sigma):
+    """2D Gaussian from the outer product of cv2.getGaussianKernel, size 6*sigma + 1."""
+    g = cv2.getGaussianKernel(int(6 * sigma) | 1, sigma)
+    return g @ g.T
 
 
 def signed(img):

@@ -145,6 +145,86 @@ The gradient magnitude ranges from 0 to 0.86. The median is 0.012 and the 99th p
 
 ### 1.3 Derivative of Gaussian (DoG) Filter
 
+The 2D Gaussian is the outer product of a 1D kernel from `cv2.getGaussianKernel`, with $$ \sigma = 2 $$ and a kernel size of $$ 6\sigma + 1 = 13 $$. Code: `Assignment 2/src/dog.py`.
+
+```python
+def gaussian_2d(sigma):
+    g = cv2.getGaussianKernel(int(6 * sigma) | 1, sigma)
+    return g @ g.T
+```
+
+#### Blur, then finite differences
+
+The cameraman image is blurred with the Gaussian, and then the 1.2 steps are repeated on the blurred image.
+
+```python
+blurred = convolve2d(img, G, mode="same", boundary="symm")
+dx = convolve2d(blurred, DX, mode="same", boundary="symm")
+dy = convolve2d(blurred, DY, mode="same", boundary="symm")
+mag = np.sqrt(dx ** 2 + dy ** 2)
+```
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/blurred.jpg" alt="Blurred"><figcaption>Blurred (sigma = 2)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/dx.png" alt="Blurred df/dx"><figcaption>df/dx of blurred</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/dy.png" alt="Blurred df/dy"><figcaption>df/dy of blurred</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/mag.png" alt="Blurred gradient magnitude"><figcaption>Gradient magnitude of blurred</figcaption></figure>
+</div>
+
+The gradient magnitude of the blurred image goes up to 0.32 (it was 0.86 without blur). The median is 0.005 and the 99th percentile is 0.20, so the thresholds below are lower than in 1.2.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.02.png" alt="t = 0.02"><figcaption>t = 0.02</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.04.png" alt="t = 0.04"><figcaption>t = 0.04</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.06.png" alt="t = 0.06"><figcaption>t = 0.06</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.08.png" alt="t = 0.08"><figcaption>t = 0.08</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.1.png" alt="t = 0.10"><figcaption>t = 0.10</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.12.png" alt="t = 0.12"><figcaption>t = 0.12</figcaption></figure>
+</div>
+
+#### Comparison with the finite difference method
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/edges_0.2.png" alt="Finite difference, t = 0.20"><figcaption>Finite difference only (1.2), t = 0.20</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.06.png" alt="Gaussian then finite difference, t = 0.06"><figcaption>Gaussian, then finite difference, t = 0.06</figcaption></figure>
+</div>
+
+<!-- Analysis (yours): What differences do you see? Look at the grass, edge thickness, and how continuous the tripod legs and skyline are. Why does blurring first suppress the noise, and what does it cost (localization, fine detail)? Why does the magnitude range shrink? -->
+
+#### DoG filters
+
+Convolving the Gaussian with $$ D_x $$ and $$ D_y $$ gives the derivative of Gaussian filters, so the blur and the derivative become one convolution:
+
+$$ (I * G) * D_x = I * (G * D_x) $$
+
+```python
+dog_x = convolve2d(G, DX)
+dog_y = convolve2d(G, DY)
+dx = convolve2d(img, dog_x, mode="same", boundary="symm")
+dy = convolve2d(img, dog_y, mode="same", boundary="symm")
+```
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/gaussian.png" alt="Gaussian kernel"><figcaption>Gaussian G (13 x 13)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/dog_x.png" alt="DoG x"><figcaption>G * Dx (13 x 15)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/dog_y.png" alt="DoG y"><figcaption>G * Dy (15 x 13)</figcaption></figure>
+</div>
+
+Applying the DoG filters directly to the image:
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/dog_dx.png" alt="DoG x response"><figcaption>Image * (G * Dx)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/dog_dy.png" alt="DoG y response"><figcaption>Image * (G * Dy)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/dog_mag.png" alt="DoG gradient magnitude"><figcaption>Gradient magnitude (DoG)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/diff.png" alt="Difference"><figcaption>|two-step - DoG| on the magnitude scale</figcaption></figure>
+</div>
+
+The largest difference between the two-step and DoG gradient magnitudes is 1.65e-15.
+
+<!-- Analysis (yours): Do you get the same result as before? Why is the difference ~1e-15 and not exactly 0? Why is one DoG convolution preferable to two convolutions? -->
+
 ### Bells & Whistles: Gradient Orientation
 
 ## Part 2: Fun with Frequencies
