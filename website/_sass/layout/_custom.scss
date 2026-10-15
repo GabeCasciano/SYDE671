@@ -282,3 +282,14 @@ figcaption a:hover {
     break-after: avoid;
   }
 }
+
+/* Mermaid diagrams: centred, never wider than the content column */
+.mermaid {
+  margin: 2em 0;
+  text-align: center;
+
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+}

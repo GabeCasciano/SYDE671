@@ -14,7 +14,7 @@
       div.textContent = code.textContent;
       (code.closest("div.highlighter-rouge") || code.closest("pre")).replaceWith(div);
     });
-    mermaid.initialize({ startOnLoad: false, theme: "dark" });
+    mermaid.initialize({ startOnLoad: false, theme: "dark", themeVariables: { fontSize: "18px" } });
     await mermaid.run();
   }
 </script>

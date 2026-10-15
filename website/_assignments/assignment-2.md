@@ -332,7 +332,7 @@ The table gives the root mean square error between each image and the original (
 A hybrid image adds the low frequencies of one image to the high frequencies of another (Oliva, Torralba, and Schyns, 2006). Up close the high frequencies dominate, and from far away only the low frequencies are visible. The code is a Python port of the MATLAB starter (`hybrid_image_starter.m` and `align_images.m`). Code: `Assignment 2/src/hybrid.py`.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A[Image 1<br/>Derek] --> C[Align<br/>2 points per image:<br/>translate, scale, rotate, crop]
   B[Image 2<br/>Nutmeg] --> C
   C --> D[Grayscale]
