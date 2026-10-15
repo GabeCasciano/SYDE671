@@ -13,6 +13,8 @@ WEB_DIR = Path(__file__).resolve().parents[2] / "website" / "images" / "assignme
 # Finite difference operators
 DX = np.array([[1.0, 0.0, -1.0]])
 DY = DX.T
+D45 = np.array([[0.0, 0.0, 1.0], [0.0, 0.0, 0.0], [-1.0, 0.0, 0.0]])
+D135 = np.fliplr(D45)
 
 
 def load_image(path, gray=False):

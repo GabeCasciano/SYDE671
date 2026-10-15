@@ -74,7 +74,7 @@ out_scipy = convolve2d(img, box, mode="same", boundary="fill")
 
 | Method | Runtime (s) | Max abs difference from scipy |
 |--------|-------------|-------------------------------|
-| Four loops | 20.32 | 2.98e-08 |
+| Four loops | 20.70 | 2.98e-08 |
 | Two loops | 2.98 | 2.98e-08 |
 | `scipy.signal.convolve2d` | 0.10 | - |
 
@@ -84,14 +84,20 @@ out_scipy = convolve2d(img, box, mode="same", boundary="fill")
 
 $$ D_x = \begin{bmatrix} 1 & 0 & -1 \end{bmatrix}, \quad D_y = \begin{bmatrix} 1 \\ 0 \\ -1 \end{bmatrix} $$
 
+The same central difference along the two diagonals:
+
+$$ D_{45} = \begin{bmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0 \end{bmatrix}, \quad D_{135} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & -1 \end{bmatrix} $$
+
 Computed with the two-loop convolution. Mid grey is zero.
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/1.1/dx.jpg" alt="Dx"><figcaption>Image * Dx</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/1.1/dy.jpg" alt="Dy"><figcaption>Image * Dy</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.1/d45.jpg" alt="D45"><figcaption>Image * D45</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.1/d135.jpg" alt="D135"><figcaption>Image * D135</figcaption></figure>
 </div>
 
-<!-- Analysis (yours): Which edges show up in Dx and which in Dy, and why? What does the sign (light vs dark side) tell you about the edge? -->
+<!-- Analysis (yours): Which edges show up in Dx and which in Dy, and why? Which edges do the diagonal operators pick up that Dx and Dy miss or weaken? What does the sign (light vs dark side) tell you about the edge? -->
 
 ### 1.2 Finite Difference Operator
 

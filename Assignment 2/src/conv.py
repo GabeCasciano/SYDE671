@@ -5,7 +5,7 @@ import time
 import numpy as np
 from scipy.signal import convolve2d
 
-from common import DATA_DIR, DX, DY, load_image, parse_args, save_image, signed, web_dir
+from common import D45, D135, DATA_DIR, DX, DY, load_image, parse_args, save_image, signed, web_dir
 
 DEFAULTS = {
     "image": "pasta-boy.jpg",
@@ -67,7 +67,7 @@ def main():
     for name in ["four_loops", "two_loops"]:
         print(f"max |{name} - scipy| = {np.abs(results[name] - results['scipy']).max():.2e}")
 
-    for name, d in [("dx", DX), ("dy", DY)]:
+    for name, d in [("dx", DX), ("dy", DY), ("d45", D45), ("d135", D135)]:
         mine = conv2(img, d)
         print(f"max |{name} two_loops - scipy| = {np.abs(mine - scipy_conv(img, d)).max():.2e}")
         save_image(out / f"{name}.jpg", signed(mine))
