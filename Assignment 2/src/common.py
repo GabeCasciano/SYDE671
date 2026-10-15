@@ -11,8 +11,8 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 WEB_DIR = Path(__file__).resolve().parents[2] / "website" / "images" / "assignment-2"
 
 # Finite difference operators
-DX = np.array([[1.0, -1.0]])
-DY = np.array([[1.0], [-1.0]])
+DX = np.array([[1.0, 0.0, -1.0]])
+DY = DX.T
 
 
 def load_image(path, gray=False):

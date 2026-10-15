@@ -61,7 +61,7 @@ The box filter is `np.ones((9, 9)) / 81`, applied to a 635 x 900 grayscale image
 
 | Method | Runtime (s) | Max abs difference from scipy |
 |--------|-------------|-------------------------------|
-| Four loops | 21.19 | 2.98e-08 |
+| Four loops | 20.32 | 2.98e-08 |
 | Two loops | 2.98 | 2.98e-08 |
 | `scipy.signal.convolve2d` | 0.10 | - |
 
@@ -69,7 +69,7 @@ The box filter is `np.ones((9, 9)) / 81`, applied to a 635 x 900 grayscale image
 
 #### Finite difference operators
 
-$$ D_x = \begin{bmatrix} 1 & -1 \end{bmatrix}, \quad D_y = \begin{bmatrix} 1 \\ -1 \end{bmatrix} $$
+$$ D_x = \begin{bmatrix} 1 & 0 & -1 \end{bmatrix}, \quad D_y = \begin{bmatrix} 1 \\ 0 \\ -1 \end{bmatrix} $$
 
 Computed with the two-loop convolution. Mid grey is zero.
 
