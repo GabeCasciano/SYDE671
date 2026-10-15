@@ -272,6 +272,83 @@ Each wheel is the legend: angle is the gradient direction, and the distance from
 
 ### 2.1 Image Sharpening
 
+The Gaussian $$ G $$ (from 1.3, $$ \sigma = 2 $$) is a low-pass filter, so subtracting the blurred image from the original leaves the high frequencies. Adding a scaled amount $$ \alpha $$ of those back to the original gives the sharpened image, and the whole operation collapses into a single kernel, the unsharp mask filter:
+
+$$ f + \alpha (f - f * G) = f * \big( (1 + \alpha)\, e - \alpha G \big) $$
+
+where $$ e $$ is the unit impulse (1 at the centre, 0 elsewhere). Colour images are filtered one channel at a time. Code: `Assignment 2/src/unsharp.py`.
+
+```python
+def unsharp_kernel(sigma, a):
+    g = gaussian_2d(sigma)
+    impulse = np.zeros_like(g)
+    impulse[g.shape[0] // 2, g.shape[1] // 2] = 1
+    return (1 + a) * impulse - a * g
+
+
+sharpened = conv(img, unsharp_kernel(sigma, a))
+```
+
+#### Taj Mahal
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/taj.jpg" alt="Taj original"><figcaption>Original</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/taj_blurred.jpg" alt="Taj blurred"><figcaption>Blurred, f * G</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/taj_high.jpg" alt="Taj high frequencies"><figcaption>High frequencies, f - f * G</figcaption></figure>
+</div>
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/taj_sharp_0.5.jpg" alt="alpha 0.5"><figcaption>Sharpened, alpha = 0.5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/taj_sharp_1.jpg" alt="alpha 1"><figcaption>Sharpened, alpha = 1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/taj_sharp_2.jpg" alt="alpha 2"><figcaption>Sharpened, alpha = 2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/taj_sharp_4.jpg" alt="alpha 4"><figcaption>Sharpened, alpha = 4</figcaption></figure>
+</div>
+
+#### Crazy cat
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/crazy-cat.jpg" alt="Cat original"><figcaption>Original</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/crazy-cat_blurred.jpg" alt="Cat blurred"><figcaption>Blurred, f * G</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/crazy-cat_high.jpg" alt="Cat high frequencies"><figcaption>High frequencies, f - f * G</figcaption></figure>
+</div>
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/crazy-cat_sharp_0.5.jpg" alt="alpha 0.5"><figcaption>Sharpened, alpha = 0.5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/crazy-cat_sharp_1.jpg" alt="alpha 1"><figcaption>Sharpened, alpha = 1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/crazy-cat_sharp_2.jpg" alt="alpha 2"><figcaption>Sharpened, alpha = 2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/crazy-cat_sharp_4.jpg" alt="alpha 4"><figcaption>Sharpened, alpha = 4</figcaption></figure>
+</div>
+
+<!-- Analysis (yours): How does the unsharp mask relate to the blur filter and to high frequencies? What changes as alpha increases: which details get crisper, and where do artifacts appear (halos around the dome and trees, amplified noise or JPEG blocks)? Which alpha looks best for each image? -->
+
+#### Blur, then re-sharpen
+
+A sharp image is blurred with the same Gaussian and then sharpened again with the unsharp mask filter.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/pasta-boy.jpg" alt="Original"><figcaption>Original (sharp)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/pasta-boy_blurred.jpg" alt="Blurred"><figcaption>Blurred, sigma = 2</figcaption></figure>
+</div>
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/pasta-boy_resharp_0.5.jpg" alt="alpha 0.5"><figcaption>Re-sharpened, alpha = 0.5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/pasta-boy_resharp_1.jpg" alt="alpha 1"><figcaption>Re-sharpened, alpha = 1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/pasta-boy_resharp_2.jpg" alt="alpha 2"><figcaption>Re-sharpened, alpha = 2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.1/pasta-boy_resharp_4.jpg" alt="alpha 4"><figcaption>Re-sharpened, alpha = 4</figcaption></figure>
+</div>
+
+The table gives the root mean square error between each image and the original (pixel values in [0, 1]):
+
+| Image | RMSE vs original |
+|-------|------------------|
+| Blurred | 0.0334 |
+| Re-sharpened, alpha = 0.5 | 0.0292 |
+| Re-sharpened, alpha = 1 | 0.0260 |
+| Re-sharpened, alpha = 2 | 0.0235 |
+| Re-sharpened, alpha = 4 | 0.0336 |
+
+<!-- Analysis (yours): Does re-sharpening recover the original? Compare fine detail (hair, beard, fork tines, plate pattern) between the original and the re-sharpened versions. Why can't the unsharp mask bring back detail the blur removed (what does it amplify instead)? Why does the error go down and then back up as alpha grows? -->
+
 ### 2.2 Hybrid Images
 
 ### Bells & Whistles: Hybrid Images
