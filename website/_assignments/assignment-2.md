@@ -602,6 +602,119 @@ With three bands, colour can be kept in the low, middle, or high band, or in all
 
 ### 2.3 Gaussian and Laplacian Stacks
 
+A stack is like a pyramid without downsampling: every level stays the same size as the original image. Each level of the Gaussian stack is the previous level blurred with the 5-tap binomial filter from the lecture, $$ \tfrac{1}{16}[1\ 4\ 6\ 4\ 1] $$, applied separably in x and y. A pyramid halves the image at each level, so a fixed-size filter covers twice as much of the scene each time. Without downsampling, the same effect comes from spreading the filter taps out instead: at level $$ i $$ there are $$ 2^i - 1 $$ zeros between taps. Each Laplacian level is the difference between neighbouring Gaussian levels. The last level is the Gaussian residual, so adding up the Laplacian stack gives back the original image. Both images use 8 levels, and colour images are filtered one channel at a time. Code: `Assignment 2/src/stacks.py`.
+
+$$ G_0 = I, \quad G_{i+1} = G_i * b_i, \quad L_i = G_i - G_{i+1}, \quad L_{N-1} = G_{N-1}, \quad \sum_i L_i = I $$
+
+```python
+BINOMIAL = np.array([1, 4, 6, 4, 1]) / 16
+
+
+def blur(img, level):
+    k = np.zeros(4 * 2 ** level + 1)
+    k[::2 ** level] = BINOMIAL
+    k = k[None, :]
+    img = convolve2d(img, k, mode="same", boundary="symm")
+    return convolve2d(img, k.T, mode="same", boundary="symm")
+
+
+def gaussian_stack(img, levels):
+    stack = [img]
+    for i in range(levels - 1):
+        stack.append(blur(stack[-1], i))
+    return stack
+
+
+def laplacian_stack(img, levels):
+    g = gaussian_stack(img, levels)
+    return [g[i] - g[i + 1] for i in range(levels - 1)] + [g[-1]]
+```
+
+Adding up the Laplacian stack reproduces each input to within 2.2e-16.
+
+The Laplacian levels are band-pass images with positive and negative values. They are shown around mid grey (zero), each scaled by its own 99th percentile of absolute value so that the weaker fine levels are still visible. The residual is shown as is.
+
+#### Apple
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g2.jpg" alt="G2"><figcaption>G2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g3.jpg" alt="G3"><figcaption>G3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g4.jpg" alt="G4"><figcaption>G4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g5.jpg" alt="G5"><figcaption>G5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
+</div>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l2.jpg" alt="L2"><figcaption>L2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l3.jpg" alt="L3"><figcaption>L3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l4.jpg" alt="L4"><figcaption>L4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l5.jpg" alt="L5"><figcaption>L5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
+</div>
+
+#### Orange
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g2.jpg" alt="G2"><figcaption>G2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g3.jpg" alt="G3"><figcaption>G3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g4.jpg" alt="G4"><figcaption>G4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g5.jpg" alt="G5"><figcaption>G5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
+</div>
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l2.jpg" alt="L2"><figcaption>L2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l3.jpg" alt="L3"><figcaption>L3</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l4.jpg" alt="L4"><figcaption>L4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l5.jpg" alt="L5"><figcaption>L5</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
+</div>
+
+#### Recreating Szeliski figure 3.42
+
+The figure uses the mask blending described in 2.4, with a vertical step mask. The masked apple is $$ G^M_i L^A_i $$, the masked orange is $$ (1 - G^M_i) L^B_i $$, and the blended level is their sum. Within each of the first three rows, all three images share the same display scale. The bottom row adds up all 8 levels of each stack.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_apple_l0.jpg" alt="(a) Masked apple, level 0"><figcaption>(a) Masked apple, level 0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_orange_l0.jpg" alt="(b) Masked orange, level 0"><figcaption>(b) Masked orange, level 0</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_blend_l0.jpg" alt="(c) Blended, level 0"><figcaption>(c) Blended, level 0</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_apple_l2.jpg" alt="(d) Masked apple, level 2"><figcaption>(d) Masked apple, level 2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_orange_l2.jpg" alt="(e) Masked orange, level 2"><figcaption>(e) Masked orange, level 2</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_blend_l2.jpg" alt="(f) Blended, level 2"><figcaption>(f) Blended, level 2</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_apple_l4.jpg" alt="(g) Masked apple, level 4"><figcaption>(g) Masked apple, level 4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_orange_l4.jpg" alt="(h) Masked orange, level 4"><figcaption>(h) Masked orange, level 4</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_blend_l4.jpg" alt="(i) Blended, level 4"><figcaption>(i) Blended, level 4</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_apple_sum.jpg" alt="(j) Masked apple, collapsed"><figcaption>(j) Masked apple, collapsed</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_orange_sum.jpg" alt="(k) Masked orange, collapsed"><figcaption>(k) Masked orange, collapsed</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_blend_sum.jpg" alt="(l) Blended, collapsed"><figcaption>(l) Blended, collapsed</figcaption></figure>
+</div>
+
 ### 2.4 Multiresolution Blending
 
 ### Bells & Whistles: Blending
