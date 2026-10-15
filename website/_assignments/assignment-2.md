@@ -977,3 +977,5 @@ The images below show the stored points. The red circles are the two clicks, in 
   <figure><img loading="lazy" src="../images/assignment-2/points/father.jpg" alt="Father with alignment points"><figcaption>Father</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/points/sister-2.jpg" alt="Sister 2 with alignment points"><figcaption>Sister 2</figcaption></figure>
 </div>
+
+## What I Learned
