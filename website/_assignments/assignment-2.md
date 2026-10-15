@@ -227,7 +227,7 @@ The difference image is shown on the same scale as the gradient magnitude images
 
 ### Bells & Whistles: Gradient Orientation
 
-The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. No built-in angle function (`np.arctan2`, `np.angle`) is used. The angle is the arctangent of the slope $$ g_y / g_x $$, which only covers $$ (-\pi/2, \pi/2) $$, so $$ \pi $$ is added wherever $$ g_x < 0 $$ to recover the full circle. Code: `Assignment 2/src/orientation.py`.
+The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. The angle is the arctangent of the slope $$ g_y / g_x $$, which only covers $$ (-\pi/2, \pi/2) $$, so $$ \pi $$ is added wherever $$ g_x < 0 $$ to recover the full circle. Code: `Assignment 2/src/orientation.py`.
 
 $$ \theta = \begin{cases} \arctan(g_y / g_x) & g_x > 0 \\ \arctan(g_y / g_x) + \pi & g_x < 0 \\ \pm \pi / 2 & g_x = 0 \end{cases} \pmod{2\pi} $$
 
