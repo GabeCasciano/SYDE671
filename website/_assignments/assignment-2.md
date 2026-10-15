@@ -82,6 +82,43 @@ Computed with the two-loop convolution. Mid grey is zero.
 
 ### 1.2 Finite Difference Operator
 
+The cameraman image is convolved with $$ D_x $$ and $$ D_y $$ using `scipy.signal.convolve2d`, and the gradient magnitude is computed from the two partial derivatives. The image borders are reflected (`boundary="symm"`) rather than zero padded. The edge image is the gradient magnitude binarized at a threshold. Code: `Assignment 2/src/finite_diff.py`.
+
+$$ \lVert \nabla f \rVert = \sqrt{\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2} $$
+
+```python
+dx = convolve2d(img, DX, mode="same", boundary="symm")
+dy = convolve2d(img, DY, mode="same", boundary="symm")
+mag = np.sqrt(dx ** 2 + dy ** 2)
+edges = mag > threshold
+```
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/gray.jpg" alt="Cameraman"><figcaption>Input</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/dx.png" alt="df/dx"><figcaption>df/dx</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/dy.png" alt="df/dy"><figcaption>df/dy</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/mag.png" alt="Gradient magnitude"><figcaption>Gradient magnitude</figcaption></figure>
+</div>
+
+#### Threshold progression
+
+The gradient magnitude ranges from 0 to 0.86. The median is 0.012 and the 99th percentile is 0.39.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/edges_0.05.png" alt="t = 0.05"><figcaption>t = 0.05</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/edges_0.1.png" alt="t = 0.10"><figcaption>t = 0.10</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/edges_0.15.png" alt="t = 0.15"><figcaption>t = 0.15</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/edges_0.2.png" alt="t = 0.20"><figcaption>t = 0.20</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/edges_0.25.png" alt="t = 0.25"><figcaption>t = 0.25</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/edges_0.3.png" alt="t = 0.30"><figcaption>t = 0.30</figcaption></figure>
+</div>
+
+<!-- Chosen threshold: TBD (user picks) -->
+
+<!-- Analysis (yours): Where does the noise come from at low thresholds (grass, sky)? Which real edges disappear first as the threshold rises (buildings in the background, tripod legs)? Which threshold is the best tradeoff, and why? -->
+
 ### 1.3 Derivative of Gaussian (DoG) Filter
 
 ### Bells & Whistles: Gradient Orientation
