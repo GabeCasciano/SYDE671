@@ -134,7 +134,12 @@ The gradient magnitude ranges from 0 to 0.86. The median is 0.012 and the 99th p
   <figure><img loading="lazy" src="../images/assignment-2/1.2/edges_0.3.png" alt="t = 0.30"><figcaption>t = 0.30</figcaption></figure>
 </div>
 
-<!-- Chosen threshold: TBD (user picks) -->
+#### Chosen threshold: t = 0.20
+
+<figure>
+  <img loading="lazy" src="../images/assignment-2/1.2/edges_0.2.png" alt="Edges at t = 0.20">
+  <figcaption>Binarized gradient magnitude, t = 0.20</figcaption>
+</figure>
 
 <!-- Analysis (yours): Where does the noise come from at low thresholds (grass, sky)? Which real edges disappear first as the threshold rises (buildings in the background, tripod legs)? Which threshold is the best tradeoff, and why? -->
 
