@@ -221,7 +221,7 @@ Applying the DoG filters directly to the image:
   <figure><img loading="lazy" src="../images/assignment-2/1.3/diff.png" alt="Difference"><figcaption>|two-step - DoG| on the magnitude scale</figcaption></figure>
 </div>
 
-The largest difference between the two-step and DoG gradient magnitudes is 1.65e-15.
+The difference image is shown on the same scale as the gradient magnitude images and comes out completely black. The largest difference between the two-step and DoG magnitudes is 1.65e-15, about 5e-15 of the brightest magnitude. That is far below one grey level (1/255), so every pixel rounds to 0.
 
 <!-- Analysis (yours): Do you get the same result as before? Why is the difference ~1e-15 and not exactly 0? Why is one DoG convolution preferable to two convolutions? -->
 
