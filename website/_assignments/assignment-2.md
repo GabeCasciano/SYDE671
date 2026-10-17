@@ -66,11 +66,13 @@ out_scipy = convolve2d(img, box, mode="same", boundary="fill")
   <figure><img loading="lazy" src="../images/assignment-2/1.1/box_scipy.jpg" alt="Box, scipy"><figcaption>scipy convolve2d</figcaption></figure>
 </div>
 
-| Method | Runtime (s) | Max abs difference from scipy |
-|--------|-------------|-------------------------------|
-| Four loops | 20.70 | 2.98e-08 |
-| Two loops | 2.98 | 2.98e-08 |
-| `scipy.signal.convolve2d` | 0.10 | - |
+Every method computes the same sum: one multiply-add per kernel entry per output pixel, so $$ 635 \times 900 \times 81 = 46{,}291{,}500 $$ multiply-adds. What changes is how many of the loop iterations run in Python.
+
+| Method | Runtime (s) | Multiply-adds | Python loop iterations | Multiply-adds per second | Max abs difference from scipy |
+|--------|-------------|---------------|------------------------|--------------------------|-------------------------------|
+| Four loops | 20.70 | 46,291,500 | 46,291,500 | 2.2 million | 2.98e-08 |
+| Two loops | 2.98 | 46,291,500 | 571,500 | 15.5 million | 2.98e-08 |
+| `scipy.signal.convolve2d` | 0.10 | 46,291,500 | 0 | 463 million | - |
 
 #### Finite difference operators
 
