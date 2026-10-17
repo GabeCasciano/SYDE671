@@ -15,12 +15,28 @@ DEFAULTS = {
 }
 
 
+def arctan(t, terms=8):
+    """arctan for t in [0, 1] without built-in angle functions.
+
+    Halving twice with arctan(t) = 2 arctan(t / (1 + sqrt(1 + t^2))) brings t below
+    tan(pi/16) ~ 0.2, where the Taylor series t - t^3/3 + t^5/5 - ... converges fast.
+    """
+    for _ in range(2):
+        t = t / (1 + np.sqrt(1 + t * t))
+    s = sum((-1) ** k * t ** (2 * k + 1) / (2 * k + 1) for k in range(terms))
+    return 4 * s
+
+
 def orientation(gx, gy):
-    """Angle in [0, 2*pi) from arctan of the slope, with the quadrant fixed by the sign of gx."""
-    with np.errstate(divide="ignore", invalid="ignore"):
-        theta = np.arctan(gy / gx)          # (-pi/2, pi/2), +-pi/2 when gx == 0
-    theta = np.where(gx < 0, theta + np.pi, theta)
-    theta = np.nan_to_num(theta)           # gx == gy == 0
+    """Angle in [0, 2*pi), counter-clockwise from +x, built up from the first octant."""
+    ax, ay = np.abs(gx), np.abs(gy)
+    big = np.maximum(ax, ay)
+    small = np.minimum(ax, ay)
+    t = np.divide(small, big, out=np.zeros_like(big), where=big > 0)
+    theta = arctan(t)                                  # [0, pi/4]
+    theta = np.where(ay > ax, np.pi / 2 - theta, theta)  # [0, pi/2]
+    theta = np.where(gx < 0, np.pi - theta, theta)       # [0, pi]
+    theta = np.where(gy < 0, 2 * np.pi - theta, theta)   # [0, 2*pi]
     return np.mod(theta, 2 * np.pi)
 
 

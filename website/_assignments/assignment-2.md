@@ -211,16 +211,27 @@ The difference image is shown on the same scale as the gradient magnitude images
 
 ### Bells & Whistles: Gradient Orientation
 
-The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. The angle is the arctangent of the slope $$ g_y / g_x $$, which only covers $$ (-\pi/2, \pi/2) $$, so $$ \pi $$ is added wherever $$ g_x < 0 $$ to recover the full circle. Code: `Assignment 2/src/orientation.py`.
+The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. The angle is computed with arithmetic and square roots only. First, the ratio $$ t = \min(|g_x|, |g_y|) / \max(|g_x|, |g_y|) $$ is in $$ [0, 1] $$, so $$ \arctan t $$ is in the first octant, $$ [0, \pi/4] $$. The half-angle identity is applied twice to bring $$ t $$ below $$ \tan(\pi/16) \approx 0.2 $$, and then 8 terms of the Taylor series are enough:
 
-$$ \theta = \begin{cases} \arctan(g_y / g_x) & g_x > 0 \\ \arctan(g_y / g_x) + \pi & g_x < 0 \\ \pm \pi / 2 & g_x = 0 \end{cases} \pmod{2\pi} $$
+$$ \arctan t = 2 \arctan \frac{t}{1 + \sqrt{1 + t^2}}, \qquad \arctan t \approx \sum_{k=0}^{7} \frac{(-1)^k \, t^{2k+1}}{2k + 1} $$
+
+The signs and the relative size of $$ g_x $$ and $$ g_y $$ then map the octant angle onto the full circle. The result matches the true angle to within 3e-13 rad. Code: `Assignment 2/src/orientation.py`.
 
 ```python
+def arctan(t, terms=8):
+    for _ in range(2):
+        t = t / (1 + np.sqrt(1 + t * t))
+    return 4 * sum((-1) ** k * t ** (2 * k + 1) / (2 * k + 1) for k in range(terms))
+
+
 def orientation(gx, gy):
-    with np.errstate(divide="ignore", invalid="ignore"):
-        theta = np.arctan(gy / gx)
-    theta = np.where(gx < 0, theta + np.pi, theta)
-    theta = np.nan_to_num(theta)
+    ax, ay = np.abs(gx), np.abs(gy)
+    big, small = np.maximum(ax, ay), np.minimum(ax, ay)
+    t = np.divide(small, big, out=np.zeros_like(big), where=big > 0)
+    theta = arctan(t)                                    # [0, pi/4]
+    theta = np.where(ay > ax, np.pi / 2 - theta, theta)  # [0, pi/2]
+    theta = np.where(gx < 0, np.pi - theta, theta)       # [0, pi]
+    theta = np.where(gy < 0, 2 * np.pi - theta, theta)   # [0, 2*pi]
     return np.mod(theta, 2 * np.pi)
 ```
 
