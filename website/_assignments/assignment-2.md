@@ -211,7 +211,7 @@ The difference image is shown on the same scale as the gradient magnitude images
 
 ### Bells & Whistles: Gradient Orientation
 
-The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. The angle is computed with arithmetic and square roots only. First, the ratio $$ t = \min(|g_x|, |g_y|) / \max(|g_x|, |g_y|) $$ is in $$ [0, 1] $$, so $$ \arctan t $$ is in the first octant, $$ [0, \pi/4] $$. The half-angle identity is applied twice to bring $$ t $$ below $$ \tan(\pi/16) \approx 0.2 $$, and then 8 terms of the Taylor series are enough:
+The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. The ratio $$ t = \min(|g_x|, |g_y|) / \max(|g_x|, |g_y|) $$ is in $$ [0, 1] $$, so $$ \arctan t $$ is in the first octant, $$ [0, \pi/4] $$. The half-angle identity is applied twice to bring $$ t $$ below $$ \tan(\pi/16) \approx 0.2 $$, and then 8 terms of the Taylor series are enough:
 
 $$ \arctan t = 2 \arctan \frac{t}{1 + \sqrt{1 + t^2}}, \qquad \arctan t \approx \sum_{k=0}^{7} \frac{(-1)^k \, t^{2k+1}}{2k + 1} $$
 
