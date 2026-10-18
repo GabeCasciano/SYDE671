@@ -211,9 +211,18 @@ Applying the DoG filters directly to the image:
 
 The difference image is shown on the same scale as the gradient magnitude images and comes out completely black. The largest difference between the two-step and DoG magnitudes is 1.65e-15, about 5e-15 of the brightest magnitude. That is far below one grey level (1/255), so every pixel rounds to 0.
 
+#### Final result: finite difference vs DoG
+
+The binarized edge image from 1.2 next to the one from the DoG filters, each at its chosen threshold.
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/1.2/edges_0.2.png" alt="Finite difference edges, t = 0.20"><figcaption>Finite difference (1.2), t = 0.20</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/1.3/dog_edges_0.06.png" alt="DoG edges, t = 0.06"><figcaption>DoG (1.3), t = 0.06</figcaption></figure>
+</div>
+
 ### Bells & Whistles: Gradient Orientation
 
-The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. The ratio $$ t = \min(|g_x|, |g_y|) / \max(|g_x|, |g_y|) $$ is in $$ [0, 1] $$, so $$ \arctan t $$ is in the first octant, $$ [0, \pi/4] $$. The half-angle identity is applied twice to bring $$ t $$ below $$ \tan(\pi/16) \approx 0.2 $$, and then 8 terms of the Taylor series are enough:
+The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. The ratio $$ t = \min(\lvert g_x \rvert, \lvert g_y \rvert) / \max(\lvert g_x \rvert, \lvert g_y \rvert) $$ is in $$ [0, 1] $$, so $$ \arctan t $$ is in the first octant, $$ [0, \pi/4] $$. The half-angle identity is applied twice to bring $$ t $$ below $$ \tan(\pi/16) \approx 0.2 $$, and then 8 terms of the Taylor series are enough:
 
 $$ \arctan t = 2 \arctan \frac{t}{1 + \sqrt{1 + t^2}}, \qquad \arctan t \approx \sum_{k=0}^{7} \frac{(-1)^k \, t^{2k+1}}{2k + 1} $$
 
