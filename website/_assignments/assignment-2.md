@@ -74,6 +74,18 @@ Every method computes the same sum: one multiply-add per kernel entry per output
 | Two loops | 2.98 | 46,291,500 | 571,500 | 15.5 million | 2.98e-08 |
 | `scipy.signal.convolve2d` | 0.10 | 46,291,500 | 0 | 463 million | - |
 
+Each method is faster than the last because it reduces the number of loop iterations done in Python. The four-loop version is the slowest because every multiply-add is performed in Python. The two-loop version is faster because the multiplication and summation over each 9x9 window are done by numpy, which runs in C. Its remaining cost is the overhead of each numpy call: each of the 571,500 iterations makes a slice, a temporary product array, and a call for only 81 numbers, so that fixed cost is larger than the maths itself. The scipy convolution is the fastest because it computes entirely within C. Overall, all the algorithms run the same number of multiply-adds; the primary difference is the number of loop iterations that are done in Python.
+
+If the kernel size is increased, the number of multiply-adds grows with $$ k^2 $$ per pixel (441 for a 21x21 kernel vs 81 for 9x9). The four-loop iterations grow with it. The two-loop version still does one Python iteration per pixel, with more work inside each numpy call, and scipy grows with $$ k^2 $$ entirely in C. Measured on a 150 x 150 crop:
+
+| Kernel | Four / two | Two / scipy | Four / scipy |
+|--------|------------|-------------|--------------|
+| 3x3 | 0.8x | 175x | 147x |
+| 9x9 | 6.8x | 32x | 215x |
+| 21x21 | 30x | 7.4x | 224x |
+
+So the gap between four and two loops grows, the gap between two loops and scipy shrinks because the fixed per-call cost is spread over more work, and four loops vs scipy stays roughly constant since both scale with $$ k^2 $$.
+
 #### Finite difference operators
 
 $$ D_x = \begin{bmatrix} 1 & 0 & -1 \end{bmatrix}, \quad D_y = \begin{bmatrix} 1 \\ 0 \\ -1 \end{bmatrix} $$
@@ -90,6 +102,8 @@ Computed with the two-loop convolution. Mid grey is zero.
   <figure><img loading="lazy" src="../images/assignment-2/1.1/d45.jpg" alt="D45"><figcaption>Image * D45</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/1.1/d135.jpg" alt="D135"><figcaption>Image * D135</figcaption></figure>
 </div>
+
+For Dx the vertical edges show up primarily, and for Dy the horizontal edges are more apparent. D45 and D135 show this effect further, picking up the diagonals between Dx and Dy.
 
 ### 1.2 Finite Difference Operator
 
@@ -132,6 +146,8 @@ The gradient magnitude ranges from 0 to 0.86. The median is 0.012 and the 99th p
   <img loading="lazy" src="../images/assignment-2/1.2/edges_0.2.png" alt="Edges at t = 0.20">
   <figcaption>Binarized gradient magnitude, t = 0.20</figcaption>
 </figure>
+
+Much of the noise comes from the grass and the texture of the man's clothing. Small changes in brightness along the surface of the grass create high-frequency signals, which show up as noise in the thresholded image. I chose t = 0.20 as the best tradeoff: most of the noise is gone while the main edges stay.
 
 ### 1.3 Derivative of Gaussian (DoG) Filter
 
@@ -181,6 +197,10 @@ The gradient magnitude of the blurred image goes up to 0.32 (it was 0.86 without
   <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.06.png" alt="Gaussian then finite difference, t = 0.06"><figcaption>Gaussian, then finite difference, t = 0.06</figcaption></figure>
 </div>
 
+Blurring first removes much of the high-frequency noise, so the noise from the grass and the sky is reduced. However, the blur can also remove information that characterizes textures, since it is typically higher frequency. The edges are also much more pronounced, because blurring increases their thickness. The threshold needed to capture the most edge information is much lower than with the finite difference alone, because of the reduced noise.
+
+The magnitude range shrinks because the blur acts as a low-pass filter, so the maximum magnitude present in the image is reduced.
+
 #### DoG filters
 
 Convolving the Gaussian with $$ D_x $$ and $$ D_y $$ gives the derivative of Gaussian filters, so the blur and the derivative become one convolution:
@@ -211,13 +231,15 @@ Applying the DoG filters directly to the image:
 
 The difference image is shown on the same scale as the gradient magnitude images and comes out completely black. The largest difference between the two-step and DoG magnitudes is 1.65e-15, about 5e-15 of the brightest magnitude. That is far below one grey level (1/255), so every pixel rounds to 0.
 
+The result is the same for every image, not just this one. Convolution is associative, so $$ (I * G) * D = I * (G * D) $$ exactly. The ~1e-15 difference is floating-point rounding, because the two methods do the arithmetic in a different order. One convolution is not fewer multiplications: the two-step method does 169 + 2 per pixel and the 13 x 15 DoG does 195. The benefit is a single pass over the image with no intermediate blurred image, and one filter that is built once, can be shown as an image, and can be reused on any image.
+
 ### Bells & Whistles: Gradient Orientation
 
-The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. The ratio $$ t = \min(\lvert g_x \rvert, \lvert g_y \rvert) / \max(\lvert g_x \rvert, \lvert g_y \rvert) $$ is in $$ [0, 1] $$, so $$ \arctan t $$ is in the first octant, $$ [0, \pi/4] $$. The half-angle identity is applied twice to bring $$ t $$ below $$ \tan(\pi/16) \approx 0.2 $$, and then 8 terms of the Taylor series are enough:
+The orientation comes from the DoG gradients in 1.3 ($$ \sigma = 2 $$). $$ g_y $$ is negated so that positive y points up, which makes angles count counter-clockwise from the +x axis as on a unit circle. The angle is built up from the first octant using the half-angle identity and a Taylor series:
 
 $$ \arctan t = 2 \arctan \frac{t}{1 + \sqrt{1 + t^2}}, \qquad \arctan t \approx \sum_{k=0}^{7} \frac{(-1)^k \, t^{2k+1}}{2k + 1} $$
 
-The signs and the relative size of $$ g_x $$ and $$ g_y $$ then map the octant angle onto the full circle. The result matches the true angle to within 3e-13 rad. Code: `Assignment 2/src/orientation.py`.
+The result matches the true angle to within 3e-13 rad. Code: `Assignment 2/src/orientation.py`.
 
 ```python
 def arctan(t, terms=8):
@@ -236,6 +258,10 @@ def orientation(gx, gy):
     theta = np.where(gy < 0, 2 * np.pi - theta, theta)   # [0, 2*pi]
     return np.mod(theta, 2 * np.pi)
 ```
+
+Computing the ratio of $$ g_y $$ and $$ g_x $$ disregards the signs, so slopes in opposing directions return the same value: a slope up to the right and a slope down to the left produce the same result. The signs therefore need to be preserved. This is done by first computing the ratio from the absolute values of $$ g_x $$ and $$ g_y $$, which puts the result in the first quadrant. Afterwards the signs place it in the correct quadrant: if $$ g_x < 0 $$ it points left, and if $$ g_y < 0 $$ it points down. The min/max of $$ \lvert g_x \rvert $$ and $$ \lvert g_y \rvert $$ normalizes the ratio to $$ [0, 1] $$, with the caveat that we need to be wary of which one is larger: if $$ \lvert g_y \rvert > \lvert g_x \rvert $$ the angle is mirrored across the 45 degree line, and that needs to be accounted for.
+
+The Taylor series for arctan is $$ t - t^3/3 + t^5/5 - \dots $$, and each term is about $$ t^2 $$ times the one before it. At $$ t = 1 $$ the terms barely shrink (1, 1/3, 1/5, ...), so it would take a huge number of terms to be accurate. The half-angle identity halves the angle using only a square root. Applying it twice takes the largest angle from 45 to 11.25 degrees ($$ t \approx 0.2 $$), where each term is about 25 times smaller than the last, so 8 terms are accurate to about 1e-13. The result is multiplied by 4 to undo the two halvings.
 
 The orientation sets the hue and the gradient magnitude sets the brightness, so flat regions go dark. Hue is periodic, which means 0 and $$ 2\pi $$ get the same colour. The magnitude is scaled by its 99th percentile and clipped to 1. In the "edges only" images, the brightness is the binary edge map from 1.3 (t = 0.06), so every edge pixel is shown at full brightness.
 
@@ -262,6 +288,14 @@ Each wheel is the legend: angle is the gradient direction, and the distance from
   <figure><img loading="lazy" src="../images/assignment-2/bw1/twilight_edges.png" alt="Twilight orientation, edges"><figcaption>Edges only</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/bw1/wheel_twilight.png" alt="Twilight wheel"><figcaption>Legend</figcaption></figure>
 </div>
+
+The hue corresponds to the orientation of the gradient and the brightness corresponds to its magnitude. The gradient points from dark to bright and is perpendicular to the edge, so a horizontal edge has a vertical gradient, and its hue is at the top or the bottom of the wheel depending on which side is brighter. As an example, the edge created by the man's right arm is mostly horizontal or at 45 degrees sloping toward the bottom left of the image, and its hue is perpendicular to the direction of the edge itself.
+
+The colormap needs to be cyclic because the gradient direction is cyclic. Imagine an edge facing 359 degrees and an edge facing 1 degree: they point in roughly the same direction. If the colormap were linear and didn't cycle, those two similar edges would appear different. Making the colormap cyclic keeps the transition at the extremes seamless.
+
+The two edges of a tripod leg get different colours because the gradient points toward the brighter side. On the left edge of the leg that is to the left, and on the right edge it is to the right, so the two sides are 180 degrees apart. That is why they show up as red and cyan, which are opposite each other on the wheel.
+
+HSV reads better in my opinion, because the hues are more distinct and easier to tell apart. However, twilight is perceptually more uniform. In HSV, cyan and yellow edges appear brighter than blue edges, even though the blue edges may have a higher magnitude.
 
 ## Part 2: Fun with Frequencies
 
