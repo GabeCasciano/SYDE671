@@ -11,7 +11,7 @@ Lesson from Assignment 1 (85 instead of 95): the website only has to show the re
   - [ ] All generated images: everything in `website/images/assignment-2/` (281 files as of 2026-10-18, in folders `1.1`, `1.2`, `1.3`, `bw1`, `2.1`, `2.2`, `2.3`, `2.4`, `points`), including those not shown on the page (see section 3)
   - [ ] A PDF of the webpage
   - [ ] A README that lists the contents and maps each script to its output folder (same format as `../Assignment 1/submission/README.md`)
-  - [ ] Optional, decide: the input images in `Assignment 2/data/` and `points.json`, so the code can be run as is. Assignment 1 left these out.
+  - [ ] All original input images from `Assignment 2/data/`, in a `data/` folder next to `src/` so the code runs as is (13 images plus `points.json`, about 11 MB): `big-cat.jpeg`, `burt_apple.png`, `burt_orange.png`, `camera-man.jpg`, `crazy-cat.jpg`, `DerekPicture.jpg`, `father.JPG`, `little-cat.jpeg`, `nutmeg.jpg`, `pasta-boy.jpg`, `sister-1.JPG`, `sister-2.JPG`, `taj.jpg`, `points.json`
 - [ ] Link to the hosted webpage: https://gabecasciano.github.io/SYDE671/assignment-2/
 - [ ] PDF of the webpage (uploaded separately as well, as in Assignment 1)
 
@@ -97,7 +97,7 @@ done
 
 ## 4. Final check before upload
 
-- [ ] `unzip -l` on the zip: every file in `src/` and `website/images/assignment-2/` is present
+- [ ] `unzip -l` on the zip: every file in `src/`, `data/` and `website/images/assignment-2/` is present
 - [ ] File counts match: `find website/images/assignment-2 -type f ! -name .gitkeep | wc -l` equals the image count in the zip
 - [ ] Every item in section 2 is checked
 - [ ] Webpage link opens and the live page matches the PDF
