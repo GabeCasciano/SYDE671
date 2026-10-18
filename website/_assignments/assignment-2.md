@@ -86,6 +86,10 @@ If the kernel size is increased, the number of multiply-adds grows with $$ k^2 $
 
 So the gap between four and two loops grows, the gap between two loops and scipy shrinks because the fixed per-call cost is spread over more work, and four loops vs scipy stays roughly constant since both scale with $$ k^2 $$.
 
+At the boundaries, all three methods zero pad, so near the edges part of each 9x9 window is filled with black. This darkens the outer 4 pixels on every side of the box-filtered image: the outermost two rows at the bottom come out at an average of 0.27 instead of 0.42 with symmetric padding, about 35% darker. The interior is not affected. `scipy.signal.convolve2d` also offers `boundary="wrap"`, which takes the missing pixels from the opposite side of the image, and `boundary="symm"`, which mirrors the image at the edge and avoids the dark border.
+
+The largest difference from scipy is 2.98e-08, which is exactly $$ 2^{-25} $$, half the spacing between float32 numbers in $$ [0.5, 1) $$. The image is loaded as float32 and both of my implementations store their output in a float32 array, while scipy returns float64. The sums agree, and the difference is only the rounding of the result to float32.
+
 #### Finite difference operators
 
 $$ D_x = \begin{bmatrix} 1 & 0 & -1 \end{bmatrix}, \quad D_y = \begin{bmatrix} 1 \\ 0 \\ -1 \end{bmatrix} $$
@@ -104,6 +108,8 @@ Computed with the two-loop convolution. Mid grey is zero.
 </div>
 
 For Dx the vertical edges show up primarily, and for Dy the horizontal edges are more apparent. D45 and D135 show this effect further, picking up the diagonals between Dx and Dy.
+
+The sign shows which side of the edge is brighter. Convolution flips $$ D_x $$, so the output is $$ I(x+1) - I(x-1) $$: it is positive (white) where the image gets brighter to the right and negative (black) where it gets darker. $$ D_y $$ works the same way downward, so a dark object on a bright background gets a black edge on one side and a white edge on the other.
 
 ### 1.2 Finite Difference Operator
 
@@ -148,6 +154,8 @@ The gradient magnitude ranges from 0 to 0.86. The median is 0.012 and the 99th p
 </figure>
 
 Much of the noise comes from the grass and the texture of the man's clothing. Small changes in brightness along the surface of the grass create high-frequency signals, which show up as noise in the thresholded image. I chose t = 0.20 as the best tradeoff: most of the noise is gone while the main edges stay.
+
+The low-contrast edges in the background disappear first as the threshold rises. At t = 0.10 the thin tower and the outlines of the buildings are visible; by t = 0.20 the tower is gone and the buildings are faint; by t = 0.30 the buildings and the horizon are mostly gone, and the edges of the tripod legs start to break into dashes. The outline of the man against the sky has the highest contrast and survives every threshold.
 
 ### 1.3 Derivative of Gaussian (DoG) Filter
 
@@ -200,6 +208,8 @@ The gradient magnitude of the blurred image goes up to 0.32 (it was 0.86 without
 Blurring first removes much of the high-frequency noise, so the noise from the grass and the sky is reduced. However, the blur can also remove information that characterizes textures, since it is typically higher frequency. The edges are also much more pronounced, because blurring increases their thickness. The threshold needed to capture the most edge information is much lower than with the finite difference alone, because of the reduced noise.
 
 The magnitude range shrinks because the blur acts as a low-pass filter, so the maximum magnitude present in the image is reduced.
+
+The cost of blurring is localization and fine detail. The thicker edges make the exact position of each edge less precise, and nearby edges merge: the details of the camera run together into blobs, and the thin tower in the background disappears.
 
 #### DoG filters
 
@@ -259,7 +269,7 @@ def orientation(gx, gy):
     return np.mod(theta, 2 * np.pi)
 ```
 
-Computing the ratio of $$ g_y $$ and $$ g_x $$ disregards the signs, so slopes in opposing directions return the same value: a slope up to the right and a slope down to the left produce the same result. The signs therefore need to be preserved. This is done by first computing the ratio from the absolute values of $$ g_x $$ and $$ g_y $$, which puts the result in the first quadrant. Afterwards the signs place it in the correct quadrant: if $$ g_x < 0 $$ it points left, and if $$ g_y < 0 $$ it points down. The min/max of $$ \lvert g_x \rvert $$ and $$ \lvert g_y \rvert $$ normalizes the ratio to $$ [0, 1] $$, with the caveat that we need to be wary of which one is larger: if $$ \lvert g_y \rvert > \lvert g_x \rvert $$ the angle is mirrored across the 45 degree line, and that needs to be accounted for.
+Computing the ratio of $$ g_y $$ and $$ g_x $$ disregards the signs, so slopes in opposing directions return the same value: a slope up to the right and a slope down to the left produce the same result. The signs therefore need to be preserved. This is done by first computing the ratio from the absolute values of $$ g_x $$ and $$ g_y $$, which puts the result in the first quadrant. Afterwards the signs place it in the correct quadrant: if $$ g_x < 0 $$ it points left, and if $$ g_y < 0 $$ it points down. The min/max of $$ \lvert g_x \rvert $$ and $$ \lvert g_y \rvert $$ normalizes the ratio to $$ [0, 1] $$, with the caveat that we need to be wary of which one is larger: if $$ \lvert g_y \rvert > \lvert g_x \rvert $$ the angle is mirrored across the 45 degree line, and that needs to be accounted for. This also keeps $$ t $$ in the range where the Taylor series works and avoids dividing by zero when $$ g_x = 0 $$. Three reflections then rebuild the full circle from the first octant: $$ \theta \to \pi/2 - \theta $$ when $$ \lvert g_y \rvert > \lvert g_x \rvert $$, $$ \theta \to \pi - \theta $$ when $$ g_x < 0 $$, and $$ \theta \to 2\pi - \theta $$ when $$ g_y < 0 $$.
 
 The Taylor series for arctan is $$ t - t^3/3 + t^5/5 - \dots $$, and each term is about $$ t^2 $$ times the one before it. At $$ t = 1 $$ the terms barely shrink (1, 1/3, 1/5, ...), so it would take a huge number of terms to be accurate. The half-angle identity halves the angle using only a square root. Applying it twice takes the largest angle from 45 to 11.25 degrees ($$ t \approx 0.2 $$), where each term is about 25 times smaller than the last, so 8 terms are accurate to about 1e-13. The result is multiplied by 4 to undo the two halvings.
 
@@ -289,7 +299,7 @@ Each wheel is the legend: angle is the gradient direction, and the distance from
   <figure><img loading="lazy" src="../images/assignment-2/bw1/wheel_twilight.png" alt="Twilight wheel"><figcaption>Legend</figcaption></figure>
 </div>
 
-The hue corresponds to the orientation of the gradient and the brightness corresponds to its magnitude. The gradient points from dark to bright and is perpendicular to the edge, so a horizontal edge has a vertical gradient, and its hue is at the top or the bottom of the wheel depending on which side is brighter. As an example, the edge created by the man's right arm is mostly horizontal or at 45 degrees sloping toward the bottom left of the image, and its hue is perpendicular to the direction of the edge itself.
+The hue corresponds to the orientation of the gradient and the brightness corresponds to its magnitude. The gradient points from dark to bright and is perpendicular to the edge, so a horizontal edge has a vertical gradient, and its hue is at the top or the bottom of the wheel depending on which side is brighter. As an example, the tripod's pan handle runs at 45 degrees from the camera down toward the bottom left of the image. It is a bright rod in front of the dark coat, so the gradient on each side points toward the rod. Its upper-left side is magenta (gradient pointing down and to the right on the wheel) and its lower-right side is green (pointing up and to the left), both perpendicular to the direction of the handle itself.
 
 The colormap needs to be cyclic because the gradient direction is cyclic. Imagine an edge facing 359 degrees and an edge facing 1 degree: they point in roughly the same direction. If the colormap were linear and didn't cycle, those two similar edges would appear different. Making the colormap cyclic keeps the transition at the extremes seamless.
 
