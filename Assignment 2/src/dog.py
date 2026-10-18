@@ -11,7 +11,6 @@ DEFAULTS = {
     "image": "camera-man.jpg",
     "sigma": 2.0,
     "thresholds": "0.02,0.04,0.06,0.08,0.1,0.12",
-    "dog_threshold": 0.06,   # chosen threshold, for the final DoG edge image
 }
 
 
@@ -53,7 +52,6 @@ def main():
     save_image(out / "dog_dx.png", signed(dx2))
     save_image(out / "dog_dy.png", signed(dy2))
     save_image(out / "dog_mag.png", mag2 / mag2.max())
-    save_image(out / f"dog_edges_{p['dog_threshold']}.png", (mag2 > p["dog_threshold"]).astype(float))
 
     diff = np.abs(mag - mag2)
     print(f"max |two step - DoG| magnitude: {diff.max():.2e}")
