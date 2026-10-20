@@ -854,6 +854,23 @@ The Laplacian levels are band-pass images with positive and negative values. The
 </div>
 </div>
 
+#### Blends made from the family stacks
+
+The father and sister stacks above are blended in 2.4. The results are repeated here next to the stacks that made them.
+
+<div class="media-set">
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_sister1_seam.jpg" alt="Father and sister 1, vertical seam"><figcaption>Father | sister 1 (seam)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_sister2_seam.jpg" alt="Father and sister 2, vertical seam"><figcaption>Father | sister 2 (seam)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_sister2_seam.jpg" alt="Sister 1 and sister 2, vertical seam"><figcaption>Sister 1 | sister 2 (seam)</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2.jpg" alt="Sister 2's eyes on father"><figcaption>Sister 2's eyes on father</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_face_father.jpg" alt="Father's face on sister 1"><figcaption>Father's face on sister 1</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-2/2.4/sister2_nose_father.jpg" alt="Father's nose and mouth on sister 2"><figcaption>Father's nose and mouth on sister 2</figcaption></figure>
+</div>
+</div>
+
 #### Recreating Szeliski figure 3.42
 
 The figure uses the mask blending described in 2.4, with a vertical step mask. The masked apple is $$ G^M_i L^A_i $$, the masked orange is $$ (1 - G^M_i) L^B_i $$, and the blended level is their sum. Within each of the first three rows, all three images share the same display scale. The bottom row adds up all 8 levels of each stack.
