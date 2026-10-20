@@ -74,7 +74,7 @@ Every method computes the same sum: one multiply-add per kernel entry per output
 | Two loops | 2.98 | 46,291,500 | 571,500 | 15.5 million | 2.98e-08 |
 | `scipy.signal.convolve2d` | 0.10 | 46,291,500 | 0 | 463 million | - |
 
-Each method is faster than the last because it reduces the number of loop iterations done in Python. The four-loop version is the slowest because every multiply-add is performed in Python. The two-loop version is faster because the multiplication and summation over each 9x9 window are done by numpy, which runs in C. Its remaining cost is the overhead of each numpy call: each of the 571,500 iterations makes a slice, a temporary product array, and a call for only 81 numbers, so that fixed cost is larger than the maths itself. The scipy convolution is the fastest because it computes entirely within C. Overall, all the algorithms run the same number of multiply-adds; the primary difference is the number of loop iterations that are done in Python.
+Each method is faster than the last because it reduces the number of loop iterations done in Python. The four-loop version is the slowest because every multiply-add is performed in Python. The two-loop version is faster because the multiplication and summation over each 9x9 window are done by numpy, which runs in C. Its remaining cost is the overhead of each numpy call: each of the 571,500 iterations makes a slice, a temporary product array, and a call for only 81 numbers, so that fixed cost is larger than the maths itself. The scipy convolution is the fastest because it computes entirely within C.
 
 If the kernel size is increased, the number of multiply-adds grows with $$ k^2 $$ per pixel (441 for a 21x21 kernel vs 81 for 9x9). The four-loop iterations grow with it. The two-loop version still does one Python iteration per pixel, with more work inside each numpy call, and scipy grows with $$ k^2 $$ entirely in C. Measured on a 150 x 150 crop:
 
@@ -107,7 +107,7 @@ Computed with the two-loop convolution. Mid grey is zero.
   <figure><img loading="lazy" src="../images/assignment-2/1.1/d135.jpg" alt="D135"><figcaption>Image * D135</figcaption></figure>
 </div>
 
-For Dx the vertical edges show up primarily, and for Dy the horizontal edges are more apparent. D45 and D135 show this effect further, picking up the diagonals between Dx and Dy.
+Dx picks up mainly vertical edges and Dy mainly horizontal ones. D45 and D135 pick up the diagonals in between.
 
 The sign shows which side of the edge is brighter. Convolution flips $$ D_x $$, so the output is $$ I(x+1) - I(x-1) $$: it is positive (white) where the image gets brighter to the right and negative (black) where it gets darker. $$ D_y $$ works the same way downward, so a dark object on a bright background gets a black edge on one side and a white edge on the other.
 
@@ -205,7 +205,7 @@ The gradient magnitude of the blurred image goes up to 0.32 (it was 0.86 without
   <figure><img loading="lazy" src="../images/assignment-2/1.3/edges_0.06.png" alt="Gaussian then finite difference, t = 0.06"><figcaption>Gaussian, then finite difference, t = 0.06</figcaption></figure>
 </div>
 
-Blurring first removes much of the high-frequency noise, so the noise from the grass and the sky is reduced. However, the blur can also remove information that characterizes textures, since it is typically higher frequency. The edges are also much more pronounced, because blurring increases their thickness. The threshold needed to capture the most edge information is much lower than with the finite difference alone, because of the reduced noise.
+Blurring first removes much of the high-frequency noise, so the noise from the grass and the sky is reduced. The blur also removes some of the texture, since texture is mostly high frequency. The edges are more pronounced, because blurring makes them thicker. With less noise, a much lower threshold captures the edges than with the finite difference alone.
 
 The magnitude range shrinks because the blur acts as a low-pass filter, so the maximum magnitude present in the image is reduced.
 
@@ -269,7 +269,7 @@ def orientation(gx, gy):
     return np.mod(theta, 2 * np.pi)
 ```
 
-Computing the ratio of $$ g_y $$ and $$ g_x $$ disregards the signs, so slopes in opposing directions return the same value: a slope up to the right and a slope down to the left produce the same result. The signs therefore need to be preserved. This is done by first computing the ratio from the absolute values of $$ g_x $$ and $$ g_y $$, which puts the result in the first quadrant. Afterwards the signs place it in the correct quadrant: if $$ g_x < 0 $$ it points left, and if $$ g_y < 0 $$ it points down. The min/max of $$ \lvert g_x \rvert $$ and $$ \lvert g_y \rvert $$ normalizes the ratio to $$ [0, 1] $$, with the caveat that we need to be wary of which one is larger: if $$ \lvert g_y \rvert > \lvert g_x \rvert $$ the angle is mirrored across the 45 degree line, and that needs to be accounted for. This also keeps $$ t $$ in the range where the Taylor series works and avoids dividing by zero when $$ g_x = 0 $$. Three reflections then rebuild the full circle from the first octant: $$ \theta \to \pi/2 - \theta $$ when $$ \lvert g_y \rvert > \lvert g_x \rvert $$, $$ \theta \to \pi - \theta $$ when $$ g_x < 0 $$, and $$ \theta \to 2\pi - \theta $$ when $$ g_y < 0 $$.
+Computing the ratio of $$ g_y $$ and $$ g_x $$ disregards the signs, so slopes in opposing directions return the same value: a slope up to the right and a slope down to the left produce the same result. The signs therefore need to be preserved. This is done by first computing the ratio from the absolute values of $$ g_x $$ and $$ g_y $$, which puts the result in the first quadrant. Afterwards the signs place it in the correct quadrant: if $$ g_x < 0 $$ it points left, and if $$ g_y < 0 $$ it points down. The min/max of $$ \lvert g_x \rvert $$ and $$ \lvert g_y \rvert $$ normalizes the ratio to $$ [0, 1] $$, but it matters which one is larger: if $$ \lvert g_y \rvert > \lvert g_x \rvert $$ the angle is mirrored across the 45 degree line, and that has to be undone. This also keeps $$ t $$ in the range where the Taylor series works and avoids dividing by zero when $$ g_x = 0 $$. Three reflections then rebuild the full circle from the first octant: $$ \theta \to \pi/2 - \theta $$ when $$ \lvert g_y \rvert > \lvert g_x \rvert $$, $$ \theta \to \pi - \theta $$ when $$ g_x < 0 $$, and $$ \theta \to 2\pi - \theta $$ when $$ g_y < 0 $$.
 
 The Taylor series for arctan is $$ t - t^3/3 + t^5/5 - \dots $$, and each term is about $$ t^2 $$ times the one before it. At $$ t = 1 $$ the terms barely shrink (1, 1/3, 1/5, ...), so it would take a huge number of terms to be accurate. The half-angle identity halves the angle using only a square root. Applying it twice takes the largest angle from 45 to 11.25 degrees ($$ t \approx 0.2 $$), where each term is about 25 times smaller than the last, so 8 terms are accurate to about 1e-13. The result is multiplied by 4 to undo the two halvings.
 
@@ -301,7 +301,7 @@ Each wheel is the legend: angle is the gradient direction, and the distance from
 
 The hue corresponds to the orientation of the gradient and the brightness corresponds to its magnitude. The gradient points from dark to bright and is perpendicular to the edge, so a horizontal edge has a vertical gradient, and its hue is at the top or the bottom of the wheel depending on which side is brighter. As an example, the tripod's pan handle runs at 45 degrees from the camera down toward the bottom left of the image. It is a bright rod in front of the dark coat, so the gradient on each side points toward the rod. Its upper-left side is magenta (gradient pointing down and to the right on the wheel) and its lower-right side is green (pointing up and to the left), both perpendicular to the direction of the handle itself.
 
-The colormap needs to be cyclic because the gradient direction is cyclic. Imagine an edge facing 359 degrees and an edge facing 1 degree: they point in roughly the same direction. If the colormap were linear and didn't cycle, those two similar edges would appear different. Making the colormap cyclic keeps the transition at the extremes seamless.
+The colormap needs to be cyclic because the gradient direction is cyclic. An edge facing 359 degrees and an edge facing 1 degree point in almost the same direction. With a linear colormap those two edges would get opposite ends of the scale, so they would look completely different. A cyclic colormap joins the two ends, so the transition is seamless.
 
 The two edges of a tripod leg get different colours because the gradient points toward the brighter side. On the left edge of the leg that is to the left, and on the right edge it is to the right, so the two sides are 180 degrees apart. That is why they show up as red and cyan, which are opposite each other on the wheel.
 
@@ -358,6 +358,8 @@ sharpened = conv(img, unsharp_kernel(sigma, a))
   <figure><img loading="lazy" src="../images/assignment-2/2.1/crazy-cat_sharp_4.jpg" alt="alpha 4"><figcaption>Sharpened, alpha = 4</figcaption></figure>
 </div>
 
+Increasing $$ \alpha $$ adds more of the high frequencies back, so edges get crisper: the dome, arches, and minarets of the Taj Mahal, and the cat's eyes, whiskers, and the lamp behind it. Too much sharpening overshoots. Each channel is pushed past its true value on both sides of an edge, which creates bright and dark halos. At $$ \alpha = 4 $$ these are clear around the dome and the tops of the trees against the sky. Values that overshoot are clipped to 0 or 1, and when one channel clips more than the others the colour shifts. Noise and JPEG blocks are also high frequency, so they are amplified along with the real edges: the sky of the Taj Mahal turns blotchy, and the wall and fur in the cat photo show visible JPEG blocks. For both images, I think $$ \alpha = 1 $$ is the best tradeoff between crisp edges and minimal artifacts.
+
 #### Blur, then re-sharpen
 
 A sharp image is blurred with the same Gaussian and then sharpened again with the unsharp mask filter.
@@ -383,6 +385,10 @@ The table gives the root mean square error between each image and the original (
 | Re-sharpened, alpha = 1 | 0.0260 |
 | Re-sharpened, alpha = 2 | 0.0235 |
 | Re-sharpened, alpha = 4 | 0.0336 |
+
+Re-sharpening does not recover the original. The blur removes the smallest high-frequency details, and once they are gone the unsharp mask has nothing to amplify. For example, the pattern on the napkin around my neck is different in the original and the re-sharpened images. Instead, the filter sharpens the larger edges that survived the blur.
+
+The error goes down and then back up. The blur weakens the mid frequencies without removing them completely, so a moderate $$ \alpha $$ boosts them back toward their original strength, and the RMSE drops from 0.0334 to 0.0235 at $$ \alpha = 2 $$. Past that point the same frequencies are boosted beyond their original strength, so the edges overshoot into halos, and at $$ \alpha = 4 $$ the error is higher than for the blurred image.
 
 ### 2.2 Hybrid Images
 
@@ -443,6 +449,8 @@ def align_images(im1, im2, pts1, pts2):
   <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_im2_aligned.jpg" alt="Nutmeg aligned"><figcaption>Nutmeg (aligned, grayscale)</figcaption></figure>
 </div>
 
+Alignment is what makes the illusion work. When the eyes, nose, and mouth of the two faces line up, the visual system groups the low and high frequencies into one object (Oliva et al.), and sees one face at each distance. Without alignment, the result looks like a mess of high-frequency detail on top of an unrelated blurry background. Some of this shows in the family hybrids below, where faces photographed from different angles only line up around the eyes. The automatic crop removed the top of Derek's hair and the tips of Nutmeg's ears. They had to go because the black fill from padding and rotation creates sharp edges, which are high frequency and would show up in the hybrid as a frame.
+
 #### Filtering
 
 The low-pass filter is a Gaussian, and the high-pass filter is the impulse minus a Gaussian, computed by subtracting the blurred image from the original:
@@ -484,6 +492,12 @@ Rows change $$ \sigma_{low} $$ (Derek) and columns change $$ \sigma_{high} $$ (N
 
 Cutoffs in brackets are in cycles per image.
 
+A larger $$ \sigma_{low} $$ blurs Derek more and keeps only his coarsest shapes. Those carry little contrast up close, so Nutmeg takes over sooner as $$ \sigma_{low} $$ grows. A larger $$ \sigma_{high} $$ also blurs more, but the blur is subtracted, so the high-pass filter keeps a wider band of frequencies and more of Nutmeg comes through. $$ \sigma_{high} = 2 $$ has the highest cutoff, so it keeps only the finest detail, the whiskers and fur. Raising it brings in lower frequencies such as the shading and the shape of her head.
+
+The two images "leak" at the extremes of the grid. In the $$ \sigma_{low} = 4 $$ row, Derek's face and smile stay sharp enough to compete with the whiskers up close. In the $$ \sigma_{high} = 8 $$ column, Nutmeg's stripes and nose are still visible from across the room, most clearly at 16 / 8.
+
+I chose $$ \sigma_{low} = 8 $$ and $$ \sigma_{high} = 4 $$ because it sits between those leaks. Derek keeps frequencies below about 16 cycles per image and Nutmeg keeps frequencies above about 33, so there is a small gap between the two bands. The gap is what makes the result look natural: with no gap, or an overlap, both Derek and Nutmeg would be visible at the same distance, like a double exposure. Because the Gaussians have soft tails, the gap is not empty, so the switch between the two is gradual.
+
 #### Chosen result: sigma_low = 8, sigma_high = 4
 
 <div class="media-grid">
@@ -518,6 +532,10 @@ Log magnitude of the 2D Fourier transform, computed as `np.log(np.abs(np.fft.fft
   <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_fft_hybrid.png" alt="FFT hybrid"><figcaption>Hybrid</figcaption></figure>
 </div>
 
+Low-pass filtering removes the high frequencies from Derek's image, such as texture, and weakens his edges. Only the bright blob in the centre of the spectrum is left, which holds the overall structure of his face. High-pass filtering does the opposite to Nutmeg: the centre of her spectrum goes dark, and the energy further out, from the fur and whiskers, is kept. Both contributions are easy to see in the hybrid spectrum, with Derek's low frequencies in the centre and Nutmeg's high frequencies around the outside.
+
+The bright horizontal and vertical lines through the centre appear in every spectrum, so they are not part of either face. The FFT treats the image as if it repeats, so the left edge meets the right edge and the top meets the bottom. The jump in brightness at those borders is a sharp edge, and it shows up as the cross. Fading the image to black near its borders with a window function, such as a Hann window, would remove the jump and reduce the lines.
+
 #### Cats
 
 Two different cats, aligned on the eyes. Each photo was cropped around the cat's face before alignment, to a box 3.5 eye distances wide centred on the eyes, so the faces fill the frame and the two backgrounds take up less of it. Both arrangements are shown: each cat is used once as the low-frequency image and once as the high-frequency image. Both use $$ \sigma_{low} = 8 $$ and $$ \sigma_{high} = 4 $$.
@@ -534,7 +552,9 @@ Two different cats, aligned on the eyes. Each photo was cropped around the cat's
   <figure><img loading="lazy" src="../images/assignment-2/2.2/littlecat_bigcat_hybrid.jpg" alt="Hybrid"><figcaption>Hybrid</figcaption></figure>
 </div>
 
-Some background clutter is left in both hybrids. The high-pass filter keeps every fine detail in its image, not only the cat. The patterned pillow and the printed blanket are full of high-frequency texture, so they come through as faint patterns around the cat. The low-pass image adds its own background as large blurred patches of colour and brightness. The two backgrounds don't match, so they don't cancel out the way the aligned faces do. Only the eyes are aligned, so anything that differs between the photos also shows up as faint double outlines, such as the ear shapes, the head tilt, and the body pose. Cropping to the faces reduced how much background is in the frame, but it can't remove the background inside the crop. A tighter crop around each face would remove most of these artifacts. The crop was deliberately left looser so that the effect stays visible and this limitation of hybrid images can be shown.
+The little cat (low) with the big cat (high) works better. The little cat's photo has the patterned pillow, and using it as the low-frequency image blurs that texture away. In the other arrangement the pillow pattern comes through strongly on the left. Even so, these two cats are not a great pair for a hybrid, because their faces are too similar to give two clearly different readings.
+
+Some background clutter is left in both hybrids. The high-pass filter keeps every fine detail in its image, not only the cat. The patterned pillow and the printed blanket are full of high-frequency texture, so they come through as faint patterns around the cat. The low-pass image adds its own background as large blurred patches of colour and brightness. The two backgrounds do not match, so they do not cancel out the way the aligned faces do. Only the eyes are aligned, so anything that differs between the photos also shows up as faint double outlines, such as the ear shapes, the head tilt, and the body pose. Cropping to the faces reduced how much background is in the frame, but it cannot remove the background inside the crop. A tighter crop around each face would remove most of these artifacts. I deliberately left the crop looser so that this limitation of hybrid images stays visible.
 
 #### Three-band hybrid: father and sisters
 
@@ -596,6 +616,8 @@ The middle and high images are aligned to the low-frequency image using the same
   <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid_0.125.jpg" alt="1/8"><figcaption>1/8</figcaption></figure>
 </div>
 
+In both arrangements, the low band dominates at every size, from full size down to 1/8. The middle person is almost never clearly visible on their own and mixes with both neighbours. This is not because the bands overlap, since the table above shows they are kept apart. The middle band is narrow, so it holds much less of the image's energy than the low band, and the faces are already similar, so the middle face has nothing distinctive enough to stand out. The sister 1, father, sister 2 arrangement looks the most cohesive to me.
+
 ### Bells & Whistles: Hybrid Images
 
 The same hybrid ($$ \sigma_{low} = 8 $$, $$ \sigma_{high} = 4 $$), with colour kept in the low-frequency image, the high-frequency image, both, or neither. Colour images are filtered one channel at a time.
@@ -606,6 +628,8 @@ The same hybrid ($$ \sigma_{low} = 8 $$, $$ \sigma_{high} = 4 $$), with colour k
   <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_colour_high.jpg" alt="Colour high"><figcaption>Colour high frequencies (Nutmeg)</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_colour_both.jpg" alt="Colour both"><figcaption>Colour both</figcaption></figure>
 </div>
+
+Colour works best in the low-frequency image. Colour in most photos changes slowly across large regions such as skin, clothing, and walls, so it is mostly low-frequency information. The low-pass image keeps it, while the high-pass image keeps only the small amount of colour on fine edges. Nutmeg is almost grey, so colour in her high frequencies adds almost nothing: the high-frequency colour version looks nearly the same as the grayscale one. A colourful high-frequency subject would show more, but only as coloured fringes up close that fade out with distance like the rest of the high band. This matches human vision, which is much less sensitive to fine detail in colour than in brightness. That is also why JPEG stores colour at a lower resolution than brightness.
 
 #### Cats
 
@@ -656,6 +680,8 @@ With three bands, colour can be kept in the low, middle, or high band, or in all
   <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_colour_high.jpg" alt="Colour high"><figcaption>Colour high (sister 2)</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_colour_all.jpg" alt="Colour all"><figcaption>Colour all three</figcaption></figure>
 </div>
+
+The cats are both grey and white, so colour mostly adds the pink nose and the warm background. In the three-band hybrids, colour fades as the cutoff frequency increases, because it is mainly low-frequency information. Colour in the low band carries over the whole image, very little of the middle band's colour comes through, and almost none of the high band's, although its edges are still visible. This supports the idea that colour helps most in the low frequencies, and the answer is the same as for Derek and Nutmeg: the low-frequency image carries almost all of the visible colour.
 
 ### 2.3 Gaussian and Laplacian Stacks
 
@@ -854,6 +880,10 @@ The Laplacian levels are band-pass images with positive and negative values. The
 </div>
 </div>
 
+Going down the Gaussian stack, the high frequencies disappear first: texture goes first, then edges, until only large shapes and colour are left. Each Laplacian level holds one band of frequencies, getting coarser with each level. L0 holds the finest texture, such as hair, stubble, and fabric. The middle levels hold edges and outlines, like the rim of the apple in L3, and the later levels hold large blobs of brightness and colour. The only level that looks like a Gaussian level is the last one, because L7 is the residual G7. L0 is almost empty for the apple and the orange because they are old, soft scans with very little detail at the finest scale. Father L0, by comparison, is full of hair and beard detail.
+
+Compared with a pyramid, a stack uses more memory, since every level is full size: 8 times the image instead of about 4/3 for a pyramid. Spreading the filter taps replaces the downsampling, and in exchange every level lines up pixel for pixel with the original, which makes the levels easy to display side by side and to blend with a mask.
+
 #### Blends made from the family stacks
 
 The father and sister stacks above are blended in 2.4. The results are repeated here next to the stacks that made them.
@@ -898,6 +928,8 @@ The figure uses the mask blending described in 2.4, with a vertical step mask. T
 </div>
 </div>
 
+Each level is blended with the mask blurred to the matching level. At level 0 the mask is nearly a hard step, so the fine texture switches from apple to orange in a narrow strip. At level 4 the mask is very blurred, so the large shapes and colour cross-fade over a wide band. Adding the levels together gives a seam that is sharp for fine detail but gradual for brightness and colour, so no line is visible in the collapsed result.
+
 ### 2.4 Multiresolution Blending
 
 Blending follows the mask algorithm on page 230 of Burt and Adelson. A Laplacian stack is built for each image, and a Gaussian stack for the mask. Each level is blended using the mask blurred to the same level, and the blended levels are added up. Because the mask gets wider at coarser levels, low frequencies mix over a wide band while fine detail switches over sharply, so no single seam is visible. The stacks are the ones from 2.3 (8 levels). Code: `Assignment 2/src/blend.py`.
@@ -916,6 +948,8 @@ def blend_stacks(im1, im2, mask, levels):
 result = sum(blend_stacks(im1, im2, mask, 8)[2])
 ```
 
+The mask method is needed because of the stacks. The simpler algorithm on page 226 joins the two Laplacian pyramids with a hard cut at every level. In a pyramid, the downsampling and upsampling blur that cut at the coarse levels, so it works. A stack never downsamples, so the cut would stay a hard step at every level and the result would look like a cut-and-paste.
+
 #### The oraple
 
 The mask is a vertical step: 1 on the left half (apple), 0 on the right (orange).
@@ -925,9 +959,11 @@ The mask is a vertical step: 1 on the left half (apple), 0 on the right (orange)
   <figcaption>Oraple</figcaption>
 </figure>
 
+A hard cut would show a straight vertical line down the middle, where the red apple meets the brighter orange. The jump in overall brightness and colour would be the most obvious part, more than the change in texture. With the blended mask, the brightness and colour change is spread across a wide band, while the peel texture still stops sharply at the centre, where it does not stand out.
+
 #### Vertical seams: father and sisters
 
-Each pair is aligned on the eyes: the second photo is warped onto the first with the same two-point transform used in 2.2. The seam runs vertically through the midpoint between the eyes, with the first person on the left. If the warped photo doesn't cover part of the frame, the first photo is used there.
+Each pair is aligned on the eyes: the second photo is warped onto the first with the same two-point transform used in 2.2. The seam runs vertically through the midpoint between the eyes, with the first person on the left. If the warped photo does not cover part of the frame, the first photo is used there.
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.4/father_sister1_seam_a.jpg" alt="Father"><figcaption>Father</figcaption></figure>
@@ -946,6 +982,8 @@ Each pair is aligned on the eyes: the second photo is warped onto the first with
   <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_sister2_seam_b.jpg" alt="Sister 2 (aligned)"><figcaption>Sister 2 (aligned)</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.4/sister1_sister2_seam.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
 </div>
+
+Sister 1 and sister 2 blend best. Their skin tone and lighting are close, so the seam down the forehead and nose is hard to find, and the main giveaway is the different hairline at the top. Father and sister 2 blend worst: sister 2's forehead is much lighter, so a bright half and a darker half are visible even with the blend. Father and sister 1 are in between. Their tones are close, but their faces are angled differently, so the nose and mouth do not line up and the seam shows as a kink in the lips.
 
 #### Irregular masks
 
@@ -989,6 +1027,8 @@ def make_mask(kind, shape, pts):
   <figure><img loading="lazy" src="../images/assignment-2/2.4/sister2_nose_father.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
 </div>
 
+The eye swap works best. The ellipse covers mostly skin and the lighting is similar, although sister 2's eyes are opened wider, which gives my father a surprised look. The face swap shows a lighter band along sister 1's hairline at the top of the ellipse, where my father's forehead meets her hair. The nose and mouth swap brings my father's grey stubble onto sister 2's face, and the bottom of the hexagon has a darker halo. The thin bright diagonal line on the left of that image is the edge of the warped photo of my father, where the alignment warp did not cover the frame.
+
 #### Something different: cats and pasta
 
 ##### Little cat's face on pasta boy
@@ -1008,6 +1048,8 @@ def make_mask(kind, shape, pts):
   <figure><img loading="lazy" src="../images/assignment-2/2.4/bigcat_face_pastaboy_mask.png" alt="Mask"><figcaption>Mask</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.4/bigcat_face_pastaboy.jpg" alt="Blended"><figcaption>Blended</figcaption></figure>
 </div>
+
+In the first blend, the cat's face is small for pasta boy's head, and a blue and purple fringe appears around the top of the head where the two backgrounds mix. The second works better than I expected, because the face sits inside the outline of the cat's head. What breaks the illusion there is skin against fur: the face has no fur texture, and its colour and lighting do not match the cat's.
 
 #### The process: eye swap
 
@@ -1034,6 +1076,8 @@ This follows Burt and Adelson figure 10 for the eye swap. The rows are Laplacian
   <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_blend_sum.jpg" alt="(l) Blended, collapsed"><figcaption>(l) Blended, collapsed</figcaption></figure>
 </div>
 
+The figure shows how far each level reaches past the edge of the mask. At level 0 the masked father has a flat grey ellipse with a sharp edge, so the two images barely overlap. By level 4 the mask has been blurred out to about 30 pixels on each side of its edge, so the eye region fades into the face over a wide band.
+
 ### Bells & Whistles: Blending
 
 The oraple and the eye swap blended in grayscale and in colour. For colour, every channel is blended separately with the same mask stack.
@@ -1047,6 +1091,12 @@ The oraple and the eye swap blended in grayscale and in colour. For colour, ever
   <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2_gray.jpg" alt="Eye swap, grayscale"><figcaption>Eye swap, grayscale</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.4/father_eyes_sister2.jpg" alt="Eye swap, colour"><figcaption>Eye swap, colour</figcaption></figure>
 </div>
+
+Colour helps the oraple. The point of the oraple is a red apple turning into an orange, and in grayscale only the change in brightness (the orange half is much lighter) and texture is left. Colour does make the seam more noticeable, because red against orange is one more difference, but the wide blend at the coarse levels spreads it across the middle, so it reads as a gradual change rather than a line.
+
+Colour mostly helps the eye swap too. Sister 2's blue-green eyes are a clear part of the swap, and grayscale loses them. Colour also exposes small skin-tone differences around the ellipse, where her skin is a little paler than my father's. Grayscale hides those differences but keeps any difference in brightness.
+
+Two changes would reduce the colour mismatches. Matching the colour statistics of the second image to the first before blending (the mean and spread of each channel) would remove most of the skin-tone and brightness steps, such as the one in the father and sister 2 seam. Blending in a colour space that separates brightness from colour, such as Lab, would let colour be blended over a wider band than brightness. Human vision is less sensitive to fine colour detail, so this would hide colour mismatches without blurring texture.
 
 ## Tooling: Selecting Alignment Points
 
@@ -1075,3 +1125,9 @@ The images below show the stored points. The red circles are the two clicks, in 
 </div>
 
 ## What I Learned
+
+I found the stacks and the irregular masks the most interesting. The irregular masks are very similar to something you might do in Photoshop. The cat hybrids surprised me the most: I expected them to blend together better, but I think the effect was the least noticeable because the two cats look so similar. The hybrids of my family surprised me in the other direction. I assumed that the slightly different perspectives would hurt them, but they turned out well.
+
+The Gaussian came up in every part of the assignment, so often that I would bet it is a dominant theme of the whole course. Closely tied to it is the idea of working one frequency band at a time: the hybrids combine a low and a high band, the stacks split an image into bands, and the blends join each band separately.
+
+The hardest part in practice was alignment. The two-point alignment had to be ported from the MATLAB starter, the clicked points had to be saved so results were repeatable, the black fill from padding and rotation had to be cropped away, and the three-band hybrids and blends needed a third image warped into place. Even then, faces photographed from slightly different angles never line up everywhere, which is what shows in the father and sister 1 seam. Choosing the cutoff frequencies was also trial and error, which is why I made the sweep grid instead of picking a single value.
