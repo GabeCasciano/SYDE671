@@ -40,9 +40,10 @@ Responsible for TensorOne's intelligence, surveillance and reconnaissance (ISR) 
 *Lead Sensors & Systems Engineer · Hamilton, ON · Jan 2022 - Mar 2026*
 
 * Led the lab's sensor and mechatronic systems, delivering 4-5 applied-research projects a year for partners including ArcelorMittal Dofasco, Stelco, Motsai, and TFT Global. Built a test fixture or calibration rig for every project.
+* Responsible for all electrical and RF engineering in the lab, and supported other IdeaWorks centres.
 * Met prospective partners, wrote scopes of work, and wrote and won about 5 applied-research grants a year (NSERC ARD, ARTP and Engage; SONAMI; OCI), with more than $1M in managed funding.
-* Built budgets and work breakdowns, introduced Agile sprints and stand-ups, ran weekly student and partner meetings, and coordinated on-site testing in production environments.
-* Hired, trained, and mentored 3-4 co-op students a year (20+ in total) with hands-on challenges covering Git, Python, Qt, Docker, MQTT, OpenCV, and embedded tooling.
+* Built budgets and work breakdowns, introduced Agile sprints and stand-ups, ran weekly student and partner meetings, and coordinated on-site testing in production environments. Led or supported drafting four final reports for industry partners.
+* Hired, trained, and mentored 3-4 co-op students a year (20 trained directly, with support for the training of 30+ more) with hands-on challenges covering Git, Python, Qt, Docker, MQTT, OpenCV, and embedded tooling.
 * Built Python IoT back ends (FastAPI, SQLAlchemy, Pydantic, PostgreSQL) over MQTT/HTTP, Qt operator applications, and Raspberry Pi sensor gateways; administered Debian/RHEL servers; delivered SOPs and implementation notes at project close.
 
 **Year 1 (2022)**
@@ -51,13 +52,14 @@ Responsible for TensorOne's intelligence, surveillance and reconnaissance (ISR) 
 * **All-in-One Industrial Sensor.** Stackable, reconfigurable predictive-maintenance sensor on Zephyr RTOS. Refactored the schematics, completed the Altium layout and DRC/ERC, produced fab/assembly packages, procured PCBA, wrote the firmware, and ran all electrical and functional testing.
 * **Industrial Predictive Maintenance System.** Characterized a scissor lift for a digital twin and failure-prediction model using motor/gearbox temperature and vibration plus motor V/I, flagging 4-6σ anomalies to a mobile operator app. Managed the project, wrote the acquisition and analysis firmware, led a student dashboard team, and presented results to the partner.
 * **Mouvion IIoT Sensor Platform.** Postage-stamp-sized motion sensor with Motsai integrating BLE, Wi-Fi, and LoRa. Selected components, designed the schematic and PCB layout, wrote the low-level firmware, and validated the design jointly with Motsai.
+* **SuperNova App.** Mobile app with Merq Inc. that guides lab technicians through food-sample preparation, with barcode and RFID traceability. Wrote the plan, timeline, and budget for the SONAMI grant, managed the project, and developed the machine-to-machine communication.
 
 **Year 2 (2023)**
 
 * **Blast Furnace Tuyere Camera Vision.** Machine-vision system that detects scabs at the tuyeres, logs events, and runs on a Dockerized microservice back end scalable to all 24 tuyeres. Wrote the plan and won a multi-year NSERC ARD grant, ran discovery, designed the camera system, collected the dataset, and led two student cohorts through multiple production deployments. The partner pursued a fee-for-service build-out.
 * **Conveyor Belt Monitoring.** Millimetre-resolution point-cloud defect detection for a ~1.6 km steel-reinforced conveyor feeding a blast furnace. Won a multi-year NSERC ARTP grant, selected a high-speed laser-line scanner, and built a scaled lab conveyor where the proof of concept was demonstrated.
 * **3D Warehouse Digital Twin.** Unity digital twin linked to a live warehouse management database showing steel-coil inventory and crane positions. Won a SONAMI grant, co-designed the architecture, and hired and managed two students.
-* **Wireless Ergonomic Tool-Sensing System.** Hand-tool sensor with six FSR grip-force channels and a 6-DOF IMU. Won a SONAMI grant and designed dual-MCU boards in Altium (STM32F446RE with an op-amp FSR front end, IMU, and SD logging; ESP32-C6 for Wi-Fi/MQTT and the operator display). Calibrated force against reference masses and delivered the firmware; the partner piloted it on the production floor.
+* **Gryp: Wireless Ergonomic Tool-Sensing System.** Hand-tool sensor with six FSR grip-force channels and a 6-DOF IMU. Won a SONAMI grant and designed dual-MCU boards in Altium (STM32F446RE with an op-amp FSR front end, IMU, and SD logging; ESP32-C6 for Wi-Fi/MQTT and the operator display). Calibrated force against reference masses and delivered the firmware; the partner piloted it on the production floor.
 
 **Year 3 (2024)**
 
@@ -75,7 +77,7 @@ Responsible for TensorOne's intelligence, surveillance and reconnaissance (ISR) 
 
 * Taught and coached teams of 20-50 students in grades 1-12 in FLL, FTC, FRC, VEX IQ, VEX EDR, and WRO, winning VEX IQ World Championship titles, FLL and WRO championships, and an FTC provincial title.
 * As Course Coordinator, managed the instructor team and made sure every class had the lesson plans and resources it needed.
-* Designed STEAM curriculum in robotics and control (bang-bang, PID), electronics and Arduino, 3D design and printing, programming (Java, C#, Python), event-driven and object-oriented programming, vision systems, Unity and 2D/3D game design, networking basics, and Android app development. Some of it was licensed to other STEM schools, and I supported their adoption.
+* Designed STEAM curriculum in robotics and control (bang-bang, PID), electronics and Arduino, 3D design and printing, programming (Scratch, Java, C#, Python), event-driven and object-oriented programming, vision systems, Unity and 2D/3D game design, networking basics, and Android app development. Some of it was licensed to other STEM schools, and I supported their adoption.
 * Mentored private students through self-directed projects such as human-detection systems, games, autonomous vehicles and ROVs, IoT sensors, and custom apps, and wrote reusable instructions for each so any instructor could teach them.
 
 ## Grants & Funding
@@ -85,11 +87,12 @@ Responsible for TensorOne's intelligence, surveillance and reconnaissance (ISR) 
 | NSERC ARD | Blast Furnace Tuyere Camera Vision | Stelco | $430k total ($300k NSERC + $130k partner cash), multi-year |
 | NSERC ARTP | Conveyor Belt Monitoring | Stelco | $136k total ($96k NSERC + $40k partner cash), multi-year |
 | SONAMI | 3D Warehouse Digital Twin | CareGo Tek | $20k total ($15k SONAMI + $5k partner cash) |
+| SONAMI | SuperNova App | Merq Inc. | $20k total ($15k SONAMI + $5k partner cash) |
 | SONAMI | Wireless Ergonomic Tool-Sensing System | Industry partner | 6 months, 2 students + materials |
 | OCI C2C | Dynamic Pick-to-Light System | Industry partner | 18 months |
 | NSERC ARD | Continuous-Casting Water Model & Iris SEN | ArcelorMittal Dofasco | Multi-year |
 | NSERC ARD | Tote-Sorting Mobile Robot | Industry partner | Proposal author |
-| NSERC ARD | Slag Raking Vision (led and delivered) | ArcelorMittal Dofasco | $300k NSERC + $120k cash + $210k in-kind |
+| NSERC ARD | Slag Raking Vision (led and delivered) | ArcelorMittal Dofasco | $420k total ($300k NSERC + $120k partner cash), plus partner in-kind |
 | NSERC ARTP + Engage | Industrial Predictive Maintenance (led and delivered) | Handling Specialty | $36k total |
 | NSERC ARTP + Engage | Mouvion IIoT Sensor Platform (delivered) | Motsai | - |
 
@@ -108,7 +111,7 @@ Responsible for TensorOne's intelligence, surveillance and reconnaissance (ISR) 
 * **University Rover Challenge (2017 - 2021):** 2nd overall in 2019 in the Utah Mars-analogue desert. Designed the rover's control system and embedded critical I/O, and managed the hardware and software teams.
 * **RoboNation RoboSub (2019):** 17th overall with an autonomous submarine. Led the controls team, designed the power distribution, thruster/solenoid, and telemetry boards, and tuned the 6-DOF feedback control.
 * **Ramsbot (2017):** designed the control and vision systems for a basketball-shooting robot for a Toronto Raptors (MLSE) halftime demo, making ~90% of shots inside the 3-point line.
-* **Canadian International Rover Challenge (2018 - 2021).**
+* **Canadian International Rover Challenge (2018 - 2021)** and **VexU**.
 * STM32 control electronics and firmware with FIR/IIR and Kalman/EKF filtering on ARM DSP and feed-forward/anti-windup PID.
 * Grew the team from about 50 to 120 members and from one to 2-3 projects a year; built training modules, managed budgets up to $60k, and met with sponsors.
 
