@@ -696,6 +696,7 @@ The Laplacian levels are band-pass images with positive and negative values. The
 
 #### Apple
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
@@ -708,7 +709,9 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
 </div>
+</div>
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
@@ -721,9 +724,11 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/apple_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
 </div>
+</div>
 
 #### Orange
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
@@ -736,7 +741,9 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
 </div>
+</div>
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
@@ -749,9 +756,11 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/orange_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
 </div>
+</div>
 
 #### Father
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
@@ -764,7 +773,9 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/father_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
 </div>
+</div>
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
@@ -777,9 +788,11 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/father_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
 </div>
+</div>
 
 #### Sister 1
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
@@ -792,7 +805,9 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
 </div>
+</div>
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
@@ -805,9 +820,11 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-1_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
 </div>
+</div>
 
 #### Sister 2
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g0.jpg" alt="G0"><figcaption>G0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g1.jpg" alt="G1"><figcaption>G1</figcaption></figure>
@@ -820,7 +837,9 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g6.jpg" alt="G6"><figcaption>G6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_g7.jpg" alt="G7"><figcaption>G7</figcaption></figure>
 </div>
+</div>
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l0.jpg" alt="L0"><figcaption>L0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l1.jpg" alt="L1"><figcaption>L1</figcaption></figure>
@@ -833,11 +852,13 @@ The Laplacian levels are band-pass images with positive and negative values. The
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l6.jpg" alt="L6"><figcaption>L6</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/sister-2_l7.jpg" alt="L7 (residual)"><figcaption>L7 (residual)</figcaption></figure>
 </div>
+</div>
 
 #### Recreating Szeliski figure 3.42
 
 The figure uses the mask blending described in 2.4, with a vertical step mask. The masked apple is $$ G^M_i L^A_i $$, the masked orange is $$ (1 - G^M_i) L^B_i $$, and the blended level is their sum. Within each of the first three rows, all three images share the same display scale. The bottom row adds up all 8 levels of each stack.
 
+<div class="media-set">
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_a_l0.jpg" alt="(a) Masked apple, level 0"><figcaption>(a) Masked apple, level 0</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_b_l0.jpg" alt="(b) Masked orange, level 0"><figcaption>(b) Masked orange, level 0</figcaption></figure>
@@ -857,6 +878,7 @@ The figure uses the mask blending described in 2.4, with a vertical step mask. T
   <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_a_sum.jpg" alt="(j) Masked apple, collapsed"><figcaption>(j) Masked apple, collapsed</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_b_sum.jpg" alt="(k) Masked orange, collapsed"><figcaption>(k) Masked orange, collapsed</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-2/2.3/fig342_blend_sum.jpg" alt="(l) Blended, collapsed"><figcaption>(l) Blended, collapsed</figcaption></figure>
+</div>
 </div>
 
 ### 2.4 Multiresolution Blending

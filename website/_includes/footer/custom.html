@@ -19,7 +19,7 @@
   }
 </script>
 
-<!-- Click any content image to enlarge it; arrows step through its set; click, the close button, or Escape exits -->
+<!-- Click any content image to enlarge it; arrows step through its .media-set or .media-grid; click, the close button, or Escape exits -->
 <div class="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged image">
   <button class="lightbox__close" aria-label="Close">&times;</button>
   <button class="lightbox__prev" aria-label="Previous image">&lsaquo;</button>
@@ -53,7 +53,7 @@
       if (img.closest("a")) return;
       img.classList.add("zoomable");
       img.addEventListener("click", function () {
-        var grid = img.closest(".media-grid");
+        var grid = img.closest(".media-set") || img.closest(".media-grid");
         group = grid ? Array.from(grid.querySelectorAll("img.zoomable")) : [img];
         box.classList.toggle("has-group", group.length > 1);
         show(group.indexOf(img));
