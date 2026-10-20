@@ -8,7 +8,7 @@ redirect_from:
 ---
 
 **Gabriel Casciano, B.Eng., E.I.T.**<br>
-Mechatronics, Sensors & Embedded Systems Engineer<br>
+Systems Engineer<br>
 [gabecasciano@gmail.com](mailto:gabecasciano@gmail.com) · [linkedin.com/in/gabe-casciano-52a717230](https://www.linkedin.com/in/gabe-casciano-52a717230)
 
 Mechatronics and embedded systems engineer (E.I.T.) with 5+ years of industry and applied-research experience taking sensor and robotic systems from concept to field deployment: mechanical design, mixed-signal PCB design, real-time firmware, motor control, sensor calibration, computer vision, and edge ML on NVIDIA Jetson. Designed and flew a 2-axis ISR tracking gimbal, built an ASIC-based acoustic drone detector, and delivered grant-funded sensing systems into steel mills and manufacturing plants. Experienced grant writer, project manager, and mentor to co-op engineers.
@@ -70,6 +70,14 @@ Responsible for TensorOne's intelligence, surveillance and reconnaissance (ISR) 
 * **Dynamic Pick-to-Light System.** Secured an 18-month OCI C2C grant, hired and trained the student developer, and led implementation of a picklist-driven light-directed picking system.
 * **Tote-Sorting Mobile Robot (proposal).** Led the literature review, concept (collaborative robot on an OTTO 600 base), and NSERC ARD proposal.
 
+### Dr. X Academy
+*Lead Instructor, Coach & Course Coordinator · Richmond Hill, ON · Aug 2018 - Dec 2021*
+
+* Taught and coached teams of 20-50 students in grades 1-12 in FLL, FTC, FRC, VEX IQ, VEX EDR, and WRO, winning VEX IQ World Championship titles, FLL and WRO championships, and an FTC provincial title.
+* As Course Coordinator, managed the instructor team and made sure every class had the lesson plans and resources it needed.
+* Designed STEAM curriculum in robotics and control (bang-bang, PID), electronics and Arduino, 3D design and printing, programming (Java, C#, Python), event-driven and object-oriented programming, vision systems, Unity and 2D/3D game design, networking basics, and Android app development. Some of it was licensed to other STEM schools, and I supported their adoption.
+* Mentored private students through self-directed projects such as human-detection systems, games, autonomous vehicles and ROVs, IoT sensors, and custom apps, and wrote reusable instructions for each so any instructor could teach them.
+
 ## Grants & Funding
 
 | Program | Project | Partner | Funding |
@@ -91,10 +99,6 @@ Responsible for TensorOne's intelligence, surveillance and reconnaissance (ISR) 
   * Developed and delivered a seminar-style introductory AutoCAD course covering drafting fundamentals, notation, and electrical schematic drafting.
 * **Applied Research & Development Course (capstone alternative)**, Mohawk College, 2024
   * Mentored a student section building pick-to-light systems from COTS parts and Arduino, benchmarked against a commercial system. Every student delivered a complete working system.
-* **Lead Instructor, Coach & Course Coordinator**, Dr. X Academy, Richmond Hill, ON, Aug 2018 - Dec 2021
-  * Coached teams of 20-50 students in grades 1-12 in FLL, FTC, FRC, VEX IQ, VEX EDR, and WRO, winning VEX IQ World Championship titles, FLL and WRO championships, and an FTC provincial title.
-  * Managed the instructor team and designed STEAM curriculum in robotics and control, electronics and Arduino, 3D design and printing, programming, vision, Unity, and app development, some of it licensed to other STEM schools.
-  * Mentored private students through self-directed projects such as human-detection systems, autonomous vehicles and ROVs, and IoT sensors.
 
 ## Robotics Competitions & Leadership
 
