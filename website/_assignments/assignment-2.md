@@ -510,7 +510,7 @@ I chose $$ \sigma_{low} = 8 $$ and $$ \sigma_{high} = 4 $$ because it sits betwe
   <figcaption>Hybrid</figcaption>
 </figure>
 
-Each level of a Gaussian pyramid blurs the image with the 5-tap binomial filter and then drops every other row and column. Halving the size is like doubling the viewing distance. Move the slider to step through full size, 1/2, 1/4, and 1/8, and watch where the image switches from the high-frequency picture to the low-frequency one:
+Each level of a Gaussian pyramid blurs the image with the 5-tap binomial filter and then drops every other row and column. Halving the size is like doubling the viewing distance:
 
 ```python
 def gaussian_pyramid(img, levels=4):
@@ -520,13 +520,7 @@ def gaussian_pyramid(img, levels=4):
     return pyr
 ```
 
-<figure class="distance-view" data-base="../images/assignment-2/2.2/derek_nutmeg_hybrid">
-  <div class="distance-view__frame"><img src="../images/assignment-2/2.2/derek_nutmeg_hybrid.jpg" alt="Hybrid at the selected scale"></div>
-  <input type="range" min="0" max="3" step="1" value="0" aria-label="Scale">
-  <figcaption>Full size</figcaption>
-</figure>
-
-<figure class="print-figure">
+<figure>
   <img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_hybrid_pyramid.jpg" alt="Gaussian pyramid of the hybrid">
   <figcaption>Gaussian pyramid: full size, 1/2, 1/4, 1/8</figcaption>
 </figure>
@@ -604,13 +598,7 @@ The middle and high images are aligned to the low-frequency image using the same
   <figcaption>Three-band hybrid</figcaption>
 </figure>
 
-<figure class="distance-view" data-base="../images/assignment-2/2.2/father_sister1_sister2_hybrid">
-  <div class="distance-view__frame"><img src="../images/assignment-2/2.2/father_sister1_sister2_hybrid.jpg" alt="Hybrid at the selected scale"></div>
-  <input type="range" min="0" max="3" step="1" value="0" aria-label="Scale">
-  <figcaption>Full size</figcaption>
-</figure>
-
-<figure class="print-figure">
+<figure>
   <img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_hybrid_pyramid.jpg" alt="Gaussian pyramid of the hybrid">
   <figcaption>Gaussian pyramid: full size, 1/2, 1/4, 1/8</figcaption>
 </figure>
@@ -628,30 +616,10 @@ The middle and high images are aligned to the low-frequency image using the same
   <figcaption>Three-band hybrid</figcaption>
 </figure>
 
-<figure class="distance-view" data-base="../images/assignment-2/2.2/sister1_father_sister2_hybrid">
-  <div class="distance-view__frame"><img src="../images/assignment-2/2.2/sister1_father_sister2_hybrid.jpg" alt="Hybrid at the selected scale"></div>
-  <input type="range" min="0" max="3" step="1" value="0" aria-label="Scale">
-  <figcaption>Full size</figcaption>
-</figure>
-
-<figure class="print-figure">
+<figure>
   <img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid_pyramid.jpg" alt="Gaussian pyramid of the hybrid">
   <figcaption>Gaussian pyramid: full size, 1/2, 1/4, 1/8</figcaption>
 </figure>
-
-<script>
-  // Slider steps through the pyramid levels; level i is shown at 1/2^i of the full width
-  document.querySelectorAll(".distance-view").forEach(function (fig) {
-    var img = fig.querySelector("img"), slider = fig.querySelector("input"), cap = fig.querySelector("figcaption");
-    slider.addEventListener("input", function () {
-      var i = Number(slider.value), frame = img.parentNode;
-      if (!frame.style.height) frame.style.height = frame.offsetHeight + "px";
-      img.src = fig.dataset.base + (i ? "_pyramid_" + i : "") + ".jpg";
-      img.style.width = 100 / 2 ** i + "%";
-      cap.textContent = i ? "1/" + 2 ** i + " size" : "Full size";
-    });
-  });
-</script>
 
 In both arrangements, the low band dominates at every size, from full size down to 1/8. The middle person is almost never clearly visible on their own and mixes with both neighbours. This is not because the bands overlap, since the table above shows they are kept apart. The middle band is narrow, so it holds much less of the image's energy than the low band, and the faces are already similar, so the middle face has nothing distinctive enough to stand out. The sister 1, father, sister 2 arrangement looks the most cohesive to me.
 

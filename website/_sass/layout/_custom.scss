@@ -219,25 +219,8 @@ figcaption a:hover {
   }
 }
 
-.print-only,
-.print-figure {
+.print-only {
   display: none;
-}
-
-/* Hybrid viewed at pyramid scales; the frame keeps the full-size height so the page does not jump */
-.distance-view {
-  text-align: center;
-
-  .distance-view__frame {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-  }
-
-  input {
-    width: 60%;
-    margin-top: 0.5em;
-  }
 }
 
 /* Print: light palette (dark vars are screen only), content only */
@@ -249,11 +232,6 @@ figcaption a:hover {
     text-align: center;
   }
 
-  .print-figure {
-    display: block;
-  }
-
-  .distance-view,
   .lightbox,
   .masthead,
   .sidebar,
