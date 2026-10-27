@@ -8,6 +8,7 @@ import numpy as np
 from scipy.ndimage import rotate
 
 from common import DATA_DIR, gaussian_blur, load_image, parse_args, resize, save_image, signed, web_dir
+from stacks import blur
 
 DEFAULTS = {
     "im1": "DerekPicture.jpg",   # low frequencies (seen from far)
@@ -123,6 +124,29 @@ def cutoff(sigma, n):
     return np.sqrt(2 * np.log(2)) / (2 * np.pi * sigma) * n
 
 
+def gaussian_pyramid(img, levels=4):
+    """Blur with the 5-tap binomial filter, then drop every other row and column."""
+    pyr = [img]
+    for _ in range(levels - 1):
+        pyr.append(blur(pyr[-1], 0)[::2, ::2])
+    return pyr
+
+
+def save_pyramid(out, name, img):
+    """Save each level, and all levels side by side at their true sizes, bottom-aligned on white."""
+    pyr = gaussian_pyramid(img)
+    for i, level in enumerate(pyr[1:], 1):
+        save_image(out / f"{name}_pyramid_{i}.jpg", level)
+    gap = 20
+    h = img.shape[0]
+    canvas = np.ones((h, sum(l.shape[1] for l in pyr) + gap * (len(pyr) - 1)) + img.shape[2:], img.dtype)
+    x = 0
+    for level in pyr:
+        canvas[h - level.shape[0]:, x:x + level.shape[1]] = level
+        x += level.shape[1] + gap
+    save_image(out / f"{name}_pyramid.jpg", canvas)
+
+
 def log_fft(gray):
     return np.log(np.abs(np.fft.fftshift(np.fft.fft2(gray))))
 
@@ -188,8 +212,7 @@ def main_three(p, out):
         save_image(out / f"{name}_mid.jpg", signed(mid))
         save_image(out / f"{name}_high.jpg", signed(high))
     save_image(out / f"{name}_hybrid.jpg", hyb)
-    for s in [0.5, 0.25, 0.125]:
-        save_image(out / f"{name}_hybrid_{s:g}.jpg", resize(hyb, s))
+    save_pyramid(out, f"{name}_hybrid", hyb)
     if p["colour"]:
         greys = [np.dstack([g] * 3) for g in (g1, gm, g2)]
         for mode in ["none", "low", "mid", "high", "all"]:
@@ -228,9 +251,8 @@ def main():
         vmax = max(ffts["im1"].max(), ffts["im2"].max())
         for k, f in ffts.items():
             plt.imsave(out / f"{name}_fft_{k}.png", np.clip(f, vmin, vmax), cmap="gray", vmin=vmin, vmax=vmax)
-        # Shrinking the hybrid simulates viewing it from further away
-        for s in [0.5, 0.25, 0.125]:
-            save_image(out / f"{name}_hybrid_{s:g}.jpg", resize(hyb, s))
+        # Each pyramid level halves the size, like doubling the viewing distance
+        save_pyramid(out, f"{name}_hybrid", hyb)
 
     if p["sweep_low"]:
         for sl in p["sweep_low"].split(","):

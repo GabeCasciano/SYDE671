@@ -510,13 +510,20 @@ I chose $$ \sigma_{low} = 8 $$ and $$ \sigma_{high} = 4 $$ because it sits betwe
   <figcaption>Hybrid</figcaption>
 </figure>
 
-The same hybrid at 1/2, 1/4, and 1/8 size, which is like viewing it from further away:
+Each level of a Gaussian pyramid blurs the image with the 5-tap binomial filter and then drops every other row and column. Halving the size is like doubling the viewing distance:
 
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_hybrid_0.5.jpg" alt="1/2"><figcaption>1/2</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_hybrid_0.25.jpg" alt="1/4"><figcaption>1/4</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_hybrid_0.125.jpg" alt="1/8"><figcaption>1/8</figcaption></figure>
-</div>
+```python
+def gaussian_pyramid(img, levels=4):
+    pyr = [img]
+    for _ in range(levels - 1):
+        pyr.append(blur(pyr[-1], 0)[::2, ::2])
+    return pyr
+```
+
+<figure>
+  <img loading="lazy" src="../images/assignment-2/2.2/derek_nutmeg_hybrid_pyramid.jpg" alt="Gaussian pyramid of the hybrid">
+  <figcaption>Gaussian pyramid: full size, 1/2, 1/4, 1/8</figcaption>
+</figure>
 
 #### Frequency analysis
 
@@ -591,11 +598,10 @@ The middle and high images are aligned to the low-frequency image using the same
   <figcaption>Three-band hybrid</figcaption>
 </figure>
 
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_hybrid_0.5.jpg" alt="1/2"><figcaption>1/2</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_hybrid_0.25.jpg" alt="1/4"><figcaption>1/4</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_hybrid_0.125.jpg" alt="1/8"><figcaption>1/8</figcaption></figure>
-</div>
+<figure>
+  <img loading="lazy" src="../images/assignment-2/2.2/father_sister1_sister2_hybrid_pyramid.jpg" alt="Gaussian pyramid of the hybrid">
+  <figcaption>Gaussian pyramid: full size, 1/2, 1/4, 1/8</figcaption>
+</figure>
 
 ##### Sister 1 (low), father (middle), sister 2 (high)
 
@@ -610,11 +616,10 @@ The middle and high images are aligned to the low-frequency image using the same
   <figcaption>Three-band hybrid</figcaption>
 </figure>
 
-<div class="media-grid">
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid_0.5.jpg" alt="1/2"><figcaption>1/2</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid_0.25.jpg" alt="1/4"><figcaption>1/4</figcaption></figure>
-  <figure><img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid_0.125.jpg" alt="1/8"><figcaption>1/8</figcaption></figure>
-</div>
+<figure>
+  <img loading="lazy" src="../images/assignment-2/2.2/sister1_father_sister2_hybrid_pyramid.jpg" alt="Gaussian pyramid of the hybrid">
+  <figcaption>Gaussian pyramid: full size, 1/2, 1/4, 1/8</figcaption>
+</figure>
 
 In both arrangements, the low band dominates at every size, from full size down to 1/8. The middle person is almost never clearly visible on their own and mixes with both neighbours. This is not because the bands overlap, since the table above shows they are kept apart. The middle band is narrow, so it holds much less of the image's energy than the low band, and the faces are already similar, so the middle face has nothing distinctive enough to stand out. The sister 1, father, sister 2 arrangement looks the most cohesive to me.
 
