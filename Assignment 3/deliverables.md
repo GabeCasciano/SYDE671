@@ -31,11 +31,11 @@ Banned functions (Part A, and reused in Part B): `cv2.findHomography`, `cv2.warp
   - [ ] In practice 3 sets are needed, since A.4 and B.4 each need 3 mosaics
   - [ ] 40 to 70 percent overlap, shot close together in time, no fisheye
 - [ ] **A.2 Recover homographies (25)**
-  - [ ] `computeH(im1_pts, im2_pts)` implemented, n-by-2 inputs, returns 3x3 H
-  - [ ] More than 4 correspondences, solved with least squares
-  - [ ] Correspondences visualized on the images
-  - [ ] System of equations shown
-  - [ ] Recovered homography matrix shown
+  - [x] `computeH(im1_pts, im2_pts)` implemented, n-by-2 inputs, returns 3x3 H
+  - [x] More than 4 correspondences, solved with least squares
+  - [x] Correspondences visualized on the images
+  - [x] System of equations shown
+  - [x] Recovered homography matrix shown
 - [ ] **A.3 Warp the images (25)**
   - [x] `warpImageNearestNeighbor(im, H)` implemented with inverse warping
   - [x] `warpImageBilinear(im, H)` implemented with inverse warping
@@ -46,8 +46,8 @@ Banned functions (Part A, and reused in Part B): `cv2.findHomography`, `cv2.warp
   - [ ] Trade-offs between speed and quality discussed
 - [ ] **A.4 Blend into a mosaic (25)**
   - [ ] 3 mosaics
-  - [ ] Source images shown for each mosaic
-  - [ ] Weighted averaging (feathering) or Laplacian pyramid blending to reduce edge artifacts
+  - [x] Source images shown for each mosaic
+  - [x] Weighted averaging (feathering) or Laplacian pyramid blending to reduce edge artifacts
   - [ ] Procedure explained
 
 ### Part B: Feature Matching for Autostitching (100 points)
@@ -70,7 +70,7 @@ Follows Brown et al., "Multi-Image Matching using Multi-Scale Oriented Patches" 
 - [ ] **B.4 RANSAC for robust homography (40)**
   - [x] 4-point RANSAC implemented from scratch
   - [x] Mosaics produced by reusing Part A code
-  - [ ] Manual and automatic stitching shown side by side
+  - [x] Manual and automatic stitching shown side by side
   - [ ] At least 3 automatic mosaics
 - [ ] **B.5 Bells & Whistles (extra for CS180, mandatory for CS280A; all three done, write-up pending)**
   - [x] Multiscale processing for corner detection and description

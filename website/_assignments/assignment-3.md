@@ -53,6 +53,110 @@ Because the camera pans continuously in both videos, almost every pair of frames
 
 ## Part A: Image Warping and Mosaicing
 
+### A.1 Source Images
+
+Each mosaic is three frames from the videos above. The same mosaics are used in Part B.
+
+| Mosaic | Frames |
+|---|---|
+| canyon_slope | IMG_0852 frames 9, 10, 11 |
+| canyon_ridge | IMG_0861 frames 40, 44, 48 |
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/a1/canyon_slope_1.jpg" alt=""><figcaption>canyon_slope, frame 9</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a1/canyon_slope_2.jpg" alt=""><figcaption>canyon_slope, frame 10</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a1/canyon_slope_3.jpg" alt=""><figcaption>canyon_slope, frame 11</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/a1/canyon_ridge_1.jpg" alt=""><figcaption>canyon_ridge, frame 40</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a1/canyon_ridge_2.jpg" alt=""><figcaption>canyon_ridge, frame 44</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a1/canyon_ridge_3.jpg" alt=""><figcaption>canyon_ridge, frame 48</figcaption></figure>
+</div>
+
+### A.2 Recovering Homographies
+
+Twelve correspondences were clicked by hand for each neighbouring pair of frames (`Assignment 3/src/click_points.py`).
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-3/a2/canyon_slope_1_points.jpg" alt=""><figcaption>canyon_slope, frames 9 and 10</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a2/canyon_slope_2_points.jpg" alt=""><figcaption>canyon_slope, frames 10 and 11</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a2/canyon_ridge_1_points.jpg" alt=""><figcaption>canyon_ridge, frames 40 and 44</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a2/canyon_ridge_2_points.jpg" alt=""><figcaption>canyon_ridge, frames 44 and 48</figcaption></figure>
+</div>
+
+A homography maps a point $$ (x, y) $$ in the first image to $$ (u, v) $$ in the second, up to scale. Fixing $$ h_{33} = 1 $$ leaves 8 unknowns:
+
+$$ u = \frac{h_{11} x + h_{12} y + h_{13}}{h_{31} x + h_{32} y + 1}, \qquad v = \frac{h_{21} x + h_{22} y + h_{23}}{h_{31} x + h_{32} y + 1} $$
+
+Multiplying out the denominators gives two equations per correspondence that are linear in the unknowns. Stacking all $$ n $$ correspondences gives a $$ 2n \times 8 $$ system $$ A h = b $$:
+
+$$ \begin{bmatrix} x_1 & y_1 & 1 & 0 & 0 & 0 & -x_1 u_1 & -y_1 u_1 \\ 0 & 0 & 0 & x_1 & y_1 & 1 & -x_1 v_1 & -y_1 v_1 \\ \vdots & & & & & & & \vdots \\ x_n & y_n & 1 & 0 & 0 & 0 & -x_n u_n & -y_n u_n \\ 0 & 0 & 0 & x_n & y_n & 1 & -x_n v_n & -y_n v_n \end{bmatrix} \begin{bmatrix} h_{11} \\ h_{12} \\ h_{13} \\ h_{21} \\ h_{22} \\ h_{23} \\ h_{31} \\ h_{32} \end{bmatrix} = \begin{bmatrix} u_1 \\ v_1 \\ \vdots \\ u_n \\ v_n \end{bmatrix} $$
+
+With 12 correspondences there are 24 equations for 8 unknowns, so the system is solved with least squares.
+
+```python
+def system(im1_pts, im2_pts):
+    A, b = [], []
+    for (x, y), (u, v) in zip(im1_pts, im2_pts):
+        A.append([x, y, 1, 0, 0, 0, -x * u, -y * u])
+        A.append([0, 0, 0, x, y, 1, -x * v, -y * v])
+        b += [u, v]
+    return np.array(A, dtype=float), np.array(b, dtype=float)
+
+
+def computeH(im1_pts, im2_pts):
+    A, b = system(im1_pts, im2_pts)
+    h = np.linalg.lstsq(A, b, rcond=None)[0]
+    return np.append(h, 1).reshape(3, 3)
+```
+
+The full system for canyon_slope, frames 9 and 10 ($$ A $$, then $$ b $$ after the bar):
+
+```
+  332.75   601.41  1.00     0.00     0.00  0.00   -206349.58  -372957.07 |  620.14
+    0.00     0.00  0.00   332.75   601.41  1.00   -221482.21  -400307.86 |  665.61
+  166.12   726.76  1.00     0.00     0.00  0.00    -76101.29  -332928.36 |  458.10
+    0.00     0.00  0.00   166.12   726.76  1.00   -129366.84  -565954.83 |  778.74
+  536.06   824.60  1.00     0.00     0.00  0.00   -427487.77  -657583.43 |  797.46
+    0.00     0.00  0.00   536.06   824.60  1.00   -481366.97  -740463.16 |  897.97
+ 1147.53   569.31  1.00     0.00     0.00  0.00  -1630812.78  -809076.81 | 1421.16
+    0.00     0.00  0.00  1147.53   569.31  1.00   -777843.20  -385902.60 |  677.84
+ 1356.95   462.30  1.00     0.00     0.00  0.00  -2237514.83  -762303.04 | 1648.93
+    0.00     0.00  0.00  1356.95   462.30  1.00   -789119.58  -268846.60 |  581.54
+ 1321.79   237.59  1.00     0.00     0.00  0.00  -2139128.32  -384503.27 | 1618.35
+    0.00     0.00  0.00  1321.79   237.59  1.00   -453463.40   -81508.98 |  343.07
+ 1447.14   269.69  1.00     0.00     0.00  0.00  -2523389.32  -470261.37 | 1743.70
+    0.00     0.00  0.00  1447.14   269.69  1.00   -551771.78  -102828.74 |  381.28
+ 1416.57    15.93  1.00     0.00     0.00  0.00  -2441927.69   -27466.01 | 1723.83
+    0.00     0.00  0.00  1416.57    15.93  1.00   -169821.49    -1910.10 |  119.88
+ 1448.67   489.82  1.00     0.00     0.00  0.00  -2539342.04  -858590.94 | 1752.88
+    0.00     0.00  0.00  1448.67   489.82  1.00   -886748.72  -299823.50 |  612.11
+  850.96    81.67  1.00     0.00     0.00  0.00   -966097.28   -92714.65 | 1135.30
+    0.00     0.00  0.00   850.96    81.67  1.00   -154049.05   -14783.82 |  181.03
+  286.89   434.79  1.00     0.00     0.00  0.00   -166946.29  -253011.20 |  581.92
+    0.00     0.00  0.00   286.89   434.79  1.00   -144908.86  -219612.94 |  505.11
+ 1468.54    26.63  1.00     0.00     0.00  0.00  -2619074.44   -47499.95 | 1783.45
+    0.00     0.00  0.00  1468.54    26.63  1.00   -191766.67    -3477.91 |  130.58
+```
+
+Recovered homographies (first frame mapped into the second), with the RMS distance between the mapped clicked points and their clicked partners:
+
+canyon_slope, 9 to 10 (RMS error 3.24 px):
+
+$$ H = \begin{bmatrix} 0.834967 & -0.0652111 & 352.782 \\ -0.00206532 & 0.905444 & 95.082 \\ -7.72146 \times 10^{-5} & -2.70661 \times 10^{-5} & 1 \end{bmatrix} $$
+
+canyon_slope, 10 to 11 (RMS error 2.67 px):
+
+$$ H = \begin{bmatrix} 0.901914 & -0.039196 & 199.319 \\ -0.00801003 & 0.932446 & 131.516 \\ -4.58217 \times 10^{-5} & -2.54684 \times 10^{-5} & 1 \end{bmatrix} $$
+
+canyon_ridge, 40 to 44 (RMS error 3.78 px):
+
+$$ H = \begin{bmatrix} 0.801391 & -0.0582999 & 491.428 \\ -0.124356 & 0.910297 & 132.916 \\ -1.70132 \times 10^{-4} & -1.67338 \times 10^{-5} & 1 \end{bmatrix} $$
+
+canyon_ridge, 44 to 48 (RMS error 3.65 px):
+
+$$ H = \begin{bmatrix} 0.841398 & -0.0425021 & 642.385 \\ -0.0626364 & 1.09375 & -242.963 \\ -2.10217 \times 10^{-4} & 8.11999 \times 10^{-5} & 1 \end{bmatrix} $$
+
 ### A.3 Warping and Rectification
 
 Both warps use inverse warping. The four corners of the input are pushed through $$ H $$ to find the output bounding box, then every output pixel is mapped back through $$ H^{-1} $$ and sampled from the input. Output pixels that land outside the input get alpha 0. Nearest neighbour rounds the source position to the closest pixel; bilinear weights the four surrounding pixels by their distance to it. Code: `Assignment 3/src/homography.py` and `Assignment 3/src/rectify.py`.
@@ -121,16 +225,74 @@ For rectification, the four corners of each book cover are clicked and mapped to
 | Feedback and Control Systems | 2327 x 2261 | 0.48 s | 1.25 s |
 | Transducer Interfacing Handbook | 2134 x 1941 | 0.38 s | 0.96 s |
 
+### A.4 Blending into a Mosaic
+
+The middle frame of each set is the reference. The pairwise homographies are chained so every frame maps into it: the first frame through $$ H_{1 \to 2} $$ and the third through $$ H_{2 \to 3}^{-1} $$. Each frame is inverse warped (bilinear) onto a shared canvas sized to fit all of them, and carries a weight that is 1 at its centre and falls linearly to 0 at its nearest edge. Code: `Assignment 3/src/blend.py`.
+
+Three ways of combining the warped frames are compared:
+
+- **Overwrite**: each frame is pasted over the previous one.
+- **Feather**: every pixel is the weighted average of the frames covering it.
+- **Two-band**: each frame is split into a low band (Gaussian blur, $$ \sigma = 6 $$) and a high band (the frame minus its low band). The low bands are feathered as above, and the high band at each pixel is taken from the one frame with the largest weight there.
+
+```python
+def chain_to_ref(pair_Hs):
+    n, m = len(pair_Hs) + 1, (len(pair_Hs) + 1) // 2
+    Hs = [np.eye(3) for _ in range(n)]
+    for i in range(m - 1, -1, -1):
+        Hs[i] = Hs[i + 1] @ pair_Hs[i]
+    for i in range(m + 1, n):
+        Hs[i] = Hs[i - 1] @ np.linalg.inv(pair_Hs[i - 1])
+    return [H / H[2, 2] for H in Hs]
+
+
+def edge_weight(shape):
+    h, w = shape[:2]
+    y, x = np.mgrid[:h, :w]
+    d = np.minimum.reduce([x + 1, w - x, y + 1, h - y]).astype(np.float32)
+    return d / d.max()
+```
+
+```python
+    # Two-band: feather the low band, take the high band from the highest-weight image
+    lows = [masked_blur(rgb, a, sigma) for rgb, _, a in layers]
+    low = sum(lo * w[..., None] for lo, (_, w, _) in zip(lows, layers)) / total
+    best = np.argmax(np.stack([w for _, w, _ in layers]), axis=0)
+    high = np.zeros_like(low)
+    for i, (lo, (rgb, _, a)) in enumerate(zip(lows, layers)):
+        pick = (best == i) & (a > 0)
+        high[pick] = (rgb - lo)[pick]
+    return crop(np.clip(low + high, 0, 1) * covered[..., None], covered)
+```
+
+#### canyon_slope
+
+<figure>
+  <img loading="lazy" src="../images/assignment-3/a4/canyon_slope_overwrite.jpg" alt="">
+  <figcaption>Overwrite</figcaption>
+</figure>
+<figure>
+  <img loading="lazy" src="../images/assignment-3/a4/canyon_slope_feather.jpg" alt="">
+  <figcaption>Feather</figcaption>
+</figure>
+<figure>
+  <img loading="lazy" src="../images/assignment-3/mosaics/canyon_slope_manual.jpg" alt="">
+  <figcaption>Two-band</figcaption>
+</figure>
+
+#### canyon_ridge
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/a4/canyon_ridge_overwrite.jpg" alt=""><figcaption>Overwrite</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a4/canyon_ridge_feather.jpg" alt=""><figcaption>Feather</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/mosaics/canyon_ridge_manual.jpg" alt=""><figcaption>Two-band</figcaption></figure>
+</div>
+
 ## Part B: Feature Matching for Autostitching
 
 Part B follows Brown, Szeliski and Winder, "Multi-Image Matching using Multi-Scale Oriented Patches" (MOPS), single scale and axis aligned unless noted. Code: `Assignment 3/src/features.py` (detection, descriptors, matching, RANSAC) and `Assignment 3/src/part_b.py` (figures and mosaics).
 
-Two mosaics are used throughout, each three frames from the videos above:
-
-| Mosaic | Frames |
-|---|---|
-| canyon_slope | IMG_0852 frames 9, 10, 11 |
-| canyon_ridge | IMG_0861 frames 40, 44, 48 |
+The mosaics are the same as in Part A.
 
 ### B.1 Harris Corners and Adaptive Non-Maximal Suppression
 
@@ -265,14 +427,16 @@ def ransac(p1, p2, iters=2000, eps=3.0, seed=0):
 
 Inliers are green and outliers red.
 
-<figure>
-  <img loading="lazy" src="../images/assignment-3/mosaics/canyon_slope_auto.jpg" alt="">
-  <figcaption>canyon_slope, automatic</figcaption>
-</figure>
-<figure>
-  <img loading="lazy" src="../images/assignment-3/mosaics/canyon_ridge_auto.jpg" alt="">
-  <figcaption>canyon_ridge, automatic</figcaption>
-</figure>
+Manual (Part A, clicked points) and automatic mosaics, both with two-band blending:
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/mosaics/canyon_slope_manual.jpg" alt=""><figcaption>canyon_slope, manual</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/mosaics/canyon_slope_auto.jpg" alt=""><figcaption>canyon_slope, automatic</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/mosaics/canyon_ridge_manual.jpg" alt=""><figcaption>canyon_ridge, manual</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/mosaics/canyon_ridge_auto.jpg" alt=""><figcaption>canyon_ridge, automatic</figcaption></figure>
+</div>
 
 ### B.5 Bells & Whistles
 
