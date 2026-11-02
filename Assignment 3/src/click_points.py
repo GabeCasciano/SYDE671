@@ -86,11 +86,11 @@ def main():
         if key in points and not args.redo:
             print(f"{key} already clicked (use --redo)")
             return
+        w, h = (float(v) for v in args.size.split("x"))
         pts = collect([load_image(args.rect)], args.rect, alternate=False)[0]
         if len(pts) != 4:
             print(f"Need exactly 4 corners, got {len(pts)}; nothing saved")
             return
-        w, h = (float(v) for v in args.size.split("x"))
         points[key] = {"corners": pts, "size": [w, h]}
         save_points(points)
         return
