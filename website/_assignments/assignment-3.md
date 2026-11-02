@@ -92,6 +92,59 @@ Twelve correspondences were clicked by hand for each neighbouring pair of frames
   <figure><img loading="lazy" src="../images/assignment-3/a2/horseshoe_2_points.jpg" alt=""><figcaption>horseshoe, photos 839 and 841</figcaption></figure>
 </div>
 
+The clicked coordinates, numbered as in the figures above:
+
+#### canyon_slope clicked points (pixels)
+
+| # | Pair 1: frame 9 | Pair 1: frame 10 | Pair 2: frame 10 | Pair 2: frame 11 |
+|---|---|---|---|---|
+| 1 | (333, 601) | (620, 666) | (272, 747) | (428, 852) |
+| 2 | (166, 727) | (458, 779) | (619, 666) | (768, 780) |
+| 3 | (536, 825) | (797, 898) | (799, 900) | (940, 1026) |
+| 4 | (1148, 569) | (1421, 678) | (1421, 679) | (1586, 820) |
+| 5 | (1357, 462) | (1649, 582) | (134, 765) | (299, 869) |
+| 6 | (1322, 238) | (1618, 343) | (1189, 248) | (1343, 374) |
+| 7 | (1447, 270) | (1744, 381) | (1650, 580) | (1829, 725) |
+| 8 | (1417, 16) | (1724, 120) | (1721, 118) | (1904, 253) |
+| 9 | (1449, 490) | (1753, 612) | (1632, 39) | (1808, 169) |
+| 10 | (851, 82) | (1135, 181) | (1135, 181) | (1288, 308) |
+| 11 | (287, 435) | (582, 505) | (1618, 346) | (1794, 479) |
+| 12 | (1469, 27) | (1783, 131) | (1062, 320) | (1210, 445) |
+
+#### canyon_ridge clicked points (pixels)
+
+| # | Pair 1: frame 40 | Pair 1: frame 44 | Pair 2: frame 44 | Pair 2: frame 48 |
+|---|---|---|---|---|
+| 1 | (77, 1054) | (511, 1119) | (147, 1210) | (662, 1004) |
+| 2 | (148, 972) | (578, 1041) | (277, 1071) | (805, 886) |
+| 3 | (219, 862) | (649, 939) | (417, 969) | (962, 800) |
+| 4 | (186, 718) | (628, 801) | (488, 905) | (1043, 736) |
+| 5 | (225, 732) | (653, 813) | (233, 1448) | (727, 1238) |
+| 6 | (376, 1035) | (796, 1119) | (198, 614) | (778, 414) |
+| 7 | (371, 823) | (803, 904) | (16, 526) | (611, 319) |
+| 8 | (558, 437) | (1017, 518) | (267, 643) | (847, 443) |
+| 9 | (62, 434) | (527, 528) | (351, 1215) | (863, 1038) |
+| 10 | (527, 675) | (975, 757) | (454, 1098) | (986, 933) |
+| 11 | (235, 633) | (676, 716) | (520, 1132) | (1049, 981) |
+| 12 | (403, 587) | (847, 667) | (219, 1785) | (689, 1544) |
+
+#### horseshoe clicked points (pixels)
+
+| # | Pair 1: IMG_0837 | Pair 1: IMG_0839 | Pair 2: IMG_0839 | Pair 2: IMG_0841 |
+|---|---|---|---|---|
+| 1 | (1169, 1154) | (686, 1136) | (684, 1132) | (199, 1138) |
+| 2 | (1287, 1477) | (799, 1425) | (721, 821) | (212, 806) |
+| 3 | (1381, 1182) | (869, 1142) | (1133, 1002) | (660, 973) |
+| 4 | (693, 880) | (171, 871) | (1312, 975) | (821, 943) |
+| 5 | (858, 827) | (357, 813) | (1102, 1340) | (647, 1304) |
+| 6 | (691, 1084) | (181, 1095) | (1077, 1403) | (629, 1366) |
+| 7 | (1229, 836) | (723, 822) | (798, 1424) | (349, 1434) |
+| 8 | (1034, 919) | (543, 907) | (1060, 1648) | (625, 1608) |
+| 9 | (1160, 1906) | (702, 1849) | (1349, 773) | (844, 748) |
+| 10 | (949, 1598) | (485, 1590) | (900, 1218) | (443, 1208) |
+| 11 | (1132, 1625) | (662, 1583) | (603, 926) | (90, 920) |
+| 12 | (1409, 1578) | (906, 1504) | (593, 1005) | (83, 1008) |
+
 A homography maps a point $$ (x, y) $$ in the first image to $$ (u, v) $$ in the second, up to scale. Fixing $$ h_{33} = 1 $$ leaves 8 unknowns:
 
 $$ u = \frac{h_{11} x + h_{12} y + h_{13}}{h_{31} x + h_{32} y + 1}, \qquad v = \frac{h_{21} x + h_{22} y + h_{23}}{h_{31} x + h_{32} y + 1} $$
@@ -211,6 +264,15 @@ def warp(im, H, box=None, sampler=sample_bilinear):
 ```
 
 For rectification, the four corners of each book cover are clicked and mapped to a rectangle with the cover's measured aspect ratio, so $$ H $$ comes from `computeH` with exactly 4 correspondences. The output is limited to one cover width and height around the cover, since the table far from the book stretches out without bound.
+
+Clicked cover corners (pixels):
+
+| Corner | Feedback and Control Systems | Transducer Interfacing Handbook |
+|---|---|---|
+| Top-left | (405, 222) | (279, 220) |
+| Top-right | (1094, 226) | (1239, 226) |
+| Bottom-right | (1273, 1268) | (1408, 759) |
+| Bottom-left | (139, 1243) | (88, 744) |
 
 #### Feedback and Control Systems (15.5 x 23.5 cm)
 
