@@ -23,7 +23,7 @@ def convert(video, height):
 
     subprocess.run(
         ["ffmpeg", "-v", "error", "-y", "-i", str(video), "-vf", vf, "-an",
-         "-c:v", "libx264", "-crf", "26", "-preset", "slow", "-pix_fmt", "yuv420p",
+         "-c:v", "libx264", "-crf", "30", "-preset", "slow", "-pix_fmt", "yuv420p",
          "-movflags", "+faststart", str(mp4)], check=True)
     subprocess.run(
         ["ffmpeg", "-v", "error", "-y", "-i", str(mp4), "-frames:v", "1",

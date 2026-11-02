@@ -1,6 +1,6 @@
 """Extract frames from videos and drop near-duplicates.
 
-Usage: python extract_frames.py VIDEO [VIDEO ...] [--fps 2] [--diff 0.04]
+Usage: python extract_frames.py VIDEO [VIDEO ...] [--fps 2] [--diff 0.1]
 Frames go to data/frames/<video name>/.
 """
 
@@ -41,6 +41,8 @@ def thumb(path):
 def extract(video, fps, diff):
     out_dir = DATA_DIR / "frames" / video.stem
     out_dir.mkdir(parents=True, exist_ok=True)
+    for old in out_dir.glob("*.jpg"):
+        old.unlink()
     vf = f"fps={fps}" + ("," + TONEMAP if is_hdr(video) else "")
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -64,7 +66,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("videos", nargs="+", type=Path)
     p.add_argument("--fps", type=float, default=2.0, help="frames sampled per second")
-    p.add_argument("--diff", type=float, default=0.04,
+    p.add_argument("--diff", type=float, default=0.1,
                    help="min mean abs difference from the last kept frame (0 to 1)")
     args = p.parse_args()
     for v in args.videos:
