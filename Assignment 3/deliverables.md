@@ -1,6 +1,6 @@
 # Assignment 3 Deliverables Checklist
 
-Source: `syde671 Assignment 3-1.pdf`, the Deliverables lines under each step, plus SCORING. Assignment 3 says "Please follow submissions as per the first 2 assignments", so the Deliverables sections of `../Assignment 1/SYDE671 assn1.pdf` and `../Assignment 2/SYDE671 assn2.pdf` also apply.
+Source: `syde671 Assignment 3-1.pdf`, the Deliverables lines under each step, plus SCORING. Part B's "detailed description of the requirements and scoring" is `CS180_280A_ Intro to Computer Vision and Computational Photography.pdf` (adds B.5 and says the Part B submission includes Part A and Part B). Assignment 3 says "Please follow submissions as per the first 2 assignments", so the Deliverables sections of `../Assignment 1/SYDE671 assn1.pdf` and `../Assignment 2/SYDE671 assn2.pdf` also apply.
 
 Lesson from Assignment 1 (85 instead of 95): the website only has to show the required results, but the submission package must contain every result produced, not just the ones on the page. Check the package against this file before uploading.
 
@@ -52,29 +52,34 @@ Banned functions (Part A, and reused in Part B): `cv2.findHomography`, `cv2.warp
 
 ### Part B: Feature Matching for Autostitching (100 points)
 
-Follows Brown et al., "Multi-Image Matching using Multi-Scale Oriented Patches". The paper and `harris.py` are referenced as attached but are not yet in this folder; put them in `starter/`.
+Follows Brown et al., "Multi-Image Matching using Multi-Scale Oriented Patches" (`MOPS.pdf`). Provided code: `starter/harris.py`.
 
-- [ ] **B.1 Harris corner detection (20)**
-  - [ ] Single-scale Harris (provided `harris.py` allowed)
-  - [ ] Figure of Harris corners overlaid on the image (without ANMS)
-  - [ ] Adaptive Non-Maximal Suppression (Section 3) implemented
-  - [ ] Figure of ANMS-chosen corners overlaid on the image
-- [ ] **B.2 Feature descriptor extraction (20)**
-  - [ ] Axis-aligned 8x8 patches sampled from a blurred 40x40 window
-  - [ ] Bias/gain normalized
-  - [ ] Several extracted features shown
+- [x] **B.1 Harris corner detection (20)**
+  - [x] Single-scale Harris (provided `harris.py` allowed)
+  - [x] Figure of Harris corners overlaid on the image (without ANMS)
+  - [x] Adaptive Non-Maximal Suppression (Section 3) implemented
+  - [x] Figure of ANMS-chosen corners overlaid on the image
+- [x] **B.2 Feature descriptor extraction (20)**
+  - [x] Axis-aligned 8x8 patches sampled from a blurred 40x40 window
+  - [x] Bias/gain normalized
+  - [x] Several extracted features shown
 - [ ] **B.3 Feature matching (20)**
-  - [ ] Lowe ratio test (first to second nearest neighbour)
-  - [ ] Threshold chosen with reference to Figure 6b of the paper
-  - [ ] Matched features shown between image pairs
+  - [x] Lowe ratio test (first to second nearest neighbour)
+  - [ ] Threshold chosen with reference to Figure 6b of the paper (0.5 used; justification is part of the write-up)
+  - [x] Matched features shown between image pairs
 - [ ] **B.4 RANSAC for robust homography (40)**
-  - [ ] 4-point RANSAC implemented from scratch
-  - [ ] Mosaics produced by reusing Part A code
+  - [x] 4-point RANSAC implemented from scratch
+  - [x] Mosaics produced by reusing Part A code
   - [ ] Manual and automatic stitching shown side by side
   - [ ] At least 3 automatic mosaics
+- [ ] **B.5 Bells & Whistles (extra for CS180, mandatory for CS280A; all three done, write-up pending)**
+  - [x] Multiscale processing for corner detection and description
+  - [x] Rotation invariance for the descriptors
+  - [x] Panorama recognition from an unordered set of images
 
 ### General
 
+- [ ] Part A and Part B both on the one page (CS180 doc: Part B submission includes Part A and B)
 - [ ] "What I Learned": the most important thing learned from the project (required in Assignment 2)
 - [ ] Clear explanations of new concepts or tricks, with improved results shown (Assignment 1)
 - [ ] Visually appealing and organized; images not oversized (Assignment 1)

@@ -50,3 +50,233 @@ for f in frames:
 | IMG_0861 | 174 | 81 |
 
 Because the camera pans continuously in both videos, almost every pair of frames half a second apart differed by more than 0.04, so a low threshold kept nearly everything. Raising it to 0.1 keeps a frame only after the view has moved a fair amount, which left neighbouring kept frames overlapping by roughly half.
+
+## Part B: Feature Matching for Autostitching
+
+Part B follows Brown, Szeliski and Winder, "Multi-Image Matching using Multi-Scale Oriented Patches" (MOPS), single scale and axis aligned unless noted. Code: `Assignment 3/src/features.py` (detection, descriptors, matching, RANSAC) and `Assignment 3/src/part_b.py` (figures and mosaics).
+
+Two mosaics are used throughout, each three frames from the videos above:
+
+| Mosaic | Frames |
+|---|---|
+| canyon_slope | IMG_0852 frames 9, 10, 11 |
+| canyon_ridge | IMG_0861 frames 40, 44, 48 |
+
+### B.1 Harris Corners and Adaptive Non-Maximal Suppression
+
+Corners come from the provided `harris.py`: the Harris corner strength (harmonic mean of the eigenvalues of the structure tensor, $$ \det H / \operatorname{tr} H $$), every local maximum kept, and corners within 20 pixels of the border discarded. On a 1920x1080 frame this gives over 50,000 corners.
+
+Adaptive non-maximal suppression gives each corner a suppression radius: the distance to the nearest corner that is sufficiently stronger.
+
+$$ r_i = \min_j \lVert x_i - x_j \rVert \quad \text{s.t.} \quad f(x_i) < c_{\text{robust}} \, f(x_j), \qquad c_{\text{robust}} = 0.9 $$
+
+The 500 corners with the largest radii are kept. Sorting the corners by strength means the corners that can suppress corner $$ i $$ are always a prefix of the sorted list, so the radii are computed in chunks with one distance matrix per chunk. Only the 10,000 strongest corners are considered, which keeps that matrix a manageable size.
+
+```python
+def anms(pts, f, n=500, c=0.9, max_pts=10000, chunk=2000):
+    order = np.argsort(-f)[:max_pts]
+    pts, f = pts[order], f[order]
+    r = np.full(len(pts), np.inf)
+    stronger = np.searchsorted(-c * f, -f, side="left")
+    for s in range(0, len(pts), chunk):
+        e = min(s + chunk, len(pts))
+        k = stronger[s:e].max()
+        if k == 0:
+            continue
+        d = dist2(pts[s:e], pts[:k])
+        d[np.arange(k)[None, :] >= stronger[s:e, None]] = np.inf
+        r[s:e] = d.min(1)
+    keep = np.argsort(-r)[:n]
+    return pts[keep], np.sqrt(r[keep])
+```
+
+#### canyon_slope, first frame
+
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b1/canyon_slope_harris_all.jpg" alt="">
+  <figcaption>All Harris corners (57,108)</figcaption>
+</figure>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/b1/canyon_slope_strongest_500.jpg" alt=""><figcaption>Strongest 500 corners</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b1/canyon_slope_anms_500.jpg" alt=""><figcaption>ANMS 500 corners, r = 41.3</figcaption></figure>
+</div>
+
+#### canyon_ridge, first frame
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/b1/canyon_ridge_harris_all.jpg" alt=""><figcaption>All Harris corners (53,523)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b1/canyon_ridge_strongest_500.jpg" alt=""><figcaption>Strongest 500</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b1/canyon_ridge_anms_500.jpg" alt=""><figcaption>ANMS 500, r = 33.1</figcaption></figure>
+</div>
+
+### B.2 Feature Descriptors
+
+Each descriptor is an 8x8 grid of samples spaced 5 pixels apart, so it covers a 40x40 window around the corner. The image is first blurred with a Gaussian ($$ \sigma = 2.5 $$, half the sample spacing) so each sample summarizes its neighbourhood instead of aliasing, and the samples are read with bilinear interpolation. Each descriptor is then bias/gain normalized to zero mean and unit standard deviation.
+
+```python
+def descriptors(g, pts, angles=None, size=8, spacing=5):
+    blurred = cv2.GaussianBlur(g, (0, 0), spacing / 2)
+    k = (np.arange(size) - (size - 1) / 2) * spacing
+    ox, oy = [a.ravel() for a in np.meshgrid(k, k)]
+    if angles is None:
+        angles = np.zeros(len(pts))
+    c, s = np.cos(angles)[:, None], np.sin(angles)[:, None]
+    xs = pts[:, :1] + c * ox - s * oy
+    ys = pts[:, 1:] + s * ox + c * oy
+    d, _ = sample_bilinear(blurred, xs, ys)
+    return (d - d.mean(1, keepdims=True)) / (d.std(1, keepdims=True) + 1e-8)
+```
+
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b2/canyon_slope_locations.jpg" alt="">
+  <figcaption>Twelve features and their 40x40 windows</figcaption>
+</figure>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/b2/canyon_slope_windows.jpg" alt=""><figcaption>40x40 windows (grayscale)</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b2/canyon_slope_descriptors.jpg" alt=""><figcaption>Normalized 8x8 descriptors</figcaption></figure>
+</div>
+
+### B.3 Feature Matching
+
+Every descriptor in one image is compared with every descriptor in the other using squared Euclidean distance. A match is kept only when the ratio of the nearest to the second-nearest squared distance (1-NN/2-NN, Figure 6b of the paper) is below 0.5.
+
+```python
+def match(d1, d2, ratio=0.5):
+    d = dist2(d1, d2)
+    nn = np.argsort(d, axis=1)[:, :2]
+    rows = np.arange(len(d1))
+    e1, e2 = d[rows, nn[:, 0]], d[rows, nn[:, 1]]
+    r = e1 / np.maximum(e2, 1e-12)
+    keep = r < ratio
+    return np.c_[rows[keep], nn[keep, 0]], r[keep]
+```
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-3/b3/canyon_slope_1_matches.jpg" alt=""><figcaption>canyon_slope, frames 9 and 10: 146 matches</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b3/canyon_slope_2_matches.jpg" alt=""><figcaption>canyon_slope, frames 10 and 11: 194 matches</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b3/canyon_ridge_1_matches.jpg" alt=""><figcaption>canyon_ridge, frames 40 and 44: 161 matches</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b3/canyon_ridge_2_matches.jpg" alt=""><figcaption>canyon_ridge, frames 44 and 48: 93 matches</figcaption></figure>
+</div>
+
+### B.4 RANSAC and Automatic Mosaics
+
+Each RANSAC iteration picks 4 random matches, solves the exact homography through them with `computeH` from Part A, and counts the matches that land within 3 pixels of where that homography predicts. After 2000 iterations the largest inlier set is kept and the homography is refit to all of its inliers with least squares. The mosaics are then built with the same warping and blending code as Part A.
+
+```python
+def ransac(p1, p2, iters=2000, eps=3.0, seed=0):
+    rng = np.random.default_rng(seed)
+    best = np.zeros(len(p1), bool)
+    for _ in range(iters):
+        idx = rng.choice(len(p1), 4, replace=False)
+        try:
+            H = computeH(p1[idx], p2[idx])
+        except np.linalg.LinAlgError:
+            continue
+        err = np.linalg.norm(apply_h(H, p1) - p2, axis=1)
+        inliers = err < eps
+        if inliers.sum() > best.sum():
+            best = inliers
+    return computeH(p1[best], p2[best]), best
+```
+
+| Pair | Matches | RANSAC inliers |
+|---|---|---|
+| canyon_slope, frames 9 and 10 | 146 | 112 |
+| canyon_slope, frames 10 and 11 | 194 | 179 |
+| canyon_ridge, frames 40 and 44 | 161 | 129 |
+| canyon_ridge, frames 44 and 48 | 93 | 60 |
+
+<div class="media-grid media-grid--2x2">
+  <figure><img loading="lazy" src="../images/assignment-3/b4/canyon_slope_1_ransac.jpg" alt=""><figcaption>canyon_slope, frames 9 and 10</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b4/canyon_slope_2_ransac.jpg" alt=""><figcaption>canyon_slope, frames 10 and 11</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b4/canyon_ridge_1_ransac.jpg" alt=""><figcaption>canyon_ridge, frames 40 and 44</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b4/canyon_ridge_2_ransac.jpg" alt=""><figcaption>canyon_ridge, frames 44 and 48</figcaption></figure>
+</div>
+
+Inliers are green and outliers red.
+
+<figure>
+  <img loading="lazy" src="../images/assignment-3/mosaics/canyon_slope_auto.jpg" alt="">
+  <figcaption>canyon_slope, automatic</figcaption>
+</figure>
+<figure>
+  <img loading="lazy" src="../images/assignment-3/mosaics/canyon_ridge_auto.jpg" alt="">
+  <figcaption>canyon_ridge, automatic</figcaption>
+</figure>
+
+### B.5 Bells & Whistles
+
+Code: `Assignment 3/src/bells.py`. All three options were implemented.
+
+#### Rotation invariance
+
+Each feature gets an orientation from the image gradient after a wide Gaussian blur ($$ \sigma = 4.5 $$, as in the paper), and the 8x8 sampling grid is rotated to that angle before sampling. To test it, the second canyon_slope frame was rotated 45 degrees with the Part A warp and matched against the first frame, with and without orientation.
+
+| Descriptors | Matches | RANSAC inliers |
+|---|---|---|
+| Axis aligned | 0 | 0 |
+| Oriented | 104 | 87 |
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/b5/rotation_input.jpg" alt=""><figcaption>Second frame rotated 45 degrees</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b5/rotation_oriented_patches.jpg" alt=""><figcaption>Oriented 40x40 windows</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/b5/rotation_axis_ransac.jpg" alt=""><figcaption>Axis aligned</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b5/rotation_oriented_ransac.jpg" alt=""><figcaption>Oriented</figcaption></figure>
+</div>
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b5/rotation_mosaic.jpg" alt="">
+  <figcaption>Mosaic of the first frame and the rotated second frame</figcaption>
+</figure>
+
+#### Multiscale processing
+
+A Gaussian pyramid ($$ \sigma = 1 $$ blur, then subsample by 2) is built with 3 levels. Harris, ANMS, and descriptors run on every level, so a descriptor from level $$ l $$ covers a $$ 40 \cdot 2^l $$ pixel window in the original image. Points are mapped back to full resolution, and descriptors from all levels are matched together. To test it, the second canyon_ridge frame was shrunk to half size and matched against the first frame.
+
+| Detection | Matches | RANSAC inliers |
+|---|---|---|
+| Single scale | 0 | 0 |
+| 3-level pyramid | 351 | 263 |
+
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b5/multiscale_corners.jpg" alt="">
+  <figcaption>Features from the pyramid; window size and colour show the level</figcaption>
+</figure>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/b5/multiscale_single_ransac.jpg" alt=""><figcaption>Single scale</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b5/multiscale_pyramid_ransac.jpg" alt=""><figcaption>3-level pyramid</figcaption></figure>
+</div>
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b5/multiscale_mosaic.jpg" alt="">
+  <figcaption>Mosaic of the full-size first frame and the half-size second frame</figcaption>
+</figure>
+
+#### Panorama recognition
+
+Thirteen frames, six from IMG_0852, five from IMG_0861, and two unrelated frames, are shuffled and given to the program with no ordering. Every pair is matched and run through RANSAC. Following Brown and Lowe, a pair is accepted as overlapping when the inlier count exceeds $$ 8 + 0.3 \times $$ the number of matches. The connected groups of accepted pairs are the panoramas. In each group, the image with the most total inliers becomes the reference, and the other images are linked to it along the strongest accepted pairs (a maximum spanning tree), multiplying homographies along the way.
+
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b5/recognition_inputs.jpg" alt="">
+  <figcaption>The shuffled input set</figcaption>
+</figure>
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b5/recognition_graph.jpg" alt="">
+  <figcaption>RANSAC inliers for every pair; * marks accepted pairs</figcaption>
+</figure>
+
+| Group | Images | Source |
+|---|---|---|
+| 1 | 1, 8, 9, 10, 13 | IMG_0861 frames 36 to 52 |
+| 2 | 3, 5, 6, 7, 11, 12 | IMG_0852 frames 7 to 12 |
+| none | 2 | IMG_0861 frame 1 |
+| none | 4 | IMG_0852 frame 3 |
+
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b5/recognition_panorama_1.jpg" alt="">
+  <figcaption>Recognized panorama 1</figcaption>
+</figure>
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b5/recognition_panorama_2.jpg" alt="">
+  <figcaption>Recognized panorama 2</figcaption>
+</figure>
