@@ -55,12 +55,13 @@ Because the camera pans continuously in both videos, almost every pair of frames
 
 ### A.1 Source Images
 
-Each mosaic is three frames from the videos above. The same mosaics are used in Part B.
+The first two mosaics are three frames each from the videos above. The third is three still photos of Horseshoe Bend, taken while turning in place. The same mosaics are used in Part B.
 
 | Mosaic | Frames |
 |---|---|
 | canyon_slope | IMG_0852 frames 9, 10, 11 |
 | canyon_ridge | IMG_0861 frames 40, 44, 48 |
+| horseshoe | Photos IMG_0837, IMG_0839, IMG_0841 (Horseshoe Bend) |
 
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-3/a1/canyon_slope_1.jpg" alt=""><figcaption>canyon_slope, frame 9</figcaption></figure>
@@ -72,6 +73,11 @@ Each mosaic is three frames from the videos above. The same mosaics are used in 
   <figure><img loading="lazy" src="../images/assignment-3/a1/canyon_ridge_2.jpg" alt=""><figcaption>canyon_ridge, frame 44</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/a1/canyon_ridge_3.jpg" alt=""><figcaption>canyon_ridge, frame 48</figcaption></figure>
 </div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/a1/horseshoe_1.jpg" alt=""><figcaption>horseshoe, IMG_0837</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a1/horseshoe_2.jpg" alt=""><figcaption>horseshoe, IMG_0839</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a1/horseshoe_3.jpg" alt=""><figcaption>horseshoe, IMG_0841</figcaption></figure>
+</div>
 
 ### A.2 Recovering Homographies
 
@@ -82,6 +88,8 @@ Twelve correspondences were clicked by hand for each neighbouring pair of frames
   <figure><img loading="lazy" src="../images/assignment-3/a2/canyon_slope_2_points.jpg" alt=""><figcaption>canyon_slope, frames 10 and 11</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/a2/canyon_ridge_1_points.jpg" alt=""><figcaption>canyon_ridge, frames 40 and 44</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/a2/canyon_ridge_2_points.jpg" alt=""><figcaption>canyon_ridge, frames 44 and 48</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a2/horseshoe_1_points.jpg" alt=""><figcaption>horseshoe, photos 837 and 839</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a2/horseshoe_2_points.jpg" alt=""><figcaption>horseshoe, photos 839 and 841</figcaption></figure>
 </div>
 
 A homography maps a point $$ (x, y) $$ in the first image to $$ (u, v) $$ in the second, up to scale. Fixing $$ h_{33} = 1 $$ leaves 8 unknowns:
@@ -156,6 +164,14 @@ $$ H = \begin{bmatrix} 0.801391 & -0.0582999 & 491.428 \\ -0.124356 & 0.910297 &
 canyon_ridge, 44 to 48 (RMS error 3.65 px):
 
 $$ H = \begin{bmatrix} 0.841398 & -0.0425021 & 642.385 \\ -0.0626364 & 1.09375 & -242.963 \\ -2.10217 \times 10^{-4} & 8.11999 \times 10^{-5} & 1 \end{bmatrix} $$
+
+horseshoe, 837 to 839 (RMS error 2.82 px):
+
+$$ H = \begin{bmatrix} 1.48866 & 0.0691509 & -879.87 \\ 0.245955 & 1.35872 & -293.446 \\ 0.00029951 & 2.61374 \times 10^{-5} & 1 \end{bmatrix} $$
+
+horseshoe, 839 to 841 (RMS error 2.98 px):
+
+$$ H = \begin{bmatrix} 1.47741 & 0.102727 & -880.245 \\ 0.20722 & 1.36624 & -277.746 \\ 0.000285376 & 3.77553 \times 10^{-5} & 1 \end{bmatrix} $$
 
 ### A.3 Warping and Rectification
 
@@ -288,6 +304,14 @@ def edge_weight(shape):
   <figure><img loading="lazy" src="../images/assignment-3/mosaics/canyon_ridge_manual.jpg" alt=""><figcaption>Two-band</figcaption></figure>
 </div>
 
+#### horseshoe
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/a4/horseshoe_overwrite.jpg" alt=""><figcaption>Overwrite</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a4/horseshoe_feather.jpg" alt=""><figcaption>Feather</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/mosaics/horseshoe_manual.jpg" alt=""><figcaption>Two-band</figcaption></figure>
+</div>
+
 ## Part B: Feature Matching for Autostitching
 
 Part B follows Brown, Szeliski and Winder, "Multi-Image Matching using Multi-Scale Oriented Patches" (MOPS), single scale and axis aligned unless noted. Code: `Assignment 3/src/features.py` (detection, descriptors, matching, RANSAC) and `Assignment 3/src/part_b.py` (figures and mosaics).
@@ -388,6 +412,8 @@ def match(d1, d2, ratio=0.5):
   <figure><img loading="lazy" src="../images/assignment-3/b3/canyon_slope_2_matches.jpg" alt=""><figcaption>canyon_slope, frames 10 and 11: 194 matches</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/b3/canyon_ridge_1_matches.jpg" alt=""><figcaption>canyon_ridge, frames 40 and 44: 161 matches</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/b3/canyon_ridge_2_matches.jpg" alt=""><figcaption>canyon_ridge, frames 44 and 48: 93 matches</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b3/horseshoe_1_matches.jpg" alt=""><figcaption>horseshoe, photos 837 and 839: 161 matches</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b3/horseshoe_2_matches.jpg" alt=""><figcaption>horseshoe, photos 839 and 841: 158 matches</figcaption></figure>
 </div>
 
 ### B.4 RANSAC and Automatic Mosaics
@@ -417,12 +443,16 @@ def ransac(p1, p2, iters=2000, eps=3.0, seed=0):
 | canyon_slope, frames 10 and 11 | 194 | 179 |
 | canyon_ridge, frames 40 and 44 | 161 | 129 |
 | canyon_ridge, frames 44 and 48 | 93 | 60 |
+| horseshoe, photos 837 and 839 | 161 | 145 |
+| horseshoe, photos 839 and 841 | 158 | 137 |
 
 <div class="media-grid media-grid--2x2">
   <figure><img loading="lazy" src="../images/assignment-3/b4/canyon_slope_1_ransac.jpg" alt=""><figcaption>canyon_slope, frames 9 and 10</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/b4/canyon_slope_2_ransac.jpg" alt=""><figcaption>canyon_slope, frames 10 and 11</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/b4/canyon_ridge_1_ransac.jpg" alt=""><figcaption>canyon_ridge, frames 40 and 44</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/b4/canyon_ridge_2_ransac.jpg" alt=""><figcaption>canyon_ridge, frames 44 and 48</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b4/horseshoe_1_ransac.jpg" alt=""><figcaption>horseshoe, photos 837 and 839</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/b4/horseshoe_2_ransac.jpg" alt=""><figcaption>horseshoe, photos 839 and 841</figcaption></figure>
 </div>
 
 Inliers are green and outliers red.
@@ -436,6 +466,10 @@ Manual (Part A, clicked points) and automatic mosaics, both with two-band blendi
 <div class="media-grid">
   <figure><img loading="lazy" src="../images/assignment-3/mosaics/canyon_ridge_manual.jpg" alt=""><figcaption>canyon_ridge, manual</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/mosaics/canyon_ridge_auto.jpg" alt=""><figcaption>canyon_ridge, automatic</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/mosaics/horseshoe_manual.jpg" alt=""><figcaption>horseshoe, manual</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/mosaics/horseshoe_auto.jpg" alt=""><figcaption>horseshoe, automatic</figcaption></figure>
 </div>
 
 ### B.5 Bells & Whistles

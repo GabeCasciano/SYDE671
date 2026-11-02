@@ -27,9 +27,9 @@ Banned functions (Part A, and reused in Part B): `cv2.findHomography`, `cv2.warp
 ### Part A: Image Warping and Mosaicing (100 points)
 
 - [ ] **A.1 Shoot the pictures (25)**
-  - [ ] At least 2 sets of own photos with projective transforms between them (fixed centre of projection, rotate camera)
-  - [ ] In practice 3 sets are needed, since A.4 and B.4 each need 3 mosaics
-  - [ ] 40 to 70 percent overlap, shot close together in time, no fisheye
+  - [x] At least 2 sets of own photos with projective transforms between them (fixed centre of projection, rotate camera)
+  - [x] In practice 3 sets are needed, since A.4 and B.4 each need 3 mosaics
+  - [x] 40 to 70 percent overlap, shot close together in time, no fisheye
 - [ ] **A.2 Recover homographies (25)**
   - [x] `computeH(im1_pts, im2_pts)` implemented, n-by-2 inputs, returns 3x3 H
   - [x] More than 4 correspondences, solved with least squares
@@ -45,7 +45,7 @@ Banned functions (Part A, and reused in Part B): `cv2.findHomography`, `cv2.warp
   - [x] Results for both interpolation methods shown and compared on quality
   - [ ] Trade-offs between speed and quality discussed
 - [ ] **A.4 Blend into a mosaic (25)**
-  - [ ] 3 mosaics
+  - [x] 3 mosaics
   - [x] Source images shown for each mosaic
   - [x] Weighted averaging (feathering) or Laplacian pyramid blending to reduce edge artifacts
   - [ ] Procedure explained
@@ -71,7 +71,7 @@ Follows Brown et al., "Multi-Image Matching using Multi-Scale Oriented Patches" 
   - [x] 4-point RANSAC implemented from scratch
   - [x] Mosaics produced by reusing Part A code
   - [x] Manual and automatic stitching shown side by side
-  - [ ] At least 3 automatic mosaics
+  - [x] At least 3 automatic mosaics
 - [ ] **B.5 Bells & Whistles (extra for CS180, mandatory for CS280A; all three done, write-up pending)**
   - [x] Multiscale processing for corner detection and description
   - [x] Rotation invariance for the descriptors

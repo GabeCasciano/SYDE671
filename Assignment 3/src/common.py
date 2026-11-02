@@ -22,6 +22,9 @@ MOSAICS = {
     "canyon_ridge": ["frames/IMG_0861/IMG_0861_0040.jpg",
                      "frames/IMG_0861/IMG_0861_0044.jpg",
                      "frames/IMG_0861/IMG_0861_0048.jpg"],
+    "horseshoe": ["photos/horseshoe/IMG_0837.jpg",
+                  "photos/horseshoe/IMG_0839.jpg",
+                  "photos/horseshoe/IMG_0841.jpg"],
 }
 
 

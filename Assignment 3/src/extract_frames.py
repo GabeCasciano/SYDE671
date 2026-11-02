@@ -1,7 +1,7 @@
 """Extract frames from videos and drop near-duplicates.
 
-Usage: python extract_frames.py VIDEO [VIDEO ...] [--fps 2] [--diff 0.1]
-Frames go to data/frames/<video name>/.
+Usage: python extract_frames.py VIDEO [VIDEO ...] [--fps 2] [--diff 0.1] [--out frames]
+Frames go to data/<out>/<video name>/.
 """
 
 import argparse
@@ -38,8 +38,8 @@ def thumb(path):
     return cv2.GaussianBlur(small, (5, 5), 0).astype(np.float32) / 255.0
 
 
-def extract(video, fps, diff):
-    out_dir = DATA_DIR / "frames" / video.stem
+def extract(video, fps, diff, out="frames"):
+    out_dir = DATA_DIR / out / video.stem
     out_dir.mkdir(parents=True, exist_ok=True)
     for old in out_dir.glob("*.jpg"):
         old.unlink()
@@ -68,9 +68,10 @@ def main():
     p.add_argument("--fps", type=float, default=2.0, help="frames sampled per second")
     p.add_argument("--diff", type=float, default=0.1,
                    help="min mean abs difference from the last kept frame (0 to 1)")
+    p.add_argument("--out", default="frames", help="folder under data/")
     args = p.parse_args()
     for v in args.videos:
-        extract(v, args.fps, args.diff)
+        extract(v, args.fps, args.diff, args.out)
 
 
 if __name__ == "__main__":
