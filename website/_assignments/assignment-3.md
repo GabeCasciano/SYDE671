@@ -51,6 +51,76 @@ for f in frames:
 
 Because the camera pans continuously in both videos, almost every pair of frames half a second apart differed by more than 0.04, so a low threshold kept nearly everything. Raising it to 0.1 keeps a frame only after the view has moved a fair amount, which left neighbouring kept frames overlapping by roughly half.
 
+## Part A: Image Warping and Mosaicing
+
+### A.3 Warping and Rectification
+
+Both warps use inverse warping. The four corners of the input are pushed through $$ H $$ to find the output bounding box, then every output pixel is mapped back through $$ H^{-1} $$ and sampled from the input. Output pixels that land outside the input get alpha 0. Nearest neighbour rounds the source position to the closest pixel; bilinear weights the four surrounding pixels by their distance to it. Code: `Assignment 3/src/homography.py` and `Assignment 3/src/rectify.py`.
+
+```python
+def sample_nn(im, xs, ys):
+    h, w = im.shape[:2]
+    xi, yi = np.floor(xs + 0.5).astype(int), np.floor(ys + 0.5).astype(int)
+    valid = (xi >= 0) & (xi < w) & (yi >= 0) & (yi < h)
+    out = im[np.clip(yi, 0, h - 1), np.clip(xi, 0, w - 1)]
+    return out, valid
+
+
+def sample_bilinear(im, xs, ys):
+    h, w = im.shape[:2]
+    valid = (xs >= 0) & (xs <= w - 1) & (ys >= 0) & (ys <= h - 1)
+    x0 = np.clip(np.floor(xs).astype(int), 0, w - 2)
+    y0 = np.clip(np.floor(ys).astype(int), 0, h - 2)
+    fx, fy = xs - x0, ys - y0
+    if im.ndim == 3:
+        fx, fy = fx[..., None], fy[..., None]
+    out = ((1 - fx) * (1 - fy) * im[y0, x0] + fx * (1 - fy) * im[y0, x0 + 1]
+           + (1 - fx) * fy * im[y0 + 1, x0] + fx * fy * im[y0 + 1, x0 + 1])
+    return out, valid
+
+
+def warp(im, H, box=None, sampler=sample_bilinear):
+    x0, y0, x1, y1 = box or warp_box(H, im.shape)
+    xs, ys = np.meshgrid(np.arange(x0, x1, dtype=float), np.arange(y0, y1, dtype=float))
+    src = apply_h(np.linalg.inv(H), np.c_[xs.ravel(), ys.ravel()])
+    out, valid = sampler(im, src[:, 0].reshape(xs.shape), src[:, 1].reshape(xs.shape))
+    if out.ndim == 2:
+        out = out[..., None]
+    out = out * valid[..., None]
+    return np.dstack([out, valid]).astype(np.float32)
+```
+
+For rectification, the four corners of each book cover are clicked and mapped to a rectangle with the cover's measured aspect ratio, so $$ H $$ comes from `computeH` with exactly 4 correspondences. The output is limited to one cover width and height around the cover, since the table far from the book stretches out without bound.
+
+#### Feedback and Control Systems (15.5 x 23.5 cm)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_1_corners.jpg" alt=""><figcaption>Input with clicked corners</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_1_nn.jpg" alt=""><figcaption>Nearest neighbour</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_1_bilinear.jpg" alt=""><figcaption>Bilinear</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_1_nn_zoom.jpg" alt=""><figcaption>Nearest neighbour, centre of the cover at 4x</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_1_bilinear_zoom.jpg" alt=""><figcaption>Bilinear, centre of the cover at 4x</figcaption></figure>
+</div>
+
+#### Transducer Interfacing Handbook (21.5 x 15.5 cm)
+
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_2_corners.jpg" alt=""><figcaption>Input with clicked corners</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_2_nn.jpg" alt=""><figcaption>Nearest neighbour</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_2_bilinear.jpg" alt=""><figcaption>Bilinear</figcaption></figure>
+</div>
+<div class="media-grid">
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_2_nn_zoom.jpg" alt=""><figcaption>Nearest neighbour, centre of the cover at 4x</figcaption></figure>
+  <figure><img loading="lazy" src="../images/assignment-3/a3/books_2_bilinear_zoom.jpg" alt=""><figcaption>Bilinear, centre of the cover at 4x</figcaption></figure>
+</div>
+
+| Image | Output size | Nearest neighbour | Bilinear |
+|---|---|---|---|
+| Feedback and Control Systems | 2327 x 2261 | 0.48 s | 1.25 s |
+| Transducer Interfacing Handbook | 2134 x 1941 | 0.38 s | 0.96 s |
+
 ## Part B: Feature Matching for Autostitching
 
 Part B follows Brown, Szeliski and Winder, "Multi-Image Matching using Multi-Scale Oriented Patches" (MOPS), single scale and axis aligned unless noted. Code: `Assignment 3/src/features.py` (detection, descriptors, matching, RANSAC) and `Assignment 3/src/part_b.py` (figures and mosaics).

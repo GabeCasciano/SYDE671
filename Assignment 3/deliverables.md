@@ -37,12 +37,12 @@ Banned functions (Part A, and reused in Part B): `cv2.findHomography`, `cv2.warp
   - [ ] System of equations shown
   - [ ] Recovered homography matrix shown
 - [ ] **A.3 Warp the images (25)**
-  - [ ] `warpImageNearestNeighbor(im, H)` implemented with inverse warping
-  - [ ] `warpImageBilinear(im, H)` implemented with inverse warping
-  - [ ] Both interpolations from scratch (no `griddata` or similar)
-  - [ ] Output size from the four corners pushed through H; alpha mask for empty pixels
-  - [ ] Rectification of at least 2 images (known rectangular object made rectangular)
-  - [ ] Results for both interpolation methods shown and compared on quality
+  - [x] `warpImageNearestNeighbor(im, H)` implemented with inverse warping
+  - [x] `warpImageBilinear(im, H)` implemented with inverse warping
+  - [x] Both interpolations from scratch (no `griddata` or similar)
+  - [x] Output size from the four corners pushed through H; alpha mask for empty pixels
+  - [x] Rectification of at least 2 images (known rectangular object made rectangular)
+  - [x] Results for both interpolation methods shown and compared on quality
   - [ ] Trade-offs between speed and quality discussed
 - [ ] **A.4 Blend into a mosaic (25)**
   - [ ] 3 mosaics
