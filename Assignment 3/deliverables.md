@@ -13,7 +13,8 @@ Package goes in `Assignment 3/submission/` (ignored by git).
   - [ ] All generated images: everything in `website/images/assignment-3/`, including those not shown on the page (see section 3)
   - [ ] A PDF of the webpage
   - [ ] A README that lists the contents and maps each script to its output folder (same format as `../Assignment 2/submission/` README)
-  - [ ] All original input images and correspondence point files from `Assignment 3/data/`, in a `data/` folder next to `src/` so the code runs as is
+  - [ ] All input images and correspondence point files from `Assignment 3/data/`, in a `data/` folder next to `src/` so the code runs as is
+  - [ ] Source videos as the converted MP4s in `website/images/assignment-3/videos/`, not the original iPhone .MOV files
 - [ ] Link to the hosted webpage: https://gabecasciano.github.io/SYDE671/assignment-3/
 - [ ] PDF of the webpage (uploaded separately as well, as in Assignments 1 and 2)
 
