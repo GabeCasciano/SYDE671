@@ -4,6 +4,18 @@ date: 2026-11-01
 excerpt: "Homographies, image warping, and mosaics, stitched by hand and then automatically with Harris corners, feature matching, and RANSAC."
 ---
 
+## Summary
+
+I stitched three mosaics from my own Grand Canyon footage. canyon_slope and canyon_ridge come from handheld iPhone 15 videos, and horseshoe comes from individual photos.
+
+**Part A.** Homographies were solved by least squares from 12 hand-clicked correspondences per pair. Images were inverse warped with nearest neighbour and bilinear interpolation, both written from scratch. Bilinear removes the jagged aliasing of nearest neighbour at about 2.5x the cost (1.25 s compared with 0.48 s). Two book covers were rectified to their measured aspect ratios. The mosaics were blended three ways. Overwrite leaves hard exposure seams. Feathering hides them but ghosts foreground objects. Two-band blending gave the cleanest results.
+
+**Part B.** Harris corners were reduced to 500 well-spread points with ANMS and described with 8x8 MOPS patches. They were matched with a 1-NN/2-NN ratio below 0.5, which gave 93 to 194 matches per pair. A 4-point RANSAC then fit the homographies. The automatic mosaics match the manual ones for canyon_slope and horseshoe. In canyon_ridge, parallax from handheld motion led RANSAC to fit the foreground, which left the distant walls misaligned.
+
+**Bells and whistles.** Oriented descriptors raised matches against a 45-degree rotated frame from 0 to 104. A 3-level pyramid raised matches against a half-size frame from 0 to 351. Panorama recognition sorted 13 shuffled images into two panoramas and correctly rejected two distractors. Choosing a central reference removed the stretching in panorama 2.
+
+**Main lesson.** A homography is only exact for pure rotation, so parallax from handheld capture was the biggest source of error.
+
 ## Procedure: Capturing the Source Images
 
 The source images come from videos taken on an iPhone at the Grand Canyon. The frames were pulled out of the videos afterwards, which gives many closely spaced views of each scene to choose from.
@@ -645,9 +657,7 @@ Panorama 2 appears stretched because the images to the right of the reference ar
 
 The most important thing I learned from this assignment is how parallax affects homographies. In my image sets, the camera did not purely rotate, and there were objects in the foreground, which made it difficult to stitch the mosaics together automatically. I also learned that automatic methods are not always better than manual ones. In canyon_ridge, RANSAC chose a homography that favoured the foreground, which left the background misaligned. Finally, I learned the importance of the reference frame. As the recognized panorama 2 shows, choosing a reference that is not central leaves the frames at the far end at a large angle from the reference plane, and they come out heavily stretched. For similar shots in the future, I would use a tripod or monopod, ideally with a panoramic head that rotates the camera about its lens, to reduce the translation of the camera and get as close to pure rotation as possible.
 
-## Panorama 2 with a central reference
-
-Panorama 2 rebuilt with a different reference image. Instead of the image with the most inliers, the reference is the image whose plane gives the smallest canvas (`central_reference` in `Assignment 3/src/bells.py`). This picks image 3 (IMG_0852 frame 9), the middle of frames 7 to 12, instead of image 7 (frame 11). The matches, homographies, spanning tree, and blending are unchanged; only the reference differs.
+To show what panorama 2 should look like with a central reference, it was rebuilt with a different reference image. Instead of the image with the most inliers, the reference is the image whose plane gives the smallest canvas (`central_reference` in `Assignment 3/src/bells.py`). This picks image 3 (IMG_0852 frame 9), the middle of frames 7 to 12, instead of image 7 (frame 11). The matches, homographies, spanning tree, and blending are unchanged; only the reference differs.
 
 <figure>
   <img loading="lazy" src="../images/assignment-3/b5/recognition_panorama_2.jpg" alt="">
