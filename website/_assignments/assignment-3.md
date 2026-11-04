@@ -8,6 +8,10 @@ excerpt: "Homographies, image warping, and mosaics, stitched by hand and then au
 
 The source images come from videos taken on an iPhone at the Grand Canyon. The frames were pulled out of the videos afterwards, which gives many closely spaced views of each scene to choose from.
 
+All of the images for this assignment, the canyon videos, the horseshoe photos, and the book cover photos, were taken on an iPhone 15 with the 1x lens. I chose not to use the 0.5x ultra-wide lens because I knew its distortion would be strong and hard to remove, and a homography cannot model it. While filming, I turned in place as best I could without moving the camera. Because the phone was handheld, it turned around my body rather than exactly around the lens, so there is some small sideways motion. That motion causes parallax only in nearby objects. The canyon walls are far away, so they are barely affected.
+
+The camera adjusted its exposure as I turned, and you can see this where frames overlap. The sky gets brighter as the view turns toward the sun. I turned as slowly as I reasonably could to keep motion blur down. The scene is distant rock faces, so nothing of substance moves in the frame. For the two canyon scenes I chose video over individual photos because it made it easier to keep the rotation steady, and it gave me plenty of frames to build the mosaics from. The cost is that video frames have lower resolution and more compression than iPhone photos, and that limits the fine detail in the mosaics. The horseshoe mosaic was made from individual photos instead.
+
 <div class="media-grid" style="grid-template-columns: 1.78fr 0.56fr">
   <figure>
     <video src="../images/assignment-3/videos/IMG_0852.mp4" poster="../images/assignment-3/videos/IMG_0852_poster.jpg" controls loop muted playsinline></video>
@@ -226,6 +230,8 @@ horseshoe, 839 to 841 (RMS error 2.98 px):
 
 $$ H = \begin{bmatrix} 1.47741 & 0.102727 & -880.245 \\ 0.20722 & 1.36624 & -277.746 \\ 0.000285376 & 3.77553 \times 10^{-5} & 1 \end{bmatrix} $$
 
+I looked for sharp, distinctive corners. The rock layers of the canyon are different shades, so the places where the canyon juts out make good edges. I also clicked points on nearby trees, because they give sharp, distinct edges. Soft, rounded ridgelines, areas of uniform rock texture, and blurry regions are hard to click precisely, so I avoided placing points on them. I used 12 points so that the system is overdetermined, which reduces the effect of points that were not clicked exactly right. Most points were far from the camera, hundreds to thousands of metres away. Those were easier to find again in the next frame and have less parallax. Some points were on trees 10 to 50 m from the camera. By comparing the frames, I found that the trees were far enough away that parallax did not affect them much.
+
 ### A.3 Warping and Rectification
 
 Both warps use inverse warping. The four corners of the input are pushed through $$ H $$ to find the output bounding box, then every output pixel is mapped back through $$ H^{-1} $$ and sampled from the input. Output pixels that land outside the input get alpha 0. Nearest neighbour rounds the source position to the closest pixel; bilinear weights the four surrounding pixels by their distance to it. Code: `Assignment 3/src/homography.py` and `Assignment 3/src/rectify.py`.
@@ -298,10 +304,14 @@ Clicked cover corners (pixels):
   <figure><img loading="lazy" src="../images/assignment-3/a3/books_2_bilinear_zoom.jpg" alt=""><figcaption>Bilinear, centre of the cover at 4x</figcaption></figure>
 </div>
 
+The main difference I saw between nearest neighbour and bilinear is how well they reproduce straight lines and sharp edges. In the 4x zoomed crops, nearest neighbour produced a lot of artifacts around high-contrast edges, such as the text on the book covers. These artifacts are aliasing: jagged lines where there should be clean, straight edges. In the full rectified images (not zoomed), the nearest neighbour artifacts were worse on the far side of each book than on the near side. The far side of the book was smaller in the original photo, so rectification stretches it more, and that produces more artifacts.
+
 | Image | Output size | Nearest neighbour | Bilinear |
 |---|---|---|---|
 | Feedback and Control Systems | 2327 x 2261 | 0.48 s | 1.25 s |
 | Transducer Interfacing Handbook | 2134 x 1941 | 0.38 s | 0.96 s |
+
+Bilinear is slower than nearest neighbour because of how each one works. Nearest neighbour finds the input pixel closest to the source position and copies its value. Bilinear reads the 4 surrounding pixels and takes a weighted average of them. Whether the extra cost is worth it depends on the application. In real-time applications where image quality matters less, nearest neighbour may be the better choice. However, when rectifying a high-quality image to produce another high-quality image, I would argue that the time cost of bilinear is acceptable because it produces a better final result.
 
 ### A.4 Blending into a Mosaic
 
@@ -374,6 +384,10 @@ def edge_weight(shape):
   <figure><img loading="lazy" src="../images/assignment-3/mosaics/horseshoe_manual.jpg" alt=""><figcaption>Two-band</figcaption></figure>
 </div>
 
+The central frame is chosen as the reference to reduce the stretching that projecting onto one of the edge frames would cause. Stretch grows quickly as a frame is rotated further from the reference plane, and the middle frame roughly halves the largest angle. H₁→₂ maps the first frame onto the second, the reference, so it can be used directly. H₂→₃ maps frame 2 onto frame 3, which is the wrong direction, so its inverse is used to map frame 3 onto frame 2. With more frames, homographies are multiplied together to chain frames that are further from the reference. Each frame is then inverse warped through its homography onto one shared canvas that is large enough to hold all of them. The centre of each frame gets the highest weight because it is the most reliable part of the image. Lens distortion and vignetting are strongest near the edges, so the weight falls gradually to 0 toward the edge of the frame. This lets the frames fade into each other, which produces soft seams. Pixels outside the overlap are unchanged, because there are no other values to blend with.
+
+With overwrite, poorly managed exposure produces very distinct seams between images. As the camera turned toward the sun, the auto-exposure changed, so the same patch of sky has different brightness in neighbouring frames. Overwrite places those values side by side, which creates a hard seam. Feathering reduces these seams, but objects in the foreground come out blurred or distorted. Feathering averages the frames in the overlap, and nearby objects are where small misalignments from parallax are largest, so averaging produces two offset copies. These artifacts are largely absent in the two-band result, because it takes high-frequency detail from only one frame and only blends the low band. In canyon_slope, the brightness change from the sun is still visible in the feather and two-band mosaics, although it is much weaker than with overwrite. Blending spreads the exposure difference into a gradual gradient but does not correct it. The most difficult mosaics were canyon_slope and canyon_ridge, because their foreground objects were distorted by feathering. For horseshoe, feathering and two-band produced nearly identical mosaics. The only difference is that the centre of the horseshoe is less sharp in the feathered version. The horseshoe scene has no foreground, so everything is far away, alignment is good, and feathering has little to blur.
+
 ## Part B: Feature Matching for Autostitching
 
 Part B follows Brown, Szeliski and Winder, "Multi-Image Matching using Multi-Scale Oriented Patches" (MOPS), single scale and axis aligned unless noted. Code: `Assignment 3/src/features.py` (detection, descriptors, matching, RANSAC) and `Assignment 3/src/part_b.py` (figures and mosaics).
@@ -427,6 +441,8 @@ def anms(pts, f, n=500, c=0.9, max_pts=10000, chunk=2000):
   <figure><img loading="lazy" src="../images/assignment-3/b1/canyon_ridge_anms_500.jpg" alt=""><figcaption>ANMS 500, r = 33.1</figcaption></figure>
 </div>
 
+In canyon_slope, the strongest 500 corners cluster on the highest-frequency parts of the image, which have many strong corners. Here that is mostly the trees in the foreground, plus a few points in the distance. canyon_ridge shows the same pattern: the strongest corners are packed onto the nearby rocks in the bottom half of the frame. ANMS spreads the points across the scene. Each corner gets a radius equal to the distance to the nearest corner that is noticeably stronger, and the 500 corners with the largest radii are kept, so most corners inside a dense cluster are dropped while isolated corners elsewhere survive. Choosing the strongest 500 is a problem for three reasons. First, the corners are densely packed at the bottom and left of the frame, so there may be little or no overlap with the next image. With ANMS the corners are spread out, so overlapping corners between frames are more likely. Second, the clusters are on foreground objects, where parallax is worst, so those matches may not follow the same homography as the distant canyon. Third, a homography fit from points in one small region is poorly constrained across the rest of the image.
+
 ### B.2 Feature Descriptors
 
 Each descriptor is an 8x8 grid of samples spaced 5 pixels apart, so it covers a 40x40 window around the corner. The image is first blurred with a Gaussian ($$ \sigma = 2.5 $$, half the sample spacing) so each sample summarizes its neighbourhood instead of aliasing, and the samples are read with bilinear interpolation. Each descriptor is then bias/gain normalized to zero mean and unit standard deviation.
@@ -478,6 +494,8 @@ def match(d1, d2, ratio=0.5):
   <figure><img loading="lazy" src="../images/assignment-3/b3/horseshoe_2_matches.jpg" alt=""><figcaption>horseshoe, photos 839 and 841: 158 matches</figcaption></figure>
 </div>
 
+In Figure 6b, the correct and incorrect match curves cross at a 1-NN/2-NN ratio of about 0.68. Choosing a threshold below the crossover keeps the number of incorrect matches low while still capturing enough matches. For my image sets, a threshold of 0.5 gave 93 or more matches per pair, far more than the 4 needed to compute a homography. Fewer incorrect matches means fewer outliers and a higher fraction of inliers. With too many outliers, RANSAC needs more iterations and could settle on the wrong homography.
+
 ### B.4 RANSAC and Automatic Mosaics
 
 Each RANSAC iteration picks 4 random matches, solves the exact homography through them with `computeH` from Part A, and counts the matches that land within 3 pixels of where that homography predicts. After 2000 iterations the largest inlier set is kept and the homography is refit to all of its inliers with least squares. The mosaics are then built with the same warping and blending code as Part A.
@@ -519,6 +537,8 @@ def ransac(p1, p2, iters=2000, eps=3.0, seed=0):
 
 Inliers are green and outliers red.
 
+In canyon_ridge frames 44 and 48, the inliers are on the nearby rocks and trees at the bottom of the frame and in the mid-ground. The outliers are mostly on the distant canyon walls in the top half. Most of the red lines are parallel and consistent with each other, so they are likely correct matches, not random mismatches. They follow a different motion from the green ones. A homography is only exact when the camera purely rotates, or when the scene is a single plane. Because the phone was handheld, it turned around my body rather than around the lens, so the camera also moved slightly sideways. With sideways motion, nearby points shift more between frames than distant points (parallax). The foreground rocks and the distant walls therefore move by different amounts, and one homography cannot map both correctly. RANSAC keeps the largest consistent set of matches. The foreground had more matches, so its motion was chosen and the distant wall matches were rejected as outliers. The 4-frame gap between frames 44 and 48 makes this worse, because more camera motion builds up between the two frames.
+
 Manual (Part A, clicked points) and automatic mosaics, both with two-band blending:
 
 <div class="media-grid">
@@ -533,6 +553,8 @@ Manual (Part A, clicked points) and automatic mosaics, both with two-band blendi
   <figure><img loading="lazy" src="../images/assignment-3/mosaics/horseshoe_manual.jpg" alt=""><figcaption>horseshoe, manual</figcaption></figure>
   <figure><img loading="lazy" src="../images/assignment-3/mosaics/horseshoe_auto.jpg" alt=""><figcaption>horseshoe, automatic</figcaption></figure>
 </div>
+
+In canyon_ridge, the manual mosaic outperformed the automatic one, and the automatic version has clear misalignment in the background. In general I would expect the automatic method to be more accurate. Its points are placed more precisely than manual clicks, which always carry some click error, and it uses many more points (around 100 inliers compared with 12 clicks), so least squares averages out the errors better. The misalignment in canyon_ridge happens because RANSAC chose a homography that favours the objects in the foreground, so the objects in the distance are sacrificed and visibly misaligned. In the horseshoe mosaic, the manual and automatic versions are nearly identical: there is no foreground, so RANSAC found a homography that aligned the images well. canyon_slope is also very similar between manual and automatic. I suspect this is because RANSAC chose a set of matches that was well distributed across the frame, as in the horseshoe mosaic.
 
 ### B.5 Bells & Whistles
 
@@ -560,6 +582,8 @@ Each feature gets an orientation from the image gradient after a wide Gaussian b
   <figcaption>Mosaic of the first frame and the rotated second frame</figcaption>
 </figure>
 
+The axis-aligned method found 0 matches because its descriptors are sampled along the image's x and y axes. When the image is rotated, the descriptors sampled at the same features are very different. There are exactly 0 matches because a feature's true match is no closer than any other descriptor, so the 1-NN and 2-NN distances are about equal and the ratio is close to 1, far above the 0.5 threshold. With oriented descriptors, matches can be made because the sampling grid is rotated to each feature's dominant gradient direction, which rotates with the image. This makes the descriptor invariant to image rotation, so each feature's descriptor is nearly the same in both images and passes the ratio test.
+
 #### Multiscale processing
 
 A Gaussian pyramid ($$ \sigma = 1 $$ blur, then subsample by 2) is built with 3 levels. Harris, ANMS, and descriptors run on every level, so a descriptor from level $$ l $$ covers a $$ 40 \cdot 2^l $$ pixel window in the original image. Points are mapped back to full resolution, and descriptors from all levels are matched together. To test it, the second canyon_ridge frame was shrunk to half size and matched against the first frame.
@@ -582,6 +606,8 @@ A Gaussian pyramid ($$ \sigma = 1 $$ blur, then subsample by 2) is built with 3 
   <figcaption>Mosaic of the full-size first frame and the half-size second frame</figcaption>
 </figure>
 
+The single-scale method finds zero matches even though corners are still detected in the half-size frame. The problem is the descriptors. A 40x40 window in the half-size frame covers twice as much of the scene in each direction as the same window in the full-size frame, so the same corner produces a very different descriptor. As with rotation, a feature's true match is no closer than any other descriptor, the 1-NN/2-NN ratio is close to 1, and every match fails the 0.5 threshold. With the pyramid, features are detected and described at several scales, so features can be matched across the scale changes the pyramid covers (factors of 1, 2 and 4). Level 1 of the full-size frame should match level 0 of the half-size frame. Level 1 has been halved once, so a 40x40 window there covers the same 80x80 pixel area of the original image as a 40x40 window at level 0 of the half-size frame.
+
 #### Panorama recognition
 
 Thirteen frames, six from IMG_0852, five from IMG_0861, and two unrelated frames, are shuffled and given to the program with no ordering. Every pair is matched and run through RANSAC. Following Brown and Lowe, a pair is accepted as overlapping when the inlier count exceeds $$ 8 + 0.3 \times $$ the number of matches. The connected groups of accepted pairs are the panoramas. In each group, the image with the most total inliers becomes the reference, and the other images are linked to it along the strongest accepted pairs (a maximum spanning tree), multiplying homographies along the way.
@@ -602,6 +628,8 @@ Thirteen frames, six from IMG_0852, five from IMG_0861, and two unrelated frames
 | none | 2 | IMG_0861 frame 1 |
 | none | 4 | IMG_0852 frame 3 |
 
+Images 2 and 4 were left out because they share very little of the scene with any other frame. Image 2, the first frame of IMG_0861, shows a rock outcrop that does not appear in any of the group 1 frames, and image 4, frame 3 of IMG_0852, shows a part of the canyon that does not appear in the group 2 frames. With little or no overlap, they have very few RANSAC inliers with any other image. A pair is accepted only when its inlier count exceeds 8 + 0.3 × the number of matches. Image 2 has a few chance inliers with images 3 and 6, but not enough to pass this test, and image 4 has essentially none. Neither image has an accepted pair, so each one is left on its own. These two frames act as distractors, and leaving them out shows that the recognition step correctly rejects images that do not belong instead of forcing every input into a panorama.
+
 <figure>
   <img loading="lazy" src="../images/assignment-3/b5/recognition_panorama_1.jpg" alt="">
   <figcaption>Recognized panorama 1</figcaption>
@@ -610,3 +638,9 @@ Thirteen frames, six from IMG_0852, five from IMG_0861, and two unrelated frames
   <img loading="lazy" src="../images/assignment-3/b5/recognition_panorama_2.jpg" alt="">
   <figcaption>Recognized panorama 2</figcaption>
 </figure>
+
+Panorama 2 appears stretched because the images to the right of the reference are furthest from the reference frame, which means they have the largest rotation away from the reference plane. When projected onto a flat plane, stretch grows faster and faster with that angle, so these images are stretched and warped more and more toward the edge of the panorama. In recognition, the reference is the image with the most total inliers, not a central frame as in A.4. Here that is image 7 (IMG_0852 frame 11), with 480 inliers, because frames 10, 11 and 12 overlap heavily with each other. Frame 11 is second from the end of the sequence (frames 7 to 12), so frames 7 and 8, on the right of the panorama, are at the largest angle from it. Those frames are also linked to the reference through several homographies multiplied together, so small errors build up along the chain. This could be fixed by choosing the image at the centre of the spanning tree as the reference, the one with the fewest links to the furthest image, instead of the one with the most inliers. Alternatively, a spherical or cylindrical projection is better suited to wide panoramas.
+
+## What I learned
+
+The most important thing I learned from this assignment is how parallax affects homographies. In my image sets, the camera did not purely rotate, and there were objects in the foreground, which made it difficult to stitch the mosaics together automatically. I also learned that automatic methods are not always better than manual ones. In canyon_ridge, RANSAC chose a homography that favoured the foreground, which left the background misaligned. Finally, I learned the importance of the reference frame. As the recognized panorama 2 shows, choosing a reference that is not central leaves the frames at the far end at a large angle from the reference plane, and they come out heavily stretched. For similar shots in the future, I would use a tripod or monopod, ideally with a panoramic head that rotates the camera about its lens, to reduce the translation of the camera and get as close to pure rotation as possible.
