@@ -15,7 +15,7 @@ import viz
 from blend import mosaic
 from common import DATA_DIR, MOSAICS, gray, load_image, save_image, web_dir
 from features import detect, match, ransac
-from homography import warpImageBilinear
+from homography import warp_box, warpImageBilinear
 
 RECOGNITION = (
     [f"frames/IMG_0852/IMG_0852_{i:04d}.jpg" for i in (7, 8, 9, 10, 11, 12)]
@@ -123,8 +123,8 @@ def components(n, edges):
     return groups
 
 
-def to_reference(group, edges):
-    """Homographies into the most connected image, grown along the strongest edges (max spanning tree)."""
+def to_reference(group, edges, ref=None):
+    """Homographies into ref (default: most connected image), grown along the strongest edges (max spanning tree)."""
     def w(u, v):
         return edges.get((u, v), edges.get((v, u), (0, None)))[0]
 
@@ -132,7 +132,8 @@ def to_reference(group, edges):
         """Maps image u into image v."""
         return edges[(u, v)][1] if (u, v) in edges else np.linalg.inv(edges[(v, u)][1])
 
-    ref = max(group, key=lambda u: sum(w(u, v) for v in group))
+    if ref is None:
+        ref = max(group, key=lambda u: sum(w(u, v) for v in group))
     Hs, done = {ref: np.eye(3)}, {ref}
     while len(done) < len(group):
         u, v = max(((u, v) for u in done for v in group if v not in done and w(u, v) > 0),
@@ -140,6 +141,14 @@ def to_reference(group, edges):
         Hs[v] = Hs[u] @ H(v, u)
         done.add(v)
     return ref, Hs
+
+
+def central_reference(group, edges, ims):
+    """The reference whose plane gives the smallest canvas, i.e. the least stretched panorama."""
+    def area(ref):
+        b = np.array([warp_box(H, ims[g].shape) for g, H in to_reference(group, edges, ref)[1].items()])
+        return (b[:, 2].max() - b[:, 0].min()) * (b[:, 3].max() - b[:, 1].min())
+    return min(group, key=area)
 
 
 def recognition(results):
@@ -191,8 +200,14 @@ def recognition(results):
         if len(grp) < 2:
             continue
         k += 1
-        _, Hs = to_reference(grp, edges)
+        ref, Hs = to_reference(grp, edges)
         save_image(out / f"recognition_panorama_{k}.jpg", mosaic([ims[g] for g in grp], [Hs[g] for g in grp]))
+        central = central_reference(grp, edges, ims)
+        r[f"panorama_{k}_reference"] = [ref + 1, central + 1]
+        if central != ref:
+            _, Hs = to_reference(grp, edges, central)
+            save_image(out / f"recognition_panorama_{k}_central.jpg",
+                       mosaic([ims[g] for g in grp], [Hs[g] for g in grp]))
     results["recognition"] = r
     print("recognition groups", r["groups"])
 

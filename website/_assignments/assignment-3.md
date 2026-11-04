@@ -644,3 +644,16 @@ Panorama 2 appears stretched because the images to the right of the reference ar
 ## What I learned
 
 The most important thing I learned from this assignment is how parallax affects homographies. In my image sets, the camera did not purely rotate, and there were objects in the foreground, which made it difficult to stitch the mosaics together automatically. I also learned that automatic methods are not always better than manual ones. In canyon_ridge, RANSAC chose a homography that favoured the foreground, which left the background misaligned. Finally, I learned the importance of the reference frame. As the recognized panorama 2 shows, choosing a reference that is not central leaves the frames at the far end at a large angle from the reference plane, and they come out heavily stretched. For similar shots in the future, I would use a tripod or monopod, ideally with a panoramic head that rotates the camera about its lens, to reduce the translation of the camera and get as close to pure rotation as possible.
+
+## Panorama 2 with a central reference
+
+Panorama 2 rebuilt with a different reference image. Instead of the image with the most inliers, the reference is the image whose plane gives the smallest canvas (`central_reference` in `Assignment 3/src/bells.py`). This picks image 3 (IMG_0852 frame 9), the middle of frames 7 to 12, instead of image 7 (frame 11). The matches, homographies, spanning tree, and blending are unchanged; only the reference differs.
+
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b5/recognition_panorama_2.jpg" alt="">
+  <figcaption>Reference with the most inliers: image 7, frame 11</figcaption>
+</figure>
+<figure>
+  <img loading="lazy" src="../images/assignment-3/b5/recognition_panorama_2_central.jpg" alt="">
+  <figcaption>Central reference: image 3, frame 9</figcaption>
+</figure>
