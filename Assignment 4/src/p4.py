@@ -19,8 +19,13 @@ Returns:
         four possible transformations
 '''
 def estimate_initial_RT(E):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    U, _, Vt = np.linalg.svd(E)
+    W = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+    Rs = []
+    for Q in (U @ W @ Vt, U @ W.T @ Vt):
+        Rs.append(np.linalg.det(Q) * Q)
+    T = U[:, 2]
+    return np.array([np.column_stack((R, t)) for R in Rs for t in (T, -T)])
 
 '''
 LINEAR_ESTIMATE_3D_POINT given a corresponding points in different images,
@@ -32,8 +37,14 @@ Returns:
     point_3d - the 3D point
 '''
 def linear_estimate_3d_point(image_points, camera_matrices):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    # Two rows per camera: x m3 - m1 and y m3 - m2
+    A = []
+    for (x, y), M in zip(image_points, camera_matrices):
+        A.append(x * M[2] - M[0])
+        A.append(y * M[2] - M[1])
+    _, _, Vt = np.linalg.svd(np.array(A))
+    P = Vt[-1]
+    return P[:3] / P[3]
 
 '''
 REPROJECTION_ERROR given a 3D point and its corresponding points in the image
@@ -46,8 +57,9 @@ Returns:
     error - the 2Mx1 reprojection error vector
 '''
 def reprojection_error(point_3d, image_points, camera_matrices):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    y = camera_matrices @ np.append(point_3d, 1)
+    p = y[:, :2] / y[:, 2:]
+    return (p - image_points).flatten()
 
 '''
 JACOBIAN given a 3D point and its corresponding points in the image
@@ -59,8 +71,13 @@ Returns:
     jacobian - the 2Mx3 Jacobian matrix
 '''
 def jacobian(point_3d, camera_matrices):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    # d(y1/y3)/dP = (m1 y3 - m3 y1) / y3^2, same for y2
+    J = []
+    for M in camera_matrices:
+        y = M @ np.append(point_3d, 1)
+        J.append((M[0, :3] * y[2] - M[2, :3] * y[0]) / y[2]**2)
+        J.append((M[1, :3] * y[2] - M[2, :3] * y[1]) / y[2]**2)
+    return np.array(J)
 
 '''
 NONLINEAR_ESTIMATE_3D_POINT given a corresponding points in different images,
@@ -72,8 +89,13 @@ Returns:
     point_3d - the 3D point
 '''
 def nonlinear_estimate_3d_point(image_points, camera_matrices):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    # 10 Gauss-Newton steps from the linear estimate
+    P = linear_estimate_3d_point(image_points, camera_matrices)
+    for _ in range(10):
+        e = reprojection_error(P, image_points, camera_matrices)
+        J = jacobian(P, camera_matrices)
+        P = P - np.linalg.solve(J.T @ J, J.T @ e)
+    return P
 
 '''
 ESTIMATE_RT_FROM_E from the Essential Matrix, we can compute  the relative RT 
@@ -87,8 +109,18 @@ Returns:
         two cameras
 '''
 def estimate_RT_from_E(E, image_points, K):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    M1 = K @ np.hstack((np.eye(3), np.zeros((3, 1))))
+    best_RT, best_count = None, -1
+    for RT in estimate_initial_RT(E):
+        M = np.array([M1, K @ RT])
+        count = 0
+        for pts in image_points:
+            P = nonlinear_estimate_3d_point(pts, M)
+            P2 = RT[:, :3] @ P + RT[:, 3]
+            count += (P[2] > 0) and (P2[2] > 0)
+        if count > best_count:
+            best_RT, best_count = RT, count
+    return best_RT
 
 if __name__ == '__main__':
     run_pipeline = True
@@ -212,6 +244,27 @@ if __name__ == '__main__':
                 matches[:,j].reshape((2,2)), camera_matrices)
         dense_structure = np.vstack((dense_structure, points_3d[use_point,:]))
 
+    out = '../website/images/assignment-4'
+    os.makedirs(out, exist_ok=True)
+
+    # Colour each point from the pixel it was matched at in the first image
+    # of its pair (matches are centred on the principal point)
+    colors = np.zeros((0, 3), dtype=np.uint8)
+    for i in range(len(frames)-1):
+        im = imread(image_paths[i])
+        xs = np.clip(np.round(dense_matches[i][0] + im_width/2).astype(int), 0, im_width-1)
+        ys = np.clip(np.round(dense_matches[i][1] + im_height/2).astype(int), 0, im_height-1)
+        colors = np.vstack((colors, im[ys, xs, :3]))
+
+    # Export the points inside the plotted box for the web viewer:
+    # N float32 xyz followed by N uint8 rgb
+    keep = ((np.abs(dense_structure[:,0]) < 5) & (np.abs(dense_structure[:,1]) < 5)
+        & (dense_structure[:,2] > 0) & (dense_structure[:,2] < 10))
+    with open(f'{out}/p4_statue_points.bin', 'wb') as f:
+        f.write(dense_structure[keep].astype(np.float32).tobytes())
+        f.write(colors[keep].astype(np.uint8).tobytes())
+    print('Points:', len(dense_structure), 'exported:', keep.sum())
+
     fig = plt.figure(figsize=(10,10))
     ax = fig.add_subplot(projection='3d')
     ax.scatter(dense_structure[:,0], dense_structure[:,1], dense_structure[:,2],
@@ -220,5 +273,6 @@ if __name__ == '__main__':
     ax.set_ylim(-5, 5)
     ax.set_zlim(0, 10)
     ax.view_init(-100, 90)
+    plt.savefig(f'{out}/p4_statue.png', bbox_inches='tight', dpi=100)
 
     plt.show()

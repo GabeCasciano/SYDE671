@@ -1,7 +1,11 @@
 import numpy as np
 from skimage.io import imread
+np.set_printoptions(precision=6, suppress=False)
 import matplotlib.pyplot as plt
 from epipolar_utils import *
+import os
+
+OUT = '../website/images/assignment-4'
 
 '''
 LLS_EIGHT_POINT_ALG  computes the fundamental matrix from matching points using 
@@ -17,8 +21,17 @@ Please see lecture notes and slides to see how the linear least squares eight
 point algorithm works
 '''
 def lls_eight_point_alg(points1, points2):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    # Each correspondence gives one row of p2^T F p1 = 0, linear in the 9 entries of F
+    x1, y1 = points1[:, 0], points1[:, 1]
+    x2, y2 = points2[:, 0], points2[:, 1]
+    A = np.stack([x2*x1, x2*y1, x2, y2*x1, y2*y1, y2, x1, y1, np.ones(len(x1))], axis=1)
+    _, _, Vt = np.linalg.svd(A)
+    F = Vt[-1].reshape(3, 3)
+
+    # Enforce rank 2 by zeroing the smallest singular value
+    U, S, Vt = np.linalg.svd(F)
+    S[2] = 0
+    return U @ np.diag(S) @ Vt
 
 '''
 NORMALIZED_EIGHT_POINT_ALG  computes the fundamental matrix from matching points
@@ -33,9 +46,18 @@ Returns:
 Please see lecture notes and slides to see how the normalized eight
 point algorithm works
 '''
+def normalization_matrix(points):
+    # Move the centroid to the origin and scale so the mean distance is sqrt(2)
+    c = points[:, :2].mean(axis=0)
+    s = np.sqrt(2) / np.mean(np.linalg.norm(points[:, :2] - c, axis=1))
+    return np.array([[s, 0, -s*c[0]], [0, s, -s*c[1]], [0, 0, 1]])
+
 def normalized_eight_point_alg(points1, points2):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    T1 = normalization_matrix(points1)
+    T2 = normalization_matrix(points2)
+    Fq = lls_eight_point_alg((T1 @ points1.T).T, (T2 @ points2.T).T)
+    # Undo the normalization (rank 2 is preserved)
+    return T2.T @ Fq @ T1
 
 '''
 PLOT_EPIPOLAR_LINES_ON_IMAGES given a pair of images and corresponding points,
@@ -96,8 +118,10 @@ Returns:
     average_distance - the average distance of each point to the epipolar line
 '''
 def compute_distance_to_epipolar_lines(points1, points2, F):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    # Epipolar lines in image 1 are l = F^T p2, distance is |l . p1| / sqrt(a^2 + b^2)
+    lines = (F.T @ points2.T).T
+    d = np.abs(np.sum(lines * points1, axis=1)) / np.linalg.norm(lines[:, :2], axis=1)
+    return d.mean()
 
 if __name__ == '__main__':
     for im_set in ['data/set1', 'data/set2']:
@@ -134,7 +158,11 @@ if __name__ == '__main__':
             compute_distance_to_epipolar_lines(points2, points1, F_normalized.T))
 
         # Plotting the epipolar lines
+        os.makedirs(OUT, exist_ok=True)
+        name = im_set.split('/')[-1]
         plot_epipolar_lines_on_images(points1, points2, im1, im2, F_lls)
+        plt.savefig(f'{OUT}/p1_{name}_lls.png', bbox_inches='tight', dpi=100)
         plot_epipolar_lines_on_images(points1, points2, im1, im2, F_normalized)
+        plt.savefig(f'{OUT}/p1_{name}_normalized.png', bbox_inches='tight', dpi=100)
 
         plt.show()

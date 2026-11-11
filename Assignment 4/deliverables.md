@@ -77,6 +77,8 @@ Website: `website/_assignments/assignment-4.md`. Run every script from `Assignme
 - `src/p4.py` line 216: `fig.gca(projection='3d')` was changed to `fig.add_subplot(projection='3d')`, since `gca` no longer takes `projection` in current Matplotlib.
 - The scripts end with `plt.show()`; figures for the website need to be saved to `website/images/assignment-4/`.
 - `data/statue/copy_dense_matches.npy` is not referenced by `p4.py`.
+- The scripts save their figures to `website/images/assignment-4/` (run headless with `MPLBACKEND=Agg`). Printed output is saved with `tee` to `p1_output.txt` to `p4_output.txt` in the same folder, e.g. `MPLBACKEND=Agg python src/p4.py | tee ../website/images/assignment-4/p4_output.txt`.
+- `p4.py` also writes `p4_statue_points.bin` (float32 xyz, then uint8 rgb) for the interactive viewer in `website/assets/js/point-cloud.js`. `statue/` holds copies of the 5 input views.
 
 ## 4. Generated figures not shown on the website
 

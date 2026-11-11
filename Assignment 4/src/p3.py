@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import scipy.io as sio
 import matplotlib.gridspec as gridspec
 from epipolar_utils import *
+import os
+
+OUT = '../website/images/assignment-4'
 
 '''
 FACTORIZATION_METHOD The Tomasi and Kanade Factorization Method to determine
@@ -18,8 +21,20 @@ Returns:
     motion - the motion matrix
 '''
 def factorization_method(points_im1, points_im2):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    # Centre each image's points on their centroid
+    x1 = points_im1[:, :2] - points_im1[:, :2].mean(axis=0)
+    x2 = points_im2[:, :2] - points_im2[:, :2].mean(axis=0)
+
+    # 2m x n measurement matrix, rows x1, y1, x2, y2
+    D = np.vstack((x1.T, x2.T))
+    U, S, Vt = np.linalg.svd(D)
+    print("Singular values:", S)
+
+    # Keep the rank 3 part and split sqrt(S) between motion and structure
+    S3 = np.diag(np.sqrt(S[:3]))
+    motion = U[:, :3] @ S3
+    structure = S3 @ Vt[:3]
+    return structure, motion
 
 if __name__ == '__main__':
     for im_set in ['data/set1', 'data/set1_subset']:
@@ -42,5 +57,9 @@ if __name__ == '__main__':
         ax = fig.add_subplot(122, projection = '3d')
         scatter_3D_axis_equal(points_3d[:,0], points_3d[:,1], points_3d[:,2], ax)
         ax.set_title('Ground Truth')
+
+        os.makedirs(OUT, exist_ok=True)
+        fig.set_size_inches(12, 6)
+        plt.savefig(f"{OUT}/p3_{im_set.split('/')[-1]}.png", bbox_inches='tight', dpi=100)
 
         plt.show()

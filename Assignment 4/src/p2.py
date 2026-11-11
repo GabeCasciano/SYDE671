@@ -13,8 +13,10 @@ Returns:
     epipole - the homogenous coordinates [x y 1] of the epipole in the image
 '''
 def compute_epipole(F):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    # e is the null vector of F^T: last right singular vector
+    _, _, Vt = np.linalg.svd(F.T)
+    e = Vt[-1]
+    return e / e[2]
 
 '''
 COMPUTE_H computes a homography to map an epipole to infinity along the horizontal axis 
@@ -25,8 +27,21 @@ Returns:
     H - homography matrix
 '''
 def compute_H(e, im):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    h, w = im.shape[:2]
+    T = np.array([[1, 0, -w/2], [0, 1, -h/2], [0, 0, 1]])
+
+    # Rotate the translated epipole onto the x axis
+    e_t = T @ e
+    e_t = e_t / e_t[2]
+    e1, e2 = e_t[0], e_t[1]
+    r = np.sqrt(e1**2 + e2**2)
+    a = 1 if e1 >= 0 else -1
+    R = np.array([[a*e1/r, a*e2/r, 0], [-a*e2/r, a*e1/r, 0], [0, 0, 1]])
+
+    # Send (f, 0, 1) to infinity
+    f = (R @ e_t)[0]
+    G = np.array([[1, 0, 0], [0, 1, 0], [-1/f, 0, 1]])
+    return np.linalg.inv(T) @ G @ R @ T
 
 '''
 COMPUTE_MATCHING_HOMOGRAPHIES determines homographies H1 and H2 such that they
@@ -42,8 +57,22 @@ Returns:
     H2 - the homography associated with the second image
 '''
 def compute_matching_homographies(e2, F, im2, points1, points2):
-    # TODO: Implement this method!
-    raise Exception('Not Implemented Error')
+    H2 = compute_H(e2, im2)
+
+    # M = [e]x F + e v^T with v = (1, 1, 1)
+    ex = np.array([[0, -e2[2], e2[1]], [e2[2], 0, -e2[0]], [-e2[1], e2[0], 0]])
+    M = ex @ F + np.outer(e2, np.ones(3))
+
+    p_hat = (H2 @ M @ points1.T).T
+    p_hat /= p_hat[:, 2:]
+    p_hat2 = (H2 @ points2.T).T
+    p_hat2 /= p_hat2[:, 2:]
+
+    # Least squares W a = b for the first row of HA
+    a, *_ = np.linalg.lstsq(p_hat, p_hat2[:, 0], rcond=None)
+    HA = np.array([a, [0, 1, 0], [0, 0, 1]])
+    H1 = HA @ H2 @ M
+    return H1, H2
 
 if __name__ == '__main__':
     # Read in the data
@@ -79,5 +108,8 @@ if __name__ == '__main__':
 
     # Plotting the image
     F_new = normalized_eight_point_alg(new_points1, new_points2)
+    print("H1\n", H1)
+    print("H2\n", H2)
     plot_epipolar_lines_on_images(new_points1, new_points2, rectified_im1, rectified_im2, F_new)
+    plt.savefig(f'{OUT}/p2_rectified.png', bbox_inches='tight', dpi=100)
     plt.show()
