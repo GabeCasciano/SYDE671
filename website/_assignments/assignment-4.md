@@ -4,7 +4,17 @@ date: 2026-11-11
 excerpt: "Fundamental matrix estimation, image rectification, the factorization method, and triangulation in a structure from motion pipeline."
 ---
 
-<!-- ANSWER: Summary (write after the analysis is done) -->
+## Summary
+
+**Part 1.** The fundamental matrix was estimated with the linear least squares eight-point algorithm and the normalized eight-point algorithm, both with rank 2 enforced by SVD. Normalization reduced the average point-to-epipolar-line distance from 28.0 and 25.2 pixels to 0.89 and 0.83 on set1, and from 9.7 and 14.6 to 0.89 on set2, because raw pixel coordinates make the system badly conditioned.
+
+**Part 2.** The set1 pair was rectified by sending the epipole to infinity with $$ H_2 $$ and fitting a matching $$ H_1 $$ by least squares. All epipolar lines became horizontal, so the correspondence search reduces to a 1D scan along a row. The left image is more distorted, since only $$ H_2 $$ is constrained to be close to rigid.
+
+**Part 3.** The Tomasi-Kanade factorization recovered the set1 structure up to an affine ambiguity, with an RMS error of 1.69 after aligning by rotation and scale. The fourth singular value (27.9) is small compared with the third (184.4). On the planar subset the third (7.2) is close to the fourth (5.1), so the depth is not constrained and the reconstruction degrades.
+
+**Part 4.** Triangulation (linear, then refined with Gauss-Newton), together with choosing the camera pose with the most points in front of both cameras, reconstructed 66,385 points of the statue from 5 images. Only the side facing the cameras is recovered. Scaling this to a house would bring drift, ambiguous matching and much higher computational cost.
+
+**Main lesson.** Normalization turned a poor fundamental matrix into an accurate one, and the SVD was at the core of nearly every step.
 
 All code is in `Assignment 4/src/` (`p1.py` to `p4.py`, with the provided `epipolar_utils.py` and `sfm_utils.py`). Each script is run from `Assignment 4/`, for example `python src/p1.py`. The full printed output of each script is saved next to its figures in `images/assignment-4/` (`p1_output.txt` to `p4_output.txt`).
 
