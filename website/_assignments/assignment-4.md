@@ -235,7 +235,7 @@ Singular values of $$ D $$:
 
 $$ \sigma = (264.5440,\ 210.0607,\ 7.2192,\ 5.1286) $$
 
-<!-- ANSWER 3(f): comparison with the previous singular values -->
+All four singular values are smaller for the subset, partly because it has fewer points (18 instead of 37) spread over a smaller area. The more important change is in the third value. For the full set the third singular value is 6.6 times the fourth (184.4 to 27.9), a clear gap between real structure and noise. For the subset it is only 1.4 times the fourth (7.2 to 5.1), and relative to the first it drops from 0.19 to 0.027. The third singular value is now about as small as the one caused by noise, so $$ D $$ is effectively rank 2 rather than rank 3: only two directions carry real structure, which matches the points lying on a plane. The third component used in the factorization is therefore mostly noise, which is why the depth of the subset reconstruction is unreliable. This makes the singular values a useful check on whether the points constrain all three dimensions.
 
 ## 4. Triangulation in Structure from Motion
 
