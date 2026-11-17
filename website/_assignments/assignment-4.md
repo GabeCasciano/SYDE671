@@ -170,11 +170,18 @@ $$ H_1 = \begin{bmatrix} -14.1400 & -4.8973 & -145.3027 \\ 1.6636 & -17.5213 & -
 ### (d) Rectified images
 
 <figure>
+  <img loading="lazy" src="../images/assignment-4/p2_original.png" alt="">
+  <figcaption>set1 before rectification, for reference</figcaption>
+</figure>
+
+<figure>
   <img loading="lazy" src="../images/assignment-4/p2_rectified.png" alt="">
   <figcaption>set1 after rectification, with epipolar lines recomputed from the rectified points</figcaption>
 </figure>
 
-<!-- ANSWER 2(d): why rectification makes correspondence search easier -->
+After rectification all the epipolar lines are horizontal and parallel, and each pair of matching points lies on the same row in both images (the two panels are drawn at different sizes, but each red line has the same $$ y $$ value in both rectified images). Before rectification, the match of a point in image 1 lies somewhere on a slanted epipolar line $$ l' = F p_1 $$ in image 2, and each point has a different line, so finding it means searching the whole image or stepping along a different slanted line for every point. After rectification the match of the point at $$ (x, y) $$ lies on row $$ y $$ of the other image, so the search becomes a 1D scan along a single pixel row, and the only unknown is the horizontal offset (the disparity). This reduces the number of candidates to compare, which makes the search faster and less prone to false matches, and it is the setup that standard stereo matching and depth from disparity rely on.
+
+The left rectified image is noticeably more skewed and rotated than the right one. This follows from how the two homographies are built. $$ H_2 = T^{-1} G R T $$ only translates the image centre to the origin, rotates the epipole onto the x axis, and applies $$ G $$, which sends the epipole to infinity. Since the epipole is far from the image, the projective term $$ -1/f $$ in $$ G $$ is small, so near the image centre $$ H_2 $$ is close to a rigid rotation and translation and image 2 is barely distorted. $$ H_1 = H_A H_2 M $$ has no such constraint. It is chosen only so the rectified points of image 1 match those of image 2: $$ M $$ is one of many homographies consistent with $$ F $$, and $$ H_A $$ is an affine shear, scale and shift along x, fit by least squares to minimize the horizontal distance between matching points. Nothing in this fit keeps image 1 looking natural, so any difference between the two views (the relative rotation and change of viewpoint between the cameras) has to be absorbed by $$ H_1 $$, which shows up as the skew and rotation of the left image.
 
 ## 3. The Factorization Method
 
