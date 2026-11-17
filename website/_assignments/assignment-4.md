@@ -220,7 +220,7 @@ Singular values of $$ D $$:
 
 $$ \sigma = (959.5852,\ 540.4761,\ 184.4317,\ 27.9152) $$
 
-<!-- ANSWER 3(d): why 4 non-zero, how many in the ideal case -->
+The measurement matrix $$ D $$ is $$ 4 \times n $$, so it has 4 singular values. In the ideal case, with no noise and a perfect affine camera, $$ D = M S $$ exactly, where $$ M $$ is $$ 4 \times 3 $$ and $$ S $$ is $$ 3 \times n $$. Since both factors have an inner dimension of 3, $$ D $$ has rank 3, so only 3 singular values would be non-zero and the fourth would be exactly 0. In practice the fourth is non-zero for two reasons: the measured 2D point positions contain noise, and the real cameras are perspective rather than affine, so $$ D $$ is not exactly rank 3. The fourth singular value (27.9) is still much smaller than the third (184.4), about 6.6 times smaller, so $$ D $$ is close to rank 3 and keeping only the top three removes mostly noise.
 
 ### (e, f) Subset of correspondences (set1_subset)
 
