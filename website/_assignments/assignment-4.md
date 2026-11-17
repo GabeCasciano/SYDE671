@@ -401,7 +401,9 @@ The interactive view below shows the same points, coloured from the pixel each o
 </script>
 <script type="module" src="../assets/js/point-cloud.js?v=2"></script>
 
-<!-- ANSWER 4(f): why a larger scene such as a house would be harder -->
+The reconstruction recovers the side of the statue facing the cameras well: the hair, the face, the front of the wooden block and the top of the table. Smoother areas have holes, and there are stray points from the background, such as the couch. The back and far sides have no points at all, because all five images were taken from a small arc on one side, and a point can only be reconstructed if it is matched in at least two images.
+
+A larger scene such as a house would be harder for several reasons. Covering it would need many more images taken all the way around, with enough overlap between neighbours for matching to work. The pipeline chains pairwise reconstructions together, so small errors in each pair's rotation, translation and scale accumulate (drift), and after going around the house the last view would no longer line up with the first unless the loop is closed and all cameras and points are optimized together. Matching is also harder: repeated texture such as identical windows and bricks causes false matches, plain walls and glass have little texture and produce holes, parts of the house are hidden in some views by trees or the house itself, and lighting can change between images. The range of depths is much larger, and distant points have a short baseline relative to their depth, so their triangulated positions are less accurate. Finally, the computation grows quickly: this pipeline took about 50 seconds for about 66,000 points from 5 images, while with hundreds of images the number of pairs to match grows roughly with the square of the number of images, and bundle adjustment has to optimize hundreds of cameras and millions of points together.
 
 ## What I learned
 
