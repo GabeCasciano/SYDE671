@@ -29,7 +29,11 @@ def lls_eight_point_alg(points1, points2):
     return U @ np.diag(S) @ Vt
 ```
 
-<!-- ANSWER 1(b): description of the LLS implementation -->
+Each point correspondence $$ p_1 = (x_1, y_1, 1) $$ in image 1 and $$ p_2 = (x_2, y_2, 1) $$ in image 2 must satisfy the epipolar constraint $$ p_2^T F p_1 = 0 $$. Expanding it gives one equation that is linear in the 9 entries of $$ F $$, with coefficients $$ [x_2 x_1, x_2 y_1, x_2, y_2 x_1, y_2 y_1, y_2, x_1, y_1, 1] $$. These coefficients form one row of $$ A $$, so the $$ N $$ correspondences give the system $$ A f = 0 $$, where $$ f $$ is $$ F $$ stacked into a vector.
+
+The trivial solution $$ f = 0 $$ is not useful, and $$ F $$ is only defined up to scale, so we constrain $$ \|f\| = 1 $$. With more than 8 noisy points there is no exact solution, so we minimize $$ \|A f\| $$ subject to $$ \|f\| = 1 $$. The minimizer is the right singular vector of $$ A $$ with the smallest singular value (equivalently, the eigenvector of $$ A^T A $$ with the smallest eigenvalue), which is the last row of $$ V^T $$.
+
+Every epipolar line passes through a single point, the epipole, which is the null vector of $$ F $$ ($$ F e = 0 $$). A matrix only has a non-zero null vector if it is singular, meaning rank 2 or lower. Because of noise, the $$ F $$ from the least squares step is almost always rank 3, so no common epipole exists and the lines do not meet at one point, which is physically impossible for a real camera pair. To fix this, we take the SVD of $$ F $$, set the smallest singular value to 0, and multiply back together. This gives the closest rank 2 matrix to the original, so $$ F $$ changes only slightly but all the epipolar lines are forced through one epipole.
 
 **set1**
 
