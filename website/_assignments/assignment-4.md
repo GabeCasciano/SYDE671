@@ -407,4 +407,4 @@ A larger scene such as a house would be harder for several reasons. Covering it 
 
 ## What I learned
 
-<!-- ANSWER: What I learned -->
+The most important thing I learned from this assignment is the importance of normalization. The LLS and normalized eight-point algorithms solve the same equations, yet on set1 the LLS fundamental matrix was off by 28 and 25 pixels while the normalized one was under 1 pixel. The only difference is that the normalized version rescales the coordinates first, so that all the entries of $$ A $$ are of similar size and the system is well conditioned. The math can be correct and still give a poor answer if the numbers are badly scaled. I also learned how powerful and useful the SVD is. Almost every part of this assignment came down to an SVD: solving $$ A f = 0 $$ for the fundamental matrix, enforcing rank 2, finding the epipole, factoring the measurement matrix into motion and structure, and triangulating 3D points. Beyond giving the solution, the singular values also tell you how much to trust it, as the subset in Part 3 showed, where a small third singular value revealed that the points could not constrain the depth.
