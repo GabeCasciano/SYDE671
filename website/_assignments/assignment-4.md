@@ -229,7 +229,7 @@ The measurement matrix $$ D $$ is $$ 4 \times n $$, so it has 4 singular values.
   <figcaption>set1_subset: factorization reconstruction (left) and ground truth (right)</figcaption>
 </figure>
 
-<!-- ANSWER 3(e): why the subset no longer matches as well -->
+The subset contains only 18 points, and all of them lie on a single plane, one wall of the house: 16 window corners in a $$ 4 \times 4 $$ grid plus two corners at the base (every ground truth point has $$ y \approx 0 $$). The factorization relies on the points spanning three dimensions so that $$ D $$ has three strong singular values. For planar points the noise-free $$ D $$ has rank 2, so the third component the SVD keeps does not describe real depth and is dominated by noise. The reconstruction is still roughly flat, but the regular window grid is sheared and unevenly spaced, and the out-of-plane direction is essentially arbitrary. With so few points, all on one plane, there is nothing to constrain the shape in the third dimension. The alignment check confirms this: after the best rotation and uniform scale, the RMS error is 1.04 against a ground truth RMS size of 5.27 (about 20%, compared with about 15% for the full set).
 
 Singular values of $$ D $$:
 
