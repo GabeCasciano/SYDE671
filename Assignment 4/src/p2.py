@@ -84,6 +84,7 @@ if __name__ == '__main__':
     assert (points1.shape == points2.shape)
 
     # Original pair for reference
+    os.makedirs(OUT, exist_ok=True)
     fig, ax = plt.subplots(1, 2, figsize=(8, 4))
     for a, im in zip(ax, [im1, im2]):
         a.imshow(im, cmap='gray')
