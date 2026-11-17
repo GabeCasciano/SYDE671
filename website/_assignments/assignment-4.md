@@ -94,7 +94,9 @@ Average point-to-epipolar-line distance in pixels:
 | set2 | LLS | 9.7014 | 14.5682 |
 | set2 | Normalized | 0.8895 | 0.8917 |
 
-<!-- ANSWER 1: comparison of LLS and normalized -->
+The normalized algorithm is far more accurate: on set1 the LLS lines are off by 28 and 25 pixels on average, while the normalized lines are under 1 pixel on both sets. In the set1 LLS plot many lines visibly miss their points, and the lines have a different slope from the normalized plot, so the LLS epipole is in the wrong place. In the normalized plots every line passes through or very close to its point.
+
+The problem with LLS is the scale of the raw pixel coordinates. With coordinates up to about 500, the entries of a row of $$ A $$ range from 1 (the last column) to about 250,000 (the $$ x_2 x_1 $$ terms), so the columns differ by about five orders of magnitude. This makes $$ A $$ badly conditioned: minimizing $$ \|A f\| $$ is dominated by the large columns, so the entries of $$ F $$ that multiply the small columns are poorly constrained, and a small amount of pixel noise can change the smallest singular vector a lot. The normalized algorithm first translates each image's points so their centroid is at the origin and scales them so the mean distance from it is $$ \sqrt{2} $$. All entries of $$ A $$ are then of similar size, the system is well conditioned, and the solution is much less sensitive to noise. The result is mapped back to pixel coordinates with $$ F = T_2^T F_q T_1 $$.
 
 <div class="media-grid media-grid--2x2">
   <figure><img loading="lazy" src="../images/assignment-4/p1_set1_lls.png" alt=""><figcaption>set1, LLS</figcaption></figure>
