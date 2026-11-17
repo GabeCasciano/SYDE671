@@ -83,6 +83,14 @@ if __name__ == '__main__':
     points2 = get_data_from_txt_file(im_set+'/pt_2D_2.txt')
     assert (points1.shape == points2.shape)
 
+    # Original pair for reference
+    fig, ax = plt.subplots(1, 2, figsize=(8, 4))
+    for a, im in zip(ax, [im1, im2]):
+        a.imshow(im, cmap='gray')
+        a.axis('off')
+    plt.tight_layout()
+    plt.savefig(f'{OUT}/p2_original.png', bbox_inches='tight', dpi=100)
+
     F = normalized_eight_point_alg(points1, points2)
     # F is such that such that (points2)^T * F * points1 = 0, so e1 is e' and e2 is e
     e1 = compute_epipole(F.T)
