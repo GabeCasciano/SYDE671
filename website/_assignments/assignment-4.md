@@ -201,7 +201,9 @@ def factorization_method(points_im1, points_im2):
     return structure, motion
 ```
 
-<!-- ANSWER 3(b): description of the implementation -->
+The factorization method assumes an affine camera, so each camera $$ i $$ projects a 3D point $$ X_j $$ to $$ x_{ij} = A_i X_j + b_i $$. The centroid of the 3D points projects to the centroid of the image points, so subtracting each image's centroid from its points, and placing the world origin at the 3D centroid, removes the translation $$ b_i $$ and leaves $$ x_{ij} = A_i X_j $$. The centred $$ x $$ and $$ y $$ coordinates of both images are stacked into the $$ 4 \times n $$ measurement matrix $$ D $$, which factors as $$ D = M S $$, where $$ M $$ ($$ 4 \times 3 $$) stacks the two camera matrices (motion) and $$ S $$ ($$ 3 \times n $$) holds the 3D points (structure).
+
+Since $$ M $$ has 3 columns, a noise-free $$ D $$ has rank at most 3. With noise it is full rank, so we take the SVD $$ D = U \Sigma V^T $$ and keep only the top 3 singular values, which gives the closest rank 3 matrix to $$ D $$ and discards most of the noise. The singular values are split evenly between the two factors: $$ M = U_3 \Sigma_3^{1/2} $$ and $$ S = \Sigma_3^{1/2} V_3^T $$. Any split gives the same product, since the factorization is only defined up to an invertible $$ 3 \times 3 $$ matrix (see (c)).
 
 ### (c, d) Full set of correspondences (set1)
 
