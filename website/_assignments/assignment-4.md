@@ -79,7 +79,11 @@ def compute_distance_to_epipolar_lines(points1, points2, F):
     return d.mean()
 ```
 
-<!-- ANSWER 1(f): description of compute_distance_to_epipolar_lines -->
+For each correspondence, the point $$ p_2 $$ in image 2 defines an epipolar line in image 1, $$ l = F^T p_2 $$, and its match $$ p_1 $$ should lie on that line. In homogeneous coordinates a line $$ l = (a, b, c) $$ is the set of points $$ (x, y) $$ with $$ a x + b y + c = 0 $$, so the dot product $$ l \cdot p_1 $$ is zero when $$ p_1 $$ lies exactly on the line. Because $$ l $$ is only defined up to scale, $$ l \cdot p_1 $$ on its own is not a distance. Dividing by $$ \sqrt{a^2 + b^2} $$ normalizes the line, giving the perpendicular distance in pixels:
+
+$$ d = \frac{|a x_1 + b y_1 + c|}{\sqrt{a^2 + b^2}} $$
+
+The absolute value removes the sign, which only says which side of the line the point is on. The function computes this distance for every correspondence and returns the mean. With a perfect $$ F $$ and noise-free points every distance would be zero, so the average distance in pixels measures how well $$ F $$ fits the data.
 
 Average point-to-epipolar-line distance in pixels:
 
