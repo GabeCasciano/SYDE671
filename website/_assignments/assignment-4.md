@@ -391,7 +391,7 @@ The full pipeline triangulates 66,385 points from the dense matches. The plot be
 
 The interactive view below shows the same points, coloured from the pixel each one was matched at in the first image of its pair. Drag to rotate, scroll to zoom, right-drag to pan, and double-click to reset. It opens at the viewpoint of the first camera.
 
-<div class="point-cloud" data-src="../images/assignment-4/p4_statue_points.bin" style="width: 100%; height: 520px; border-radius: 4px; overflow: hidden;"></div>
+<div class="point-cloud" data-src="../images/assignment-4/p4_statue_points.bin?v=2" style="width: 100%; height: 520px; border-radius: 4px; overflow: hidden;"></div>
 
 <script type="importmap">
 { "imports": {
@@ -399,7 +399,7 @@ The interactive view below shows the same points, coloured from the pixel each o
   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
 } }
 </script>
-<script type="module" src="../assets/js/point-cloud.js"></script>
+<script type="module" src="../assets/js/point-cloud.js?v=2"></script>
 
 <!-- ANSWER 4(f): why a larger scene such as a house would be harder -->
 
