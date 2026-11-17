@@ -2,7 +2,7 @@
 
 Source: `syde671 Assignment 4.pdf` (borrowed from CS231A PSET 2). The handout has no Deliverables section. Items marked with a computer icon are code, items marked with a document icon go in the "written report". Submission format follows the first 3 assignments (Assignment 1 Deliverables: code zip, webpage link, PDF of the webpage), so the webpage is the written report.
 
-Open question: the handout says "written report", not webpage. Confirm with the instructor or Learn whether the webpage PDF is acceptable as the report.
+The handout asks for a "written report"; the PDF of the webpage serves as the report, as in Assignments 1 to 3.
 
 Lesson from Assignment 1 (85 instead of 95): the website only has to show the required results, but the submission package must contain every result produced, not just the ones on the page. Check the package against this file before uploading.
 
