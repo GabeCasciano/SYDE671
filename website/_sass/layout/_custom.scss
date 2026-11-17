@@ -274,7 +274,8 @@ figcaption a:hover {
   table,
   pre,
   .highlight,
-  .media-grid figure {
+  .media-grid figure,
+  mjx-container[display="true"] {
     break-inside: avoid;
   }
 

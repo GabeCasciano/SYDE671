@@ -58,6 +58,13 @@ layout: default
             p.innerHTML = 'Play online: <a href="' + url + '">' + url + "</a>";
             fig ? fig.appendChild(p) : el.after(p);
           });
+          document.querySelectorAll(".page__content .point-cloud").forEach(function (el) {
+            var url = location.origin + location.pathname;
+            var p = document.createElement("p");
+            p.className = "print-only";
+            p.innerHTML = 'Interactive view online: <a href="' + url + '">' + url + "</a>";
+            el.after(p);
+          });
         </script>
         {% endif %}
 
