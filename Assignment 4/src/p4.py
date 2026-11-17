@@ -248,12 +248,12 @@ if __name__ == '__main__':
     os.makedirs(out, exist_ok=True)
 
     # Colour each point from the pixel it was matched at in the first image
-    # of its pair (matches are centred on the principal point)
+    # of its pair (matches are centred on the principal point, with x left and y up)
     colors = np.zeros((0, 3), dtype=np.uint8)
     for i in range(len(frames)-1):
         im = imread(image_paths[i])
-        xs = np.clip(np.round(dense_matches[i][0] + im_width/2).astype(int), 0, im_width-1)
-        ys = np.clip(np.round(dense_matches[i][1] + im_height/2).astype(int), 0, im_height-1)
+        xs = np.clip(np.round(im_width/2 - dense_matches[i][0]).astype(int), 0, im_width-1)
+        ys = np.clip(np.round(im_height/2 - dense_matches[i][1]).astype(int), 0, im_height-1)
         colors = np.vstack((colors, im[ys, xs, :3]))
 
     # Export the points inside the plotted box for the web viewer:

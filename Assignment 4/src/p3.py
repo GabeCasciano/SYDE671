@@ -36,6 +36,19 @@ def factorization_method(points_im1, points_im2):
     structure = S3 @ Vt[:3]
     return structure, motion
 
+def alignment_error(structure, points_3d):
+    # RMS error after aligning the reconstruction to the centred ground truth,
+    # with rotation and uniform scale, then with a general affine map
+    S = structure.T
+    G = points_3d[:, :3] - points_3d[:, :3].mean(axis=0)
+    U, s, Vt = np.linalg.svd(S.T @ G)
+    sim = s.sum() / (S**2).sum() * S @ U @ Vt
+    A, *_ = np.linalg.lstsq(S, G, rcond=None)
+    rms = lambda P: np.sqrt(((P - G)**2).sum(axis=1).mean())
+    print("Ground truth RMS size:", rms(0*G))
+    print("RMS error, rotation and scale:", rms(sim))
+    print("RMS error, affine:", rms(S @ A))
+
 if __name__ == '__main__':
     for im_set in ['data/set1', 'data/set1_subset']:
         # Read in the data
@@ -48,6 +61,7 @@ if __name__ == '__main__':
 
         # Run the Factorization Method
         structure, motion = factorization_method(points_im1, points_im2)
+        alignment_error(structure, points_3d)
 
         # Plot the structure
         fig = plt.figure()

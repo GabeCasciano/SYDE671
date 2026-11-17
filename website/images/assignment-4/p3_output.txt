@@ -1,2 +1,8 @@
 Singular values: [959.5852216  540.47613178 184.43174791  27.9151956 ]
+Ground truth RMS size: 11.60020946658479
+RMS error, rotation and scale: 1.6876217644950393
+RMS error, affine: 1.0633646178772431
 Singular values: [264.54396508 210.06072009   7.21921783   5.12857709]
+Ground truth RMS size: 5.268211118184118
+RMS error, rotation and scale: 1.04357164911031
+RMS error, affine: 0.1151708972895834

@@ -19,9 +19,9 @@ async function init(el) {
   scene.add(new THREE.Points(geom, new THREE.PointsMaterial({
     size: 2, sizeAttenuation: false, vertexColors: true })));
 
-  // Start at the first camera's view: x right, y down, z forward
+  // Start at the first camera's view: x left, y up, z forward
   const camera = new THREE.PerspectiveCamera(45, 1, radius / 100, radius * 100);
-  camera.up.set(0, -1, 0);
+  camera.up.set(0, 1, 0);
   camera.position.set(center.x, center.y, center.z - radius * 2.8);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });

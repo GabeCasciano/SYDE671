@@ -212,7 +212,9 @@ Since $$ M $$ has 3 columns, a noise-free $$ D $$ has rank at most 3. With noise
   <figcaption>set1: factorization reconstruction (left) and ground truth (right)</figcaption>
 </figure>
 
-<!-- ANSWER 3(c): why they match up to scale and rotation -->
+The reconstruction and the ground truth show the same set of points, but in different coordinate frames: they are rotated relative to each other and drawn at different scales. This is expected, because the factorization is not unique. For any invertible $$ 3 \times 3 $$ matrix $$ A $$, $$ D = M S = (M A)(A^{-1} S) $$, so the SVD returns one valid factorization whose structure differs from the true points by an unknown $$ A $$ (translation is already removed by centring). The images alone cannot tell these solutions apart, so the reconstruction can only match the ground truth after aligning the two by a rotation and scale. Strictly, a general $$ A $$ can also include shear and different scaling along each axis, so the method recovers shape up to an affine transformation. Narrowing this down to only rotation and scale would need additional metric constraints on the camera matrices, which this implementation does not apply. In our result the reconstruction is close to a rotated and scaled copy of the ground truth, with a slight stretch along one direction.
+
+To check this, `alignment_error()` in `p3.py` aligns the reconstruction to the centred ground truth (RMS size 11.60). The best rotation and uniform scale leaves an RMS error of 1.69, and the best general affine map reduces it to 1.06.
 
 Singular values of $$ D $$:
 
